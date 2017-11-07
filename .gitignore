@@ -1,0 +1,26 @@
+# db dump
+.rdb
+
+#jshint config
+.jshintrc
+
+# WebStorm
+
+*.iml
+.idea/
+
+# Mac
+
+.DS_Store
+
+# NPM
+
+node_modules
+
+# Redis
+
+dump.rdb
+
+# Istanbul
+
+coverage//coverage

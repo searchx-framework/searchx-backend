@@ -1,0 +1,33 @@
+{% extends 'layouts/base.html' %}
+{% block title %}
+Sign into your Pienapple account
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Sign into your Pienapple account</h3>
+        </div>
+    </div>
+    <div class="card card-container">
+        <img id="profile-img" class="profile-img-card" src="{{ profilePicture || '/img/avatar.png' }}" />
+        {% if handle.length %}
+        <p id="profile-name" class="profile-name-card">{{ handle }}</p>
+        {% endif %}
+        <form class="form-signin" action="/v1/login" method="POST">
+            <span id="reauth-email" class="reauth-email"></span>
+            <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" value="{{ email || '' }}" required {% if email.length === 0 %}autofocus{% endif %}>
+            <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" {% if email.length > 0 %}autofocus{% endif %} required>
+            <!--<div id="remember" class="checkbox">-->
+                <!--<label>-->
+                    <!--<input type="checkbox" value="remember-me"> Remember me-->
+                <!--</label>-->
+            <!--</div>-->
+            <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+        </form><!-- /form -->
+        <a href="/v1/register" class="text-under">
+            Create a new Pienapple account
+        </a>
+    </div><!-- /card-container -->
+</div><!-- /container -->
+{% endblock %}

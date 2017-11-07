@@ -1,0 +1,1 @@
+curl -XDELETE 'https://ovljleud:vc8bwtm7w60ttbxn@alder-4168004.eu-west-1.bonsai.io/index/'

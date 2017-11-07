@@ -1,0 +1,2 @@
+web: forever -m 5 --killSignal=SIGTERM server.js
+worker: forever -m 5 --killSignal=SIGTERM worker.js

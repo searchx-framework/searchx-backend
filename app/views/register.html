@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+{% block title %}
+Create a Pienapple account
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Create a Pienapple account</h3>
+        </div>
+    </div>
+    <div class="card card-container">
+        {% if error.length %}
+        <div class="alert alert-warning" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form class="form-signin" action="/v1/register" method="POST">
+            <span id="reauth-email" class="reauth-email"></span>
+            <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+            <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+            <input name="handle" type="text" id="inputHandle" class="form-control" placeholder="Username" required>
+            <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Register</button>
+            <a href="/v1/login" class="text-under">
+                Sign in with an existing account
+            </a>
+        </form><!-- /form -->
+    </div><!-- /card-container -->
+</div><!-- /container -->
+{% endblock %}

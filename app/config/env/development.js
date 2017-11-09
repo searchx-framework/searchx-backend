@@ -6,6 +6,6 @@ module.exports = {
     port: 4443,
     client: 'http://localhost:3000',
     redis: 'redis://localhost:6379',
-    bingAccessKey: '96ef9a4cb6f743cc81b02cda23fa2ad2',  /* free tier claudia.hauff@gmail.com */
-    cacheFreshness: 3600
+    bingAccessKey: '6e59738375db412aa639665e99f6926d', /* free tier sindunuragarp@gmail.com */
+    cacheFreshness: 3600,
 };

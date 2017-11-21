@@ -3,16 +3,13 @@
 var config = require('../config/config');
 var cache = require('./cache');
 var rating = require('./rating');
-var queue = require('../config/initializers/kue');
+var scrap = require('./scrap');
 
 console.log(config.bingAccessKey);
 
 var request  = require('request');
 var Bing     = require('node-bing-api')({accKey: config.bingAccessKey});
 var async    = require('async');
-
-var kue = require('kue');
-var queue = kue.createQueue();
 
 exports.searchWeb = function(req, res) {
     var searchQuery = req.query.query || '';
@@ -27,7 +24,8 @@ exports.searchWeb = function(req, res) {
                     'matches': response.matches,
                     'id': response.id
                 };
-                storeDocuments(result.results);
+                
+                scrap.scrapDocumentHtmls(result.results);
                 res.status(200).json(result);
             });
         } else {
@@ -44,7 +42,7 @@ exports.searchWeb = function(req, res) {
                     cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), courseId, date, result, body);
                     addMetadata(body.webPages.value, userId, courseId, function(results) {
                         result.results = results;
-                        storeDocuments(result.results);
+                        scrap.scrapDocumentHtmls(result.results);
                         res.status(200).json(result);
                     });
                 } else {
@@ -211,38 +209,3 @@ var constructOptions = function(params, vertical) {
         mkt: mkt
     };
 };
-
-/*
- * Adds new job for Document Scrap Worker
- * 
- * @params search result
- */
-var storeDocuments = function(results) {
-    results.forEach((result) => {
-        storeDocument(result);
-    });
-};
-
-var storeDocument = function(result) {
-    var data = {
-        title: "Scrap HTML : " + result.url,
-        url: result.url
-    }
-
-    queue.create('scrap_html', data)
-        .attempts(3)
-        .backoff({type: 'exponential'})
-        .save();
-}
-
-var screenshotDocument = function(result) {
-    var data = {
-        title: "Screenshot : " + result.url,
-        url: result.url
-    }
-
-    queue.create('scrap_screenshot', data)
-        .attempts(3)
-        .backoff({type: 'exponential'})
-        .save();
-}

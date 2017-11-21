@@ -12,16 +12,13 @@ var refreshPeriod = 1000 * 60 * 60 * 24;
 
 exports.processHtml = function(job, done) {
     var url = job.data.url;
-    console.log('Working on ' + url);
 
     Document.findOne({'url': url}).exec()
         .then((doc) => {
-            if (doc) {
+            if (doc && doc.html) {
                 var now = Math.floor(Date.now());
                 var prev = Math.floor(doc.timestamp);
-                var diff = now - prev;
-    
-                if(diff < refreshPeriod) return done();
+                if(now - prev < refreshPeriod) return done();
             }
 
             saveHtml(url)
@@ -33,12 +30,24 @@ exports.processHtml = function(job, done) {
 
 exports.processScreenshot = function(job, done) {
     var url = job.data.url;
-    console.log('Working on ' + url);
 
-    saveScreenshot(url)
-        .then((result) => console.log('Document screenshot saved successfully : ' + url))
-        .catch((err) => console.log('Failed to save screenshot : ' + url))
-        .then(() => done());
+    Document.findOne({'url': url}).exec()
+        .then((doc) => {
+            if (!doc) return done();
+            if (doc.screenshot) {
+                var now = Math.floor(Date.now());
+                var prev = Math.floor(doc.timestamp);
+                if(now - prev < refreshPeriod) return done();
+            }
+            
+            var id = doc._id;
+            var filepath = config.imageDir + '/' + id + '.png';
+
+            saveScreenshot(url, filepath)
+                .then((result) => console.log('Document screenshot saved successfully : ' + url))
+                .catch((err) => console.log('Failed to save screenshot : ' + err ))
+                .then(() => done());
+        });
 };
 
 
@@ -52,7 +61,6 @@ var saveHtml = async function(url) {
     await page.waitFor(100);
 
     const body = await page.content();
-    
     upsertDocument(url, {
         'url': url,
         'html': body,
@@ -72,15 +80,14 @@ var saveHtmlFallback = function(url) {
     });
 }
 
-var saveScreenshot = async function(url) {
-    const browser = await puppeteer.launch({headless: false});
+var saveScreenshot = async function(url, filepath) {
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    await page.goto(url, {waitUntil: 'networkidle'});
-    await page.setViewport({width: 1000, height: 500});
+    await page.goto(url, {waitUntil: 'networkidle2'});
+    await page.setViewport({width: 1360, height: 768});
+    await page.waitFor(100);
 
-    const filepath = config.imageDir + '/' + url + '.png';
-    await page.screenshot({fullPage: true});
-
+    await page.screenshot({fullPage: true, path: filepath});
     upsertDocument(url, {
         'url': url,
         'screenshot': filepath,

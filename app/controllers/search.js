@@ -213,22 +213,36 @@ var constructOptions = function(params, vertical) {
 };
 
 /*
- * Adds new job to document Scrapper
+ * Adds new job for Document Scrap Worker
  * 
  * @params search result
  */
 var storeDocuments = function(results) {
     results.forEach((result) => {
-        console.log(result.url);
-
-        var data = {
-            title: "Scrap HTML : " + result.url,
-            url: result.url
-        }
-
-        queue.create('scrap_html', data)
-            .attempts(3)
-            .backoff({type: 'exponential'})
-            .save();
+        storeDocument(result);
     });
 };
+
+var storeDocument = function(result) {
+    var data = {
+        title: "Scrap HTML : " + result.url,
+        url: result.url
+    }
+
+    queue.create('scrap_html', data)
+        .attempts(3)
+        .backoff({type: 'exponential'})
+        .save();
+}
+
+var screenshotDocument = function(result) {
+    var data = {
+        title: "Screenshot : " + result.url,
+        url: result.url
+    }
+
+    queue.create('scrap_screenshot', data)
+        .attempts(3)
+        .backoff({type: 'exponential'})
+        .save();
+}

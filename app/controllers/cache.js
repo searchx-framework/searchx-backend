@@ -26,6 +26,10 @@ function isObject(o) {
     return true;
 }
 
+
+////
+
+
 exports.addSearchResultsToCache = function(query, vertical, page, courseId, date, results, body){
     //we need all arguments
     if (arguments.length != 7) {
@@ -44,8 +48,7 @@ exports.addSearchResultsToCache = function(query, vertical, page, courseId, date
             vertical: vertical,
             page:  page,
             results: results,
-            body: body,
-            courseId: courseId
+            body: body
     });
     C.save(function(error) {
         if (error) {
@@ -63,18 +66,11 @@ exports.getSearchResultsFromCache = function(query, vertical, page, courseId, ca
         throw new Error('Missing required arguments.'); 
     }
 
-    
-
     if ((typeof query == 'undefined') || (query == null) || (typeof query != 'string')){
         callback(false,{});
     }
 
     if ((typeof vertical == 'undefined') || (vertical == null)  || (typeof vertical != 'string') ){
-        callback(false,{});
-        return;
-    }
-
-    if ((typeof courseId == 'undefined') || (courseId == null)  || (typeof courseId != 'string') ){
         callback(false,{});
         return;
     }
@@ -87,9 +83,6 @@ exports.getSearchResultsFromCache = function(query, vertical, page, courseId, ca
     if ((typeof callback == 'undefined') || (callback == null) || (callback < 0) || (typeof callback != 'function')){
        throw new Error('Callback is not a function.'); 
     }
-
-    
-  
   
     Cache.find({query: query, vertical: vertical, page: parseInt(page), courseId: courseId})
         .sort({date:'descending'}).limit(1).exec(function(error, data) {
@@ -105,9 +98,8 @@ exports.getSearchResultsFromCache = function(query, vertical, page, courseId, ca
             } else {
                 callback(false,{});  
             }    
-    });
+        });
 }
-
 
 var isFresh = function(date){
     var currentDate = new Date;

@@ -36,8 +36,8 @@ var bookmarkDeindexer = require('./app/workers/bookmarkDeindexer');
 queue.process('deindex_bookmark', bookmarkDeindexer.process);
 
 var documentScraper = require('./app/workers/documentScraper');
-queue.process('scrap_html', 5, documentScraper.processHtml);
-queue.process('scrap_screenshot', documentScraper.processScreenshot);
+queue.process('scrap_document', 3, documentScraper.processScrap);
+queue.process('scrap_screenshot', 3, documentScraper.processScreenshot);
 
 
 // Handle termination

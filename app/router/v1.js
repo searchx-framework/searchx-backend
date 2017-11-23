@@ -4,7 +4,6 @@ var LogCtrl         = require('../controllers/log');
 var SearchCtrl      = require('../controllers/search');
 var RatingCtrl      = require('../controllers/rating');
 var ProfileCtrl     = require('../controllers/profile');
-var ScrapCtrl       = require('../controllers/scrap');
 
 module.exports = function(router) {
 
@@ -35,7 +34,4 @@ module.exports = function(router) {
     // Rating resource
     router.get('/users/:userId/profile', ProfileCtrl.getProfile);
     router.post('/rating', RatingCtrl.updateRating);
-
-    // Scrap resource
-    router.get('/scrap/screenshot', ScrapCtrl.screenshotDocument);
 };

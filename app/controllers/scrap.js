@@ -4,14 +4,9 @@ var queue = require('../config/initializers/kue');
 ////
 
 
-exports.screenshotDocument = function(req, res) {
-    var url = req.url || '';
-    storeDocumentScreenshot(url);
-}
-
-exports.scrapDocumentHtmls = function(results) {
+exports.scrapDocuments = function(results) {
     results.forEach((result) => {
-        storeDocumentHtml(result.url);
+        storeDocumentScrap(result.url);
     });
 };
 
@@ -19,13 +14,13 @@ exports.scrapDocumentHtmls = function(results) {
 ////
 
 
-var storeDocumentHtml = function(url) {
+var storeDocumentScrap = function(url) {
     var data = {
-        title: "Scrap HTML : " + url,
+        title: "Scrap : " + url,
         url: url
     }
 
-    queue.create('scrap_html', data)
+    queue.create('scrap_document', data)
         .attempts(3)
         .backoff({type: 'exponential'})
         .save();

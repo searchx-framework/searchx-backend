@@ -25,7 +25,7 @@ exports.searchWeb = function(req, res) {
                     'id': response.id
                 };
                 
-                scrap.scrapDocumentHtmls(result.results);
+                scrap.scrapDocuments(result.results);
                 res.status(200).json(result);
             });
         } else {
@@ -42,7 +42,7 @@ exports.searchWeb = function(req, res) {
                     cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), courseId, date, result, body);
                     addMetadata(body.webPages.value, userId, courseId, function(results) {
                         result.results = results;
-                        scrap.scrapDocumentHtmls(result.results);
+                        scrap.scrapDocuments(result.results);
                         res.status(200).json(result);
                     });
                 } else {

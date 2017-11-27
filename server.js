@@ -23,12 +23,9 @@ var options = {
   cert: fs.readFileSync('sslcert/certificate.pem')
 };
 
-
-
 // Init
 require('./app/config/initializers/mongoose')(config.db);
 require('./app/router/v1')(router);
-
 
 // Engine
 app.engine('html', swig.renderFile);
@@ -72,9 +69,10 @@ app.get('/', function(req, res) {
 });
 app.use('/v1', router);
 
+
 // Start the server
 
-
+console.log('Starting Server');
 var secureServer = https.createServer(options, app).listen( app.get('port'), function() {
     console.log('Pienapple API is running on port', app.get('port'));
 });

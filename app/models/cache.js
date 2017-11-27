@@ -27,10 +27,6 @@ var CacheSchema = new Schema({
     body: {
         type: Schema.Types.Mixed,
         required: true
-    },
-    courseId: {
-        type: String,
-        required: true
     }
 });
 

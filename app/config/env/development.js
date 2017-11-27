@@ -6,6 +6,7 @@ module.exports = {
     port: 4443,
     client: 'http://localhost:3000',
     redis: 'redis://localhost:6379',
-    bingAccessKey: '6e59738375db412aa639665e99f6926d', /* free tier sindunuragarp@gmail.com */
+    imageDir: 'img',
+    bingAccessKey: '8206d394cf504f40978d97205f6e7c41', /* sindunuragarp@gmail.com */
     cacheFreshness: 3600,
 };

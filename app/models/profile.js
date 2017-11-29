@@ -8,7 +8,7 @@ var ProfileSchema = new Schema({
         type: String,
         required: true
     },
-    courseId: {
+    taskId: {
         type: String,
         required: true
     },

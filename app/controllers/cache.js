@@ -30,9 +30,8 @@ function isObject(o) {
 ////
 
 
-exports.addSearchResultsToCache = function(query, vertical, page, courseId, date, results, body){
-    //we need all arguments
-    if (arguments.length != 7) {
+exports.addSearchResultsToCache = function(query, vertical, page, date, results, body){
+    if (arguments.length != 6) {
         console.log('Could not create a new cache - Arguments.');
         return false;
     }
@@ -50,6 +49,7 @@ exports.addSearchResultsToCache = function(query, vertical, page, courseId, date
             results: results,
             body: body
     });
+
     C.save(function(error) {
         if (error) {
             console.log('Could not create a new cache.');
@@ -57,12 +57,12 @@ exports.addSearchResultsToCache = function(query, vertical, page, courseId, date
             return false;
         }
     });
+
     return true;
 }
 
-exports.getSearchResultsFromCache = function(query, vertical, page, courseId, callback){
-    
-    if (arguments.length < 5) {
+exports.getSearchResultsFromCache = function(query, vertical, page, callback){
+    if (arguments.length < 4) {
         throw new Error('Missing required arguments.'); 
     }
 
@@ -84,7 +84,7 @@ exports.getSearchResultsFromCache = function(query, vertical, page, courseId, ca
        throw new Error('Callback is not a function.'); 
     }
   
-    Cache.find({query: query, vertical: vertical, page: parseInt(page), courseId: courseId})
+    Cache.find({query: query, vertical: vertical, page: parseInt(page)})
         .sort({date:'descending'}).limit(1).exec(function(error, data) {
             
             if (!error) {

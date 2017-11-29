@@ -43,23 +43,7 @@ describe('Profile resource', function() {
         request
             .get('/users/123/profile')
             .query({
-                courseId: 'C1'
-            })
-            .end(function(err, res) {
-                
-                if (err) {
-                    throw err;
-                }
-                should(res.body).have.property('found').be.equal(false);
-                done();
-            });
-    });
-
-    it('should handle get profile false because of not course', function(done) {
-        request
-            .get('/users/123/profile')
-            .query({
-                courseId: 'C2'
+                taskId: 'T1'
             })
             .end(function(err, res) {
                 
@@ -75,7 +59,7 @@ describe('Profile resource', function() {
         request
             .get('/users/123/profile')
             .query({
-                courseId: 'C2'
+                taskId: 'T2'
             })
             .end(function(err, res) {
                 

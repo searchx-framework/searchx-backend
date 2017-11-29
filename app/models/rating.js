@@ -16,10 +16,6 @@ var RatingSchema = new Schema({
         type: String,
         required: true
     },
-    courseId: {
-        type: String,
-        required: true
-    },
     serpId: {
         type: String,
         required: true

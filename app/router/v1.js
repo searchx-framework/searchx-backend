@@ -29,7 +29,6 @@ module.exports = function(router) {
     router.get('/search/news', SearchCtrl.searchNews);
     router.get('/search/images', SearchCtrl.searchImages);
     router.get('/search/videos', SearchCtrl.searchVideos);
-    router.post('/search/forums', SearchCtrl.storeSearchResultsForums);
 
     // Rating resource
     router.get('/users/:userId/profile', ProfileCtrl.getProfile);

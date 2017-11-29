@@ -22,8 +22,7 @@ describe('Search resource', function() {
             .get('/search/web')
             .query({
                 query: 'business',
-                page: 1,
-                courseId: "C1"
+                page: 1
             })
             .end(function(err, res) {
                 
@@ -43,8 +42,7 @@ describe('Search resource', function() {
             .get('/search/news')
             .query({
                 query: 'business',
-                page: 1,
-                courseId: "C1"
+                page: 1
             })
             .end(function(err, res) {
                 if (err) {
@@ -63,8 +61,7 @@ describe('Search resource', function() {
             .get('/search/images')
             .query({
                 query: 'business',
-                page: 1,
-                courseId: "C1"
+                page: 1
             })
             .end(function(err, res) {
                 if (err) {
@@ -83,8 +80,7 @@ describe('Search resource', function() {
             .get('/search/videos')
             .query({
                 query: 'business',
-                page: 1,
-                courseId: "C1"
+                page: 1
             })
             .end(function(err, res) {
                 if (err) {

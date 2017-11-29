@@ -14,11 +14,10 @@ var async    = require('async');
 exports.searchWeb = function(req, res) {
     var searchQuery = req.query.query || '';
     var userId = req.query.userId || '';
-    var courseId = req.query.courseId || '';
 
-    cache.getSearchResultsFromCache(searchQuery, 'web', parseInt(req.query.page), courseId, function(status, response) {
+    cache.getSearchResultsFromCache(searchQuery, 'web', parseInt(req.query.page), function(status, response) {
         if (status) {
-            addMetadata(response.results, userId, courseId, function(results) {
+            addMetadata(response.results, userId, function(results) {
                 var result = {
                     'results': results,
                     'matches': response.matches,
@@ -32,15 +31,15 @@ exports.searchWeb = function(req, res) {
             Bing.web(searchQuery, constructOptions(req.query, 'web'), function(error, response, body) {
                 if (body && body.webPages) {
                     var date = new Date();
-                    var id = courseId + '_' + searchQuery + '_' + req.query.page + '_web_' + date.getTime();
+                    var id = searchQuery + '_' + req.query.page + '_web_' + date.getTime();
                     var result = {
                         results: body.webPages.value,
                         matches: body.webPages.totalEstimatedMatches,
                         id: id
                     };
 
-                    cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), courseId, date, result, body);
-                    addMetadata(body.webPages.value, userId, courseId, function(results) {
+                    cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), date, result, body);
+                    addMetadata(body.webPages.value, userId, function(results) {
                         result.results = results;
                         scrap.scrapDocuments(result.results);
                         res.status(200).json(result);
@@ -59,19 +58,18 @@ exports.searchWeb = function(req, res) {
 
 exports.searchNews = function(req, res) {
     var searchQuery = req.query.query || '';
-    var courseId = req.query.courseId || '';
 
     Bing.news(searchQuery, constructOptions(req.query, 'news'), function(error, response, body) {
         if (body && body.value) {
             var date = new Date();
-            var id = courseId + '_' + searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+            var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
             var result  = {
                 'results': body.value,
                 'matches': body.totalEstimatedMatches,
                 'id': id
 
             };
-            cache.addSearchResultsToCache(searchQuery, 'news', parseInt(req.query.page), courseId, date, result, body);
+            cache.addSearchResultsToCache(searchQuery, 'news', parseInt(req.query.page), date, result, body);
             res.status(200).json(result);
         } else {
             res.status(503).json({
@@ -84,21 +82,21 @@ exports.searchNews = function(req, res) {
 
 exports.searchImages = function(req, res) {
     var searchQuery = req.query.query || '';
-    var courseId = req.query.courseId || '';
-    cache.getSearchResultsFromCache(searchQuery, 'images', parseInt(req.query.page), courseId, function(status, response) {
+
+    cache.getSearchResultsFromCache(searchQuery, 'images', parseInt(req.query.page), function(status, response) {
         if (status) {
             res.status(200).json(response);
         } else {
             Bing.images(searchQuery, constructOptions(req.query, 'images'), function(error, response, body) {
                 if (body && body.value) {
                     var date = new Date();
-                    var id = courseId + '_' + searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+                    var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
                     var result  = {
                         'results': body.value,
                         'matches': body.totalEstimatedMatches,
                         'id': id
                     };
-                    cache.addSearchResultsToCache(searchQuery, 'images', parseInt(req.query.page), courseId, date, result, body);
+                    cache.addSearchResultsToCache(searchQuery, 'images', parseInt(req.query.page), date, result, body);
                     res.status(200).json(result);
                 } else {
                     res.status(503).json({
@@ -113,21 +111,21 @@ exports.searchImages = function(req, res) {
 
 exports.searchVideos = function(req, res) {
     var searchQuery = req.query.query || '';
-    var courseId = req.query.courseId || '';
-    cache.getSearchResultsFromCache(searchQuery, 'videos', parseInt(req.query.page), courseId, function(status, response) {
+
+    cache.getSearchResultsFromCache(searchQuery, 'videos', parseInt(req.query.page), function(status, response) {
         if (status) {
             res.status(200).json(response);
         } else {
             Bing.video(searchQuery, constructOptions(req.query, 'videos'), function(error, response, body) {
                 if (body && body.value) {
                     var date = new Date();
-                    var id = courseId + '_' + searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+                    var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
                     var result  = {
                         'results': body.value,
                         'matches': body.totalEstimatedMatches,
                         'id': id
                     };
-                    cache.addSearchResultsToCache(searchQuery, 'videos',  parseInt(req.query.page), courseId, date, result, body);
+                    cache.addSearchResultsToCache(searchQuery, 'videos',  parseInt(req.query.page), date, result, body);
                     res.status(200).json(result);
                 } else {
                     res.status(503).json({
@@ -140,38 +138,23 @@ exports.searchVideos = function(req, res) {
     });
 };
 
-exports.storeSearchResultsForums = function(req, res) {
-    var searchQuery = req.query.query || '';
-    var courseId = req.query.courseId || '';
-    var date = new Date(req.body.date);
-    var page = req.query.page;
-    var id = courseId + '_'+  searchQuery + '_' + page + '_forums_' + (date).getTime();
-    var result  = {
-        'results': req.body.results,
-        'matches': req.body.matches,
-        'id': id
-    };
-    cache.addSearchResultsToCache(searchQuery, 'forums',  parseInt(page), courseId, date, result, result);
-    res.status(201);
-};
-
 /*
  * Add metadata from search results
  *
  * @params
  */
-var addMetadata = function(results, userId, courseId, callback) {
+var addMetadata = function(results, userId, callback) {
     // This is your async worker function
     // It takes the item first and the callback second
     function fillWithRating(result, callback) {
-        rating.getRating('web', result.displayUrl, courseId, function(data) {
+        rating.getRating('web', result.displayUrl, function(data) {
             result.rating = data;
             callback(null, result);
         });
     }
 
     function fillWithRatingSignal(result, callback) {
-        rating.userHasRated('web', result.displayUrl, userId, courseId, function(data) {
+        rating.userHasRated('web', result.displayUrl, userId, function(data) {
             result.signal = data;
             callback(null, result);
         });

@@ -20,34 +20,39 @@ exports.updateRating = function(req, res) {
         }
     });
     
-    User.findOne({ vertical: data.vertical, url: data.url, userId: data.userId, courseId : data.courseId }, 
+    User.findOne({ vertical: data.vertical, url: data.url, userId: data.userId}, 
         function (err, doc){
             if (err) {
-                var U = new User({ vertical: data.vertical, url: data.url, userId: data.userId, 
-                    courseId : data.courseId, signal: data.signal });
+                var U = new User({ 
+                    vertical: data.vertical, 
+                    url: data.url, 
+                    userId: data.userId,
+                    signal: data.signal 
+                });
                 U.save(function(error) {});
             } else {
                 if (doc) {
                     doc.signal = data.signal;
                     doc.save();
                 } else {
-                    var U = new User({ vertical: data.vertical, url: data.url, userId: data.userId, 
-                        courseId : data.courseId, signal: data.signal });
+                    var U = new User({
+                        vertical: data.vertical, 
+                        url: data.url, 
+                        userId: data.userId,
+                        signal: data.signal 
+                    });
                     U.save(function(error) {});
                     
                 }
             }
         }
     );
-
-
-
 };
 
-exports.getRating = function(vertical,url, courseId, callback){
+exports.getRating = function(vertical, url, callback){
     Rating.aggregate(
         [ {
-            $match :  {vertical: vertical, url: url, courseId: courseId } ,
+            $match :  {vertical: vertical, url: url } ,
         },
         { $group : {
         _id : null,
@@ -68,8 +73,8 @@ exports.getRating = function(vertical,url, courseId, callback){
 }
 
 
-exports.userHasRated = function(vertical,url,userId, courseId, callback){
-    User.find({vertical:vertical,url:url, userId: userId, courseId: courseId}, function(err, docs) {
+exports.userHasRated = function(vertical, url, userId, callback){
+    User.find({vertical:vertical, url:url, userId: userId}, function(err, docs) {
         if (docs.length > 0) {
             callback(docs[0].signal);
         } else {

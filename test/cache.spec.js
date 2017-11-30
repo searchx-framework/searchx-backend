@@ -20,7 +20,6 @@ describe('cache', function(){
     var query1 = "business"
     var query2 = "business-2";    
     var vertical = "web";
-    var courseId = "course";
     var page = 2;
     var results1  = {
         'results' : ["RES"],
@@ -54,13 +53,13 @@ describe('cache', function(){
     }); 
 
     it('should handle an addition to the cache', function(done){
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, courseId, new Date(), results1, body); 
+        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, body); 
         b1.should.be.true();
         done();
     });
 
     it('should return the just-added result', function(done){
-        cache.getSearchResultsFromCache(query1, vertical, page, courseId, function(isHit, res){
+        cache.getSearchResultsFromCache(query1, vertical, page, function(isHit, res){
             isHit.should.be.true();
             res.should.be.deepEqual(results1);
             done();
@@ -68,7 +67,7 @@ describe('cache', function(){
     })
 
     it('should recognize an uncached result', function(done){
-        cache.getSearchResultsFromCache(query2, vertical, page, courseId, function(isHit, res){
+        cache.getSearchResultsFromCache(query2, vertical, page, function(isHit, res){
             isHit.should.be.false();
             res.should.deepEqual({});
             done();
@@ -76,11 +75,11 @@ describe('cache', function(){
     })  
 
     it('should retrieve the most recent cache entry', function(done){
-        cache.addSearchResultsToCache(query1, vertical, page, courseId, new Date(), results2, body);
+        cache.addSearchResultsToCache(query1, vertical, page, new Date(), results2, body);
 
         //give the cache time to incorporate this information        
         setTimeout(function() {
-            cache.getSearchResultsFromCache(query1, vertical, page, courseId, function(isHit, res){
+            cache.getSearchResultsFromCache(query1, vertical, page, function(isHit, res){
                 isHit.should.be.true();
                 res.should.be.deepEqual(results2);
                 done();
@@ -95,13 +94,13 @@ describe('cache', function(){
     });
 
     it('should reject non-sensical addition to the cache (result string)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, courseId, new Date(), "RES", body);
+        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), "RES", body);
         b1.should.be.false();
         done();
     });    
 
     it('should reject non-sensical addition to the cache (body string)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, courseId, new Date(), results1, "BODY");
+        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, "BODY");
         b1.should.be.false();
         done();
     });
@@ -120,20 +119,20 @@ describe('cache', function(){
     });  
     
     it('should reject non-sensical addition to the cache (negative page number in param)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, -1000, courseId, new Date(), results1, body);
+        var b1 = cache.addSearchResultsToCache(query1, vertical, -1000, new Date(), results1, body);
         b1.should.be.false();
         done();
     });    
 
 
     it('should reject non-sensical addition to the cache (null query)', function (done) {
-        var b1 = cache.addSearchResultsToCache(null, vertical, page, courseId, new Date(), results1, body);
+        var b1 = cache.addSearchResultsToCache(null, vertical, page, new Date(), results1, body);
         b1.should.be.false();
         done();
     });  
     
     it('should return no cache hit when the input is non-sensical (null query/page)', function (done) {
-        cache.getSearchResultsFromCache(null, vertical, null, courseId, function (isHit, res) {
+        cache.getSearchResultsFromCache(null, vertical, null, function (isHit, res) {
             isHit.should.be.false();
             res.should.deepEqual({});
         });
@@ -141,7 +140,7 @@ describe('cache', function(){
     })  
     
     it('should return no cache hit when the input is non-sensical (undefined query)', function (done) {
-        cache.getSearchResultsFromCache(undefined, vertical, page, courseId, function (isHit, res) {
+        cache.getSearchResultsFromCache(undefined, vertical, page, function (isHit, res) {
             isHit.should.be.false();
             res.should.deepEqual({});
         });
@@ -171,7 +170,7 @@ describe('cache', function(){
 
 
     it('should return no cache hit when the input is non-sensical (null page)', function (done) {
-        cache.getSearchResultsFromCache(query1, vertical, null, courseId, function (isHit, res) {
+        cache.getSearchResultsFromCache(query1, vertical, null, function (isHit, res) {
             isHit.should.be.false();
             res.should.deepEqual({});
         });

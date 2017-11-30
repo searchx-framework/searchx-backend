@@ -25,13 +25,12 @@ describe('Log', function () {
 
     var uid = '123';
     var eventQueue = [];
-    var cid = "A"
+    var tid = "A"
 
     it('should handle the addition of a log entry', function (done) {
 
         eventQueue.push({
             userId: uid,
-            courseId: cid, 
             event: "EVENT",
             meta: {},
             date: new Date()
@@ -73,7 +72,6 @@ describe('Log', function () {
         eventQueue.pop();
         eventQueue.push({
             userId: "100",
-            courseId: cid, 
             event: 'e1',
             meta: {},
             date: new Date()
@@ -96,21 +94,18 @@ describe('Log', function () {
         eventQueue = [];
         eventQueue.push({
             userId: uid,
-            courseId: cid, 
             event: 'e1',
             meta: {},
             date: new Date()
         });
         eventQueue.push({
-            userId: uid,
-            courseId: cid, 
+            userId: uid, 
             event: 'e2',
             meta: {},
             date: new Date()
         });
         eventQueue.push({
-            userId: uid,
-            courseId: cid, 
+            userId: uid, 
             event: 'e3',
             meta: {},
             date: new Date()

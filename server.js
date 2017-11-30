@@ -15,13 +15,7 @@ var app          = express();
 var router       = express.Router();
 var swig         = require('swig');
 var passport     = require('passport');
-var fs = require('fs');
-var https = require('https');
-
-var options = {
-  key: fs.readFileSync('sslcert/private.key'),
-  cert: fs.readFileSync('sslcert/certificate.pem')
-};
+var fs           = require('fs');
 
 // Init
 require('./app/config/initializers/mongoose')(config.db);
@@ -36,7 +30,6 @@ app.set('port', (process.env.PORT || config.port));
 app.set('views', __dirname + '/app/views');
 app.set('view engine', 'html');
 app.set('view cache', false);
-
 
 // Use
 //if (process.env.NODE_ENV === 'development') {
@@ -62,17 +55,17 @@ app.use(session({
         collection: 'sessions'
     })
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/v1', router);
+
 app.get('/', function(req, res) {
     res.redirect(config.client);
 });
-app.use('/v1', router);
-
 
 // Start the server
-
 console.log('Starting Server');
-var secureServer = https.createServer(options, app).listen( app.get('port'), function() {
+var server = app.listen(app.get('port'), function() {
     console.log('Pienapple API is running on port', app.get('port'));
 });

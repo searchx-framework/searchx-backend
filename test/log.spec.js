@@ -31,7 +31,6 @@ describe('Log', function () {
 
         eventQueue.push({
             userId: uid,
-            taskId: tid, 
             event: "EVENT",
             meta: {},
             date: new Date()
@@ -73,7 +72,6 @@ describe('Log', function () {
         eventQueue.pop();
         eventQueue.push({
             userId: "100",
-            taskId: tid, 
             event: 'e1',
             meta: {},
             date: new Date()
@@ -96,21 +94,18 @@ describe('Log', function () {
         eventQueue = [];
         eventQueue.push({
             userId: uid,
-            taskId: tid, 
             event: 'e1',
             meta: {},
             date: new Date()
         });
         eventQueue.push({
-            userId: uid,
-            taskId: tid, 
+            userId: uid, 
             event: 'e2',
             meta: {},
             date: new Date()
         });
         eventQueue.push({
-            userId: uid,
-            taskId: tid, 
+            userId: uid, 
             event: 'e3',
             meta: {},
             date: new Date()

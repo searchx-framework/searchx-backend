@@ -3,7 +3,7 @@
 var LogCtrl         = require('../controllers/log');
 var SearchCtrl      = require('../controllers/search');
 var RatingCtrl      = require('../controllers/rating');
-var ProfileCtrl     = require('../controllers/profile');
+var TaskCtrl        = require('../controllers/task');
 
 module.exports = function(router) {
 
@@ -21,8 +21,9 @@ module.exports = function(router) {
         });
     });
 
-    // Client logs
+    // User resource
     router.post('/users/:userId/logs', LogCtrl.createLog);
+    router.post('/rating', RatingCtrl.updateRating);
 
     // Search resource
     router.get('/search/web', SearchCtrl.searchWeb);
@@ -30,7 +31,6 @@ module.exports = function(router) {
     router.get('/search/images', SearchCtrl.searchImages);
     router.get('/search/videos', SearchCtrl.searchVideos);
 
-    // Rating resource
-    router.get('/users/:userId/profile', ProfileCtrl.getProfile);
-    router.post('/rating', RatingCtrl.updateRating);
+    // Task resource
+    router.get('/users/:userId/task', TaskCtrl.getTask);
 };

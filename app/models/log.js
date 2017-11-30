@@ -12,19 +12,24 @@ var LogSchema = new Schema({
         type: Date,
         required: true
     },
-    event:
-     {
+    event: {
         type: String,
         required: true
     },
-    meta:
-    {
+    meta: {
         type: Schema.Types.Mixed,
         required: true
     },
-    taskId: {
-        type: String,
-        required: false
+    task: {
+        topicId: {
+            type: String
+        },
+        type: {
+            type: String
+        },
+        duration: {
+            type: Number
+        }
     }
 });
 

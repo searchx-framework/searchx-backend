@@ -16,34 +16,34 @@ var request    = supertest(config.url + ':' + config.port + '/v1');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-var Profile = require('../app/models/profile');
-var ProfileCrl = require('../app/controllers/profile');
+var Task = require('../app/models/task');
+var TaskCrl = require('../app/controllers/task');
 
 
 // Test the resource
-describe('Profile resource', function() {
+describe('Task resource', function() {
 
         //before the test runs, make sure the cache is clean
     before(function() {
-        Profile.remove({userId: "123"}, function(err){
+        Task.remove({userId: "123"}, function(err){
             ;
         })
     }); 
 
     //once the test ran, the cached query should be removed
     after(function() {
-        Profile.remove({userId: "123"}, function(err){
+        Task.remove({userId: "123"}, function(err){
             ;
         })
     }); 
 
 
 
-    it('should handle get profile false', function(done) {
+    it('should handle get task false', function(done) {
         request
-            .get('/users/123/profile')
+            .get('/users/123/task')
             .query({
-                taskId: 'T1'
+                topicId: 'T1'
             })
             .end(function(err, res) {
                 
@@ -55,11 +55,11 @@ describe('Profile resource', function() {
             });
     });
 
-    it('should handle get profile true', function(done) {
+    it('should handle get task true', function(done) {
         request
-            .get('/users/123/profile')
+            .get('/users/123/task')
             .query({
-                taskId: 'T2'
+                topicId: 'T2'
             })
             .end(function(err, res) {
                 

@@ -3,7 +3,7 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-var DocumentSchema = new Schema({
+var PageSchema = new Schema({
     url: {
         type: String,
         required: true
@@ -23,4 +23,4 @@ var DocumentSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('Document', DocumentSchema);
+module.exports = mongoose.model('Page', PageSchema);

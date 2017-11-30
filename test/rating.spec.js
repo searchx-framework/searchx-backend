@@ -32,7 +32,6 @@ describe('Rating resource', function() {
          url : "https://www.test.nl",
          userId : '908727',
          discount: 1,
-         courseId: "C",
          serpId: "S",
          signal: "up"
     }; 
@@ -42,7 +41,6 @@ describe('Rating resource', function() {
          url : "https://www.test.nl",
          userId : '908728',
          discount: 1,
-         courseId: "C",
          serpId: "S",
          signal: "up"
     }; 
@@ -84,16 +82,18 @@ describe('Rating resource', function() {
     });
 
     it('should return correct rating number for url', function(done) {
-        RatingCrl.getRating(rating1.vertical,rating1.url, rating1.courseId, function(r) {
-            r.should.be.exactly(2);
-            done();
-        });
+        RatingCrl.getRating(rating1.vertical,rating1.url,
+            function(r) {
+                r.should.be.exactly(2);
+                done();
+            }
+        );
         
     });
 
 
     it('should return correct user signal for url', function(done) {
-        RatingCrl.userHasRated(rating1.vertical,rating1.url, rating1.userId, rating1.courseId,
+        RatingCrl.userHasRated(rating1.vertical, rating1.url, rating1.userId,
             function (b){
                 b.should.be.equal("up");
                 done();

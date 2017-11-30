@@ -8,23 +8,28 @@ var LogSchema = new Schema({
         type: String,
         required: true
     },
-    courseId: {
-        type: String,
-        required: true
-    },
     date: {
         type: Date,
         required: true
     },
-    event:
-     {
+    event: {
         type: String,
         required: true
     },
-    meta:
-     {
+    meta: {
         type: Schema.Types.Mixed,
         required: true
+    },
+    task: {
+        topicId: {
+            type: String
+        },
+        type: {
+            type: String
+        },
+        duration: {
+            type: Number
+        }
     }
 });
 

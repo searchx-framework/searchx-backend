@@ -1,7 +1,7 @@
 var puppeteer = require('puppeteer');
 var request = require('request');
 var mongoose = require('mongoose');
-var Document = require('../models/document');
+var Page = require('../models/page');
 var config = require('../config/config');
 
 var refreshPeriod = 1000 * 60 * 60 * 24;
@@ -13,7 +13,7 @@ var refreshPeriod = 1000 * 60 * 60 * 24;
 exports.processScrap = function(job, done) {
     var url = job.data.url;
 
-    Document.findOne({'url': url}).exec()
+    Page.findOne({'url': url}).exec()
         .then((doc) => {
             if (doc && doc.html) {
                 var now = Math.floor(Date.now());
@@ -22,7 +22,7 @@ exports.processScrap = function(job, done) {
             }
 
             saveAll(url)
-                .then((result) => console.log('Document scraped successfully : ' + url))
+                .then((result) => console.log('Page scraped successfully : ' + url))
                 .catch((err) => {
                     console.log('Headless Chrome failed. Using fallback method : ' + url);
                     console.log(err);
@@ -35,7 +35,7 @@ exports.processScrap = function(job, done) {
 exports.processScreenshot = function(job, done) {
     var url = job.data.url;
 
-    Document.findOne({'url': url}).exec()
+    Page.findOne({'url': url}).exec()
         .then((doc) => {
             if (!doc) return done();
             
@@ -43,7 +43,7 @@ exports.processScreenshot = function(job, done) {
             var filepath = config.imageDir + '/' + id + '.png';
 
             saveScreenshot(url, filepath)
-                .then((result) => console.log('Document screenshot saved successfully : ' + url))
+                .then((result) => console.log('Page screenshot saved successfully : ' + url))
                 .then(() => done());
         });
 };
@@ -59,7 +59,7 @@ var saveHtml = async function(url) {
     await page.waitFor(100);
 
     const body = await page.content();
-    await upsertDocument(url, {
+    await upsertPage(url, {
         'url': url,
         'html': body,
         'timestamp': Math.floor(Date.now())
@@ -75,7 +75,7 @@ var saveScreenshot = async function(url, filepath) {
     await page.setViewport({width: 1360, height: 768});
 
     await page.screenshot({fullPage: true, path: filepath});
-    await upsertDocument(url, {
+    await upsertPage(url, {
         'url': url,
         'screenshot': filepath,
         'timestamp': Math.floor(Date.now())
@@ -91,7 +91,7 @@ var saveAll = async function(url) {
     await page.setViewport({width: 1360, height: 768});
 
     const body = await page.content();
-    const id = await upsertDocument(url, {
+    const id = await upsertPage(url, {
         'url': url,
         'html': body,
         'timestamp': Math.floor(Date.now())
@@ -101,7 +101,7 @@ var saveAll = async function(url) {
 
     const filepath = config.imageDir + '/' + id + '.png';
     await page.screenshot({fullPage: true, path: filepath});
-    await upsertDocument(url, {
+    await upsertPage(url, {
         'screenshot': filepath
     });
 
@@ -114,7 +114,7 @@ var saveAll = async function(url) {
 
 var saveHtmlFallback = function(url) {
     request(url, function (error, response, body) {
-        upsertDocument(url, {
+        upsertPage(url, {
             'url': url,
             'html': body,
             'timestamp': Math.floor(Date.now())
@@ -126,7 +126,7 @@ var saveHtmlFallback = function(url) {
 ////
 
 
-var upsertDocument = async function(url, doc) {
+var upsertPage = async function(url, doc) {
     const query = {'url': url};
     const options = {
         upsert: true,
@@ -134,9 +134,9 @@ var upsertDocument = async function(url, doc) {
         setDefaultsOnInsert: true
     }
 
-    const res = await Document.findOneAndUpdate(query, doc, options).exec()
+    const res = await Page.findOneAndUpdate(query, doc, options).exec()
         .catch((err) => {
-            console.log('Could not save document.');
+            console.log('Could not save page.');
             console.log(err);
         });
 

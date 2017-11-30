@@ -24,7 +24,7 @@ exports.searchWeb = function(req, res) {
                     'id': response.id
                 };
                 
-                scrap.scrapDocuments(result.results);
+                scrap.scrapPages(result.results);
                 res.status(200).json(result);
             });
         } else {
@@ -41,7 +41,7 @@ exports.searchWeb = function(req, res) {
                     cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), date, result, body);
                     addMetadata(body.webPages.value, userId, function(results) {
                         result.results = results;
-                        scrap.scrapDocuments(result.results);
+                        scrap.scrapPages(result.results);
                         res.status(200).json(result);
                     });
                 } else {

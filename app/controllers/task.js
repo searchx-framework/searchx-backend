@@ -1,18 +1,21 @@
 'use strict';
 
 var mongoose = require('mongoose');
-var Profile = mongoose.model('Profile');
+var Task = mongoose.model('Task');
 
 
-var addProfile = function(userId, taskId) {
-    var P = new Profile({
+var addTask = function(userId, topicId, type, duration) {
+    var T = new Task({
             userId: userId,
-            taskId: taskId,
+            topicId: topicId,
+            taskType: type,
+            taskDuration: duration,
             date: new Date
     });
-    P.save(function(error) {
+
+    T.save(function(error) {
         if (error) {
-            console.log('Could not create a new profile.');
+            console.log('Could not create a new task.');
             console.log(error);
             return false;
         }
@@ -20,11 +23,13 @@ var addProfile = function(userId, taskId) {
 }
 
 
-exports.getProfile = function(req, res) {
+exports.getTask = function(req, res) {
     var userId = req.params.userId;
-    var taskId = req.query.taskId || '';
+    var topicId = req.query.topic || '';
+    var type = req.query.type || '';
+    var duration = req.query.duration || '';
    
-    Profile.find({userId: userId, taskId: taskId}, function(error, data) {
+    Task.find({userId: userId, topicId: topicId}, function(error, data) {
         if (!error) {
             if (data.length > 0) {
                 var result = {
@@ -35,17 +40,15 @@ exports.getProfile = function(req, res) {
                 var result = {
                     'found' : false
                 };
-                res.status(200).json(result);  
-                addProfile(userId, taskId);
+                res.status(200).json(result);
+                addTask(userId, topicId, type, duration);
             }
         } else {
             var result = {
                 'found' : false
             };
             res.status(200).json(result);  
-            addProfile(userId, taskId);
+            addTask(userId, topicId, type, duration);
         }    
-    });
-    
+    });  
 };
-

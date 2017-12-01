@@ -3,10 +3,8 @@
 var LogCtrl         = require('../controllers/log');
 var SearchCtrl      = require('../controllers/search');
 var RatingCtrl      = require('../controllers/rating');
-var TaskCtrl        = require('../controllers/task');
 
 module.exports = function(router) {
-
     // Set Content-Type for all responses
     router.use(function(req, res, next) {
        res.header('Content-Type', 'application/json');
@@ -30,7 +28,4 @@ module.exports = function(router) {
     router.get('/search/news', SearchCtrl.searchNews);
     router.get('/search/images', SearchCtrl.searchImages);
     router.get('/search/videos', SearchCtrl.searchVideos);
-
-    // Task resource
-    router.get('/users/:userId/task', TaskCtrl.getTask);
 };

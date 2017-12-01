@@ -8,7 +8,6 @@ exports.createLog = function(req, res) {
     var error = false;
     var userId = req.params.userId;
 
-   
     for (var i = 0; i < eventData.length; i++ ) {
         if (typeof eventData[i] != 'object' || eventData[i].userId != userId){
             error = true;
@@ -27,14 +26,10 @@ exports.createLog = function(req, res) {
                 res.status(201).json({ error: false});
             }
         });
-    } else {
-        
+    } else {   
         res.status(400).json({
             error: true,
             message: 'Could not create a new log.',        
         });
-    }
-    
-    
+    }  
 };
-

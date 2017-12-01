@@ -21,15 +21,7 @@ var LogSchema = new Schema({
         required: true
     },
     task: {
-        topicId: {
-            type: String
-        },
-        type: {
-            type: String
-        },
-        duration: {
-            type: Number
-        }
+        type: Object
     }
 });
 

@@ -53,7 +53,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     secret: 'gFCfcFnpwVIP682neT0KoPUymH6XVE669yMi8sZrbV',
-    name: 'pienapple.api.sid',
+    name: 'searchx.api.sid',
     cookie: {maxAge: 3600000*24*365},
     store: new connectMongo({
         url: 'mongodb://heroku_dv02792b:ub5gq9n1aabpjna4nsofhp403k@ds047474.mongolab.com:47474/heroku_dv02792b',
@@ -71,6 +71,6 @@ app.get('/', function(req, res) {
 
 // Start the server
 console.log('Starting Server');
-var server = http.listen(app.get('port'), function() {
-    console.log('Pienapple API is running on port', app.get('port'));
+http.listen(app.get('port'), function() {
+    console.log('SearchX API is running on port', app.get('port'));
 });

@@ -13,9 +13,9 @@ var shouldHttp = require('should-http');
 var request    = supertest(config.url + ':' + config.port + '/v1');
 
 
-var Rating = require('../app/models/rating');
+var bookmark = require('../app/models/bookmark');
 var User = require('../app/models/user');
-var RatingCrl = require('../app/controllers/rating');
+var BookmarkCrl = require('../app/controllers/bookmark');
 
 var mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)
@@ -25,44 +25,39 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
 // Test the resource
-describe('Rating resource', function() {
+describe('Bookmark resource', function() {
   
-    var rating1  = {
-         vertical : "web", 
+    var bookmark1  = {
          url : "https://www.test.nl",
-         userId : '908727',
-         discount: 1,
-         serpId: "S",
-         signal: "up"
+         title : "teste",
+         userId : '908727'
     }; 
 
-    var rating2  = {
-         vertical : "web", 
-         url : "https://www.test.nl",
-         userId : '908728',
-         discount: 1,
-         serpId: "S",
-         signal: "up"
-    }; 
+  
+    var bookmark2  = {
+        url : "https://www.test.nl",
+        title : "teste",
+        userId : '908727'
+   }; 
 
     //before the test runs, make sure the cache is clean
     before(function() {
-        Rating.remove({url: rating1.url}, function(err){
+        bookmark.remove({url: bookmark1.url, userId: bookmark1.userId}, function(err){
             ;
         })
     }); 
 
     //once the test ran, the cached query should be removed
     after(function() {
-        Rating.remove({url: rating1.url}, function(err){
+        bookmark.remove({url: bookmark1.url, userId: bookmark1.userId}, function(err){
             ;
         })
     }); 
 
-    it('should handle rating insert 1', function(done) {
+    it('should handle bookmark insert 1', function(done) {
         request
-            .post('/rating')
-            .send(rating1)
+            .post('/bookmark')
+            .send(bookmark1)
             .expect(201)
             .end(function (err, res) { 
                 if (err) return done(err);
@@ -70,10 +65,10 @@ describe('Rating resource', function() {
             });
     });
 
-    it('should handle rating insert 2', function(done) {
+    it('should handle bookmark insert 2', function(done) {
         request
-            .post('/rating')
-            .send(rating2)
+            .post('/bookmark')
+            .send(bookmark2)
             .expect(201)
             .end(function (err, res) { 
                 if (err) return done(err);
@@ -81,24 +76,14 @@ describe('Rating resource', function() {
             });
     });
 
-    it('should return correct rating number for url', function(done) {
-        RatingCrl.getRating(rating1.vertical,rating1.url,
+    it('should return correct bookmark number for url', function(done) {
+        BookmarkCrl.isBookmarked(bookmark1.userId, bookmark1.url,
             function(r) {
-                r.should.be.exactly(2);
+                r.should.be.exactly(true);
                 done();
             }
         );
         
-    });
-
-
-    it('should return correct user signal for url', function(done) {
-        RatingCrl.userHasRated(rating1.vertical, rating1.url, rating1.userId,
-            function (b){
-                b.should.be.equal("up");
-                done();
-            }
-        );
     });
 
 

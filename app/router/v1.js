@@ -2,7 +2,7 @@
 
 var LogCtrl         = require('../controllers/log');
 var SearchCtrl      = require('../controllers/search');
-var RatingCtrl      = require('../controllers/rating');
+var BookmarkCtrl      = require('../controllers/bookmark');
 
 module.exports = function(router) {
     // Set Content-Type for all responses
@@ -21,11 +21,15 @@ module.exports = function(router) {
 
     // User resource
     router.post('/users/:userId/logs', LogCtrl.createLog);
-    router.post('/rating', RatingCtrl.updateRating);
 
     // Search resource
     router.get('/search/web', SearchCtrl.searchWeb);
     router.get('/search/news', SearchCtrl.searchNews);
     router.get('/search/images', SearchCtrl.searchImages);
     router.get('/search/videos', SearchCtrl.searchVideos);
+
+    // Bookmark resource
+    router.post('/bookmark/', BookmarkCtrl.addBookmark);
+    router.get('/bookmark/:userId/', BookmarkCtrl.getBookmarks);
+    router.delete('/bookmark/', BookmarkCtrl.removeBookmark);
 };

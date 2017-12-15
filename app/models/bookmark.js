@@ -3,12 +3,12 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-var RatingSchema = new Schema({
+var BookmarkSchema = new Schema({
     url: {
         type: String,
         required: true
     },
-    vertical: {
+    title: {
         type: String,
         required: true
     },
@@ -16,12 +16,8 @@ var RatingSchema = new Schema({
         type: String,
         required: true
     },
-    serpId: {
-        type: String,
-        required: true
-    },
-    discount: {
-        type: Number,
+    deleted: {
+        type: Boolean,
         required: true
     },
     date: {
@@ -30,4 +26,4 @@ var RatingSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('Rating', RatingSchema);
+module.exports = mongoose.model('Bookmark', BookmarkSchema);

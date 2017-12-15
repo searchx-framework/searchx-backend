@@ -2,13 +2,11 @@
 
 var config = require('../config/config');
 var cache = require('./cache');
-var rating = require('./rating');
+var bookmark = require('./bookmark');
 var scrap = require('./scrap');
 
-console.log(config.bingAccessKey);
-
 var request  = require('request');
-var Bing     = require('node-bing-api')({accKey: config.bingAccessKey});
+var Bing     = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"});
 var async    = require('async');
 
 exports.searchWeb = function(req, res) {
@@ -17,7 +15,7 @@ exports.searchWeb = function(req, res) {
 
     cache.getSearchResultsFromCache(searchQuery, 'web', parseInt(req.query.page), function(status, response) {
         if (status) {
-            addMetadata(response.results, userId, function(results) {
+            addMetadata(response.results, userId, function(err, results) {
                 var result = {
                     'results': results,
                     'matches': response.matches,
@@ -39,13 +37,13 @@ exports.searchWeb = function(req, res) {
                     };
 
                     cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), date, result, body);
-                    addMetadata(body.webPages.value, userId, function(results) {
+                    addMetadata(body.webPages.value, userId, function(err, results) {
                         result.results = results;
                         scrap.scrapPages(result.results);
                         res.status(200).json(result);
                     });
                 } else {
-                    console.log(body);
+                   
                     res.status(503).json({
                         error: true,
                         message: 'The request resulted in a backend time out or backend error. The team is investigating the issue. We are sorry for the inconvenience.'
@@ -99,6 +97,7 @@ exports.searchImages = function(req, res) {
                     cache.addSearchResultsToCache(searchQuery, 'images', parseInt(req.query.page), date, result, body);
                     res.status(200).json(result);
                 } else {
+                    console.log(error);
                     res.status(503).json({
                         error: true,
                         message: 'The request resulted in a backend time out or backend error. The team is investigating the issue. We are sorry for the inconvenience.'
@@ -143,34 +142,20 @@ exports.searchVideos = function(req, res) {
  *
  * @params
  */
-var addMetadata = function(results, userId, callback) {
+var addMetadata = function(results, userId, finish) {
     // This is your async worker function
     // It takes the item first and the callback second
-    function fillWithRating(result, callback) {
-        rating.getRating('web', result.displayUrl, function(data) {
-            result.rating = data;
+    
+    function fillWithBookmark(result, callback) {
+
+        bookmark.isBookmarked(userId, result.displayUrl, function(data) {
+            result.bookmark = data;
             callback(null, result);
         });
     }
 
-    function fillWithRatingSignal(result, callback) {
-        rating.userHasRated('web', result.displayUrl, userId, function(data) {
-            result.signal = data;
-            callback(null, result);
-        });
-    }
 
-    // The done function must take an error first
-    // and the results array second
-    function thenWithRatingSignal(error, results) {
-        async.map(results, fillWithRatingSignal, done);
-    }
-
-    function done(error, results) {
-        callback(results);
-    }
-
-    async.map(results, fillWithRating, thenWithRatingSignal);
+    async.map(results, fillWithBookmark, finish);
 };
 
 /*

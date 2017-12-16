@@ -11,15 +11,20 @@ var express      = require('express');
 var session      = require('express-session');
 var connectMongo = require('connect-mongo')(session);
 var bodyParser   = require('body-parser');
-var app          = express();
-var router       = express.Router();
 var swig         = require('swig');
 var passport     = require('passport');
 var fs           = require('fs');
 
+// Setup server
+var app          = express();
+var router       = express.Router();
+var http         = require('http').Server(app);
+var io           = require('socket.io')(http);
+
 // Init
 require('./app/config/initializers/mongoose')(config.db);
 require('./app/router/v1')(router);
+require('./app/socket')(io);
 
 // Engine
 app.engine('html', swig.renderFile);
@@ -55,17 +60,17 @@ app.use(session({
         collection: 'sessions'
     })
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/v1', router);
 
+// Routes
+app.use('/v1', router);
 app.get('/', function(req, res) {
     res.redirect(config.client);
 });
 
 // Start the server
 console.log('Starting Server');
-var server = app.listen(app.get('port'), function() {
+var server = http.listen(app.get('port'), function() {
     console.log('Pienapple API is running on port', app.get('port'));
 });

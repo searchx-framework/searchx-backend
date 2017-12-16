@@ -45,6 +45,7 @@
     "request": "^2.83.0",
     "should": "^7.1.1",
     "should-http": "0.0.4",
+    "socket.io": "^2.0.4",
     "speakingurl": "^7.0.0",
     "stopwords": "0.0.5",
     "supertest": "^1.2.0",

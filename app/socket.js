@@ -2,12 +2,16 @@
 
 module.exports = function(io) {
     io.on('connection', (socket) => {
-        socket.on('subscribeToTimer', (interval) => {
-            console.log('client is subscribing to timer with interval ', interval);
 
-            setInterval(() => {
-                socket.emit('timer', new Date());
-            }, interval);
+        console.log('Socket ' + socket.id + ' connected');
+
+        socket.on('subscribeToSyncSearch', (data) => {
+            //TODO : register to room according to pairing
+        });
+
+        socket.on('pushSearchState', (data) => {
+            //TODO : only push to user's room
+            socket.broadcast.volatile.emit('syncSearch', data);
         });
     });
 };

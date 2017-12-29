@@ -56,8 +56,10 @@ exports.searchWeb = function(req, res) {
 
 exports.searchNews = function(req, res) {
     var searchQuery = req.query.query || '';
-
+    var userId = req.query.userId || '';
     Bing.news(searchQuery, constructOptions(req.query, 'news'), function(error, response, body) {
+
+
         if (body && body.value) {
             var date = new Date();
             var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
@@ -68,7 +70,12 @@ exports.searchNews = function(req, res) {
 
             };
             cache.addSearchResultsToCache(searchQuery, 'news', parseInt(req.query.page), date, result, body);
-            res.status(200).json(result);
+            addMetadata(body.value, userId, function(err, results) {
+                result.results = results;
+                scrap.scrapPages(result.results);
+                res.status(200).json(result);
+            });
+            
         } else {
             res.status(503).json({
                 error: true,
@@ -80,10 +87,24 @@ exports.searchNews = function(req, res) {
 
 exports.searchImages = function(req, res) {
     var searchQuery = req.query.query || '';
+    var userId = req.query.userId || '';
 
     cache.getSearchResultsFromCache(searchQuery, 'images', parseInt(req.query.page), function(status, response) {
         if (status) {
-            res.status(200).json(response);
+
+            addMetadata(response.results, userId, function(err, results) {
+                var result = {
+                    'results': results,
+                    'matches': response.matches,
+                    'id': response.id
+                };
+                
+                scrap.scrapPages(result.results);
+                res.status(200).json(result);
+            });
+
+
+            
         } else {
             Bing.images(searchQuery, constructOptions(req.query, 'images'), function(error, response, body) {
                 if (body && body.value) {
@@ -94,8 +115,18 @@ exports.searchImages = function(req, res) {
                         'matches': body.totalEstimatedMatches,
                         'id': id
                     };
+
+                    for (let i = 0; i < body.value.length; i++) {
+                        body.value[i].url = body.value[i].contentUrl;
+                    }
+
                     cache.addSearchResultsToCache(searchQuery, 'images', parseInt(req.query.page), date, result, body);
-                    res.status(200).json(result);
+
+                    addMetadata(body.value, userId, function(err, results) {
+                        result.results = results;
+                        scrap.scrapPages(result.results);
+                        res.status(200).json(result);
+                    });
                 } else {
                     console.log(error);
                     res.status(503).json({
@@ -110,22 +141,43 @@ exports.searchImages = function(req, res) {
 
 exports.searchVideos = function(req, res) {
     var searchQuery = req.query.query || '';
-
+    var userId = req.query.userId || '';
     cache.getSearchResultsFromCache(searchQuery, 'videos', parseInt(req.query.page), function(status, response) {
         if (status) {
-            res.status(200).json(response);
+
+            addMetadata(response.results, userId, function(err, results) {
+                var result = {
+                    'results': results,
+                    'matches': response.matches,
+                    'id': response.id
+                };
+                
+                scrap.scrapPages(result.results);
+                res.status(200).json(result);
+            });
+
         } else {
             Bing.video(searchQuery, constructOptions(req.query, 'videos'), function(error, response, body) {
                 if (body && body.value) {
                     var date = new Date();
-                    var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+                    var id = searchQuery + '_' + req.query.page + '_videos_' + date.getTime();
                     var result  = {
                         'results': body.value,
                         'matches': body.totalEstimatedMatches,
                         'id': id
                     };
+                    
+                    
+                    for (let i = 0; i < body.value.length; i++) {
+                        body.value[i].url = body.value[i].contentUrl;
+                    }
                     cache.addSearchResultsToCache(searchQuery, 'videos',  parseInt(req.query.page), date, result, body);
-                    res.status(200).json(result);
+
+                    addMetadata(body.value, userId, function(err, results) {
+                        result.results = results;
+                        scrap.scrapPages(result.results);
+                        res.status(200).json(result);
+                    });
                 } else {
                     res.status(503).json({
                         error: true,
@@ -147,8 +199,8 @@ var addMetadata = function(results, userId, finish) {
     // It takes the item first and the callback second
     
     function fillWithBookmark(result, callback) {
-
-        bookmark.isBookmarked(userId, result.displayUrl, function(data) {
+        
+        bookmark.isBookmarked(userId, result.url, function(data) {
             result.bookmark = data;
             callback(null, result);
         });

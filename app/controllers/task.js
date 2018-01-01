@@ -18,24 +18,35 @@ function sampleTopics(n) {
     let samples = sample(properTopics, n + 1);
     samples['1'] = topics['0'];
 
-    console.log(properTopics);
-    console.log(samples);
-
     return samples;
 }
 
-////
+////  TODO : improve generation of group ID
+
+const groupMembers = 2;
 
 const getGroupId = function(userId) {
-    // TODO : improve generation of group ID
     let index = 0;
     for (let key in codes) {
         index += 1;
         if (key === userId) break;
     }
 
-    return Math.ceil(index/2);
+    return Math.ceil(index/groupMembers) - 1;
 };
+
+const getGroupMembers = function(groupId) {
+    const keys = Object.keys(codes);
+    let members = [];
+
+    Array(groupMembers).fill().forEach((_,i) => {
+        members.push(keys[groupId * groupMembers + i]);
+    });
+
+    return members;
+};
+
+////
 
 const initializeGroup = function(groupId, callback) {
     const query = Group.findOne({'groupId': groupId}).select();
@@ -46,7 +57,8 @@ const initializeGroup = function(groupId, callback) {
                 const group = {
                     groupId: groupId,
                     created: new Date(),
-                    topics: sampleTopics(3)
+                    topics: sampleTopics(3),
+                    members: getGroupMembers(groupId)
                 };
 
                 new Group(group).save((err) => {

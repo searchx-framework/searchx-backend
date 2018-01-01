@@ -50,6 +50,7 @@
     "stopwords": "0.0.5",
     "supertest": "^1.2.0",
     "swig": "^1.4.2",
+    "underscore": "^1.8.3",
     "url": "^0.11.0",
     "when": "^3.7.8"
   },

@@ -1,8 +1,9 @@
 'use strict';
 
-var LogCtrl         = require('../controllers/log');
-var SearchCtrl      = require('../controllers/search');
-var BookmarkCtrl      = require('../controllers/bookmark');
+const LogCtrl         = require('../controllers/log');
+const SearchCtrl      = require('../controllers/search');
+const BookmarkCtrl    = require('../controllers/bookmark');
+const TaskCtrl        = require('../controllers/task');
 
 module.exports = function(router) {
     // Set Content-Type for all responses
@@ -19,14 +20,17 @@ module.exports = function(router) {
         });
     });
 
-    // User resource
-    router.post('/users/:userId/logs', LogCtrl.createLog);
-
     // Search resource
     router.get('/search/web', SearchCtrl.searchWeb);
     router.get('/search/news', SearchCtrl.searchNews);
     router.get('/search/images', SearchCtrl.searchImages);
     router.get('/search/videos', SearchCtrl.searchVideos);
+
+    // User resource
+    router.post('/users/:userId/logs', LogCtrl.createLog);
+
+    // Task Resource
+    router.get('/task/:userId', TaskCtrl.getUserTask);
 
     // Bookmark resource
     router.post('/bookmark/', BookmarkCtrl.addBookmark);

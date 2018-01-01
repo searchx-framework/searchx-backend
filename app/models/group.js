@@ -3,26 +3,27 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-var LogSchema = new Schema({
-    userId: {
+var GroupSchema = new Schema({
+
+    groupId: {
         type: String,
         required: true
     },
-    date: {
+    created: {
         type: Date,
         required: true
     },
-    event: {
-        type: String,
-        required: true
-    },
-    meta: {
+    topics: {
         type: Schema.Types.Mixed,
         required: true
     },
-    task: {
+
+    assignedTopicId: {
+        type: String
+    },
+    results: {
         type: Schema.Types.Mixed
     }
 });
 
-module.exports = mongoose.model('Log', LogSchema);
+module.exports = mongoose.model('Group', GroupSchema);

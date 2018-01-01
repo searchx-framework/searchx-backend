@@ -1,9 +1,9 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema   = mongoose.Schema;
 
-var BookmarkSchema = new Schema({
+const BookmarkSchema = new Schema({
     url: {
         type: String,
         required: true

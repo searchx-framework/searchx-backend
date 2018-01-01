@@ -17,6 +17,10 @@ const GroupSchema = new Schema({
         type: Schema.Types.Mixed,
         required: true
     },
+    members: {
+        type: [String],
+        required: true
+    },
 
     assignedTopicId: {
         type: String

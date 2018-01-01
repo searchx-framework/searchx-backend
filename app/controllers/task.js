@@ -14,7 +14,14 @@ function sample(a, n) {
 }
 
 function sampleTopics(n) {
-    return sample(topics, n);
+    const properTopics = underscore.omit(topics, "0");
+    let samples = sample(properTopics, n + 1);
+    samples['1'] = topics['0'];
+
+    console.log(properTopics);
+    console.log(samples);
+
+    return samples;
 }
 
 ////

@@ -10,7 +10,6 @@ const codes = require('../../static/data/codes.json');
 ////
 
 const groupMembers = 2;
-const maxWaitingTime = 5 * 60 * 1000;
 
 ////
 
@@ -115,9 +114,8 @@ exports.getGroupTopic = async function(groupId) {
     const group = await getGroupById(groupId);
 
     if (group) {
-        const duration = new Date() - group.created;
-        if (duration > maxWaitingTime) {
-            return -1;
+        if (group.assignedTopicId) {
+            return group.assignedTopicId;
         }
 
         ////
@@ -152,7 +150,24 @@ exports.getGroupTopic = async function(groupId) {
         return items[0][0];
     }
 
-    return null;
+    return '-1';
+};
+
+exports.disableGroup = async function(groupId) {
+    const group = await getGroupById(groupId);
+
+    if (group) {
+        if (!group.assignedTopicId) {
+            group.assignedTopicId = '-1';
+            await group.save((err) => {
+                if (err) console.log(err);
+            });
+        }
+
+        return group.assignedTopicId
+    }
+
+    return '-1';
 };
 
 ////

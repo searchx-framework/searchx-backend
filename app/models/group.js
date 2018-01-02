@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
 const GroupSchema = new Schema({
-
     groupId: {
         type: String,
         required: true
@@ -21,13 +20,13 @@ const GroupSchema = new Schema({
         type: [String],
         required: true
     },
-
+    scores: {
+        type: Schema.Types.Mixed,
+        default: {}
+    },
     assignedTopicId: {
         type: String
-    },
-    results: {
-        type: Schema.Types.Mixed
     }
-});
+}, {minimize: false});
 
 module.exports = mongoose.model('Group', GroupSchema);

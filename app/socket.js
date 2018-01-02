@@ -1,17 +1,35 @@
 'use strict';
 
+const Task = require('../app/controllers/task');
+
 module.exports = function(io) {
-    io.on('connection', (socket) => {
 
-        console.log('Socket ' + socket.id + ' connected');
+    const gio = io.of('/group');
+    gio.on('connection', (socket) => {
 
-        socket.on('subscribeToSyncSearch', (data) => {
-            //TODO : register to room according to pairing
+        socket.on('register', (data) => {
+            socket.userId = data.userId;
+            socket.groupId = Task.getGroupId(socket.userId);
+            socket.join(socket.groupId);
         });
 
+        socket.on('pretestScore', async (data) => {
+            await Task.savePretestScores(socket.userId, data.scores);
+            await Task.getGroupTopic(socket.groupId).then((topicId) => {
+                console.log(topicId);
+                if (topicId) {
+                    gio.to(socket.groupId).emit('groupTopic', {
+                        groupId: socket.groupId,
+                        topicId: topicId
+                    });
+                }
+            });
+        });
+
+        ////
+
         socket.on('pushSearchState', (data) => {
-            //TODO : only push to user's room
-            socket.broadcast.volatile.emit('syncSearch', data);
+            socket.broadcast.to(socket.groupId).volatile.emit('syncSearch', data);
         });
     });
 };

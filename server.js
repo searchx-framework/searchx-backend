@@ -4,22 +4,21 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load the config
-var config = require('./app/config/config');
+const config = require('./app/config/config');
 
 // Load dependencies
-var express      = require('express');
-var session      = require('express-session');
-var connectMongo = require('connect-mongo')(session);
-var bodyParser   = require('body-parser');
-var swig         = require('swig');
-var passport     = require('passport');
-var fs           = require('fs');
+const express      = require('express');
+const session      = require('express-session');
+const connectMongo = require('connect-mongo')(session);
+const bodyParser   = require('body-parser');
+const swig         = require('swig');
+const passport     = require('passport');
 
 // Setup server
-var app          = express();
-var router       = express.Router();
-var http         = require('http').Server(app);
-var io           = require('socket.io')(http);
+const app          = express();
+const router       = express.Router();
+const http         = require('http').Server(app);
+const io           = require('socket.io').listen(http);
 
 // Init
 require('./app/config/initializers/mongoose')(config.db);

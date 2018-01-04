@@ -17,12 +17,16 @@ const GroupSchema = new Schema({
         required: true
     },
     members: {
-        type: [String],
+        type: Schema.Types.Mixed,
         required: true
     },
+
     scores: {
         type: Schema.Types.Mixed,
         default: {}
+    },
+    sessionId: {
+        type: String
     },
     assignedTopicId: {
         type: String

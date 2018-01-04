@@ -9,7 +9,8 @@ const codes = require('../../static/data/codes.json');
 
 ////
 
-const groupMembers = 2;
+const numMembers = 2;
+const namePool = ['Bailey', 'Jules', 'Alex', 'Micah', 'Kyle', 'Charlie', 'Drew', 'Logan', 'Taylor', 'Hayden', 'Nico', 'Jaden', 'Jordan', 'Riley', 'Rowan', 'Parker']; // http://www.cosmopolitan.com/lifestyle/a57226/popular-unisex-baby-names/
 
 ////
 
@@ -25,8 +26,9 @@ function sampleTopics(n) {
     return samples;
 }
 
-////  TODO : improve generation of group ID
+////
 
+// TODO : improve generation of group ID
 const getGroupId = function(userId) {
     let index = 0;
     for (let key in codes) {
@@ -34,21 +36,24 @@ const getGroupId = function(userId) {
         if (key === userId) break;
     }
 
-    return Math.ceil(index/groupMembers) - 1;
+    return Math.ceil(index/numMembers) - 1;
 };
 
-const getGroupMembers = function(groupId) {
-    const keys = Object.keys(codes);
-    let members = [];
+////
 
-    Array(groupMembers).fill().forEach((_,i) => {
-        members.push(keys[groupId * groupMembers + i]);
+const initializeGroupMembers = function(groupId) {
+    const keys = Object.keys(codes);
+    const names = sample(namePool, numMembers);
+    let members = {};
+
+    Array(numMembers).fill().forEach((_,i) => {
+        const index = groupId * numMembers + i;
+        const userId = keys[index];
+        members[userId] = names[i];
     });
 
     return members;
 };
-
-////
 
 const initializeGroup = function(groupId, callback) {
     const query = Group.findOne({'groupId': groupId});
@@ -60,7 +65,7 @@ const initializeGroup = function(groupId, callback) {
                     groupId: groupId,
                     created: new Date(),
                     topics: sampleTopics(3),
-                    members: getGroupMembers(groupId)
+                    members: initializeGroupMembers(groupId)
                 };
 
                 new Group(group).save((err) => {
@@ -84,10 +89,8 @@ const initializeGroup = function(groupId, callback) {
 
 const getGroupById = async function(groupId) {
     const query = Group.findOne({'groupId': groupId});
-    const res = await query.exec()
+    return await query.exec()
         .catch((err) => console.log(err));
-
-    return res;
 };
 
 ////
@@ -96,13 +99,27 @@ exports.getGroupId = function(userId) {
     return getGroupId(userId);
 };
 
-exports.savePretestScores = async function(userId, scores) {
+exports.getGroupMembers = async function(groupId) {
+    const group = await getGroupById(groupId);
+    return group.members;
+};
+
+exports.getGroupSession = async function(groupId) {
+    const group = await getGroupById(groupId);
+    return group.sessionId;
+};
+
+exports.savePretestScores = async function(userId, sessionId, scores) {
     const groupId = getGroupId(userId);
     const group = await getGroupById(groupId);
 
     if (group) {
         group.scores[userId] = scores;
         group.markModified('scores');
+
+        if (!group.sessionId) {
+            group.sessionId = sessionId;
+        }
 
         await group.save((err) => {
             if (err) console.log(err);
@@ -121,8 +138,8 @@ exports.getGroupTopic = async function(groupId) {
         ////
 
         const nscores = Object.keys(group.scores).length;
-        const nmembers = group.members.length;
-        if (nscores !== nmembers) {
+        const nmembers = Object.keys(group.members).length;
+        if (nscores < nmembers) {
             return null;
         }
 
@@ -147,7 +164,16 @@ exports.getGroupTopic = async function(groupId) {
             return a[1] - b[1];
         });
 
-        return items[0][0];
+        const topicId = items[0][0];
+
+        ////
+
+        group.assignedTopicId = topicId;
+        await group.save((err) => {
+            if (err) console.log(err);
+        });
+
+        return topicId;
     }
 
     return '-1';

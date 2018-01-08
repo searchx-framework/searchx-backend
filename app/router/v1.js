@@ -34,6 +34,6 @@ module.exports = function(router) {
 
     // Bookmark resource
     router.post('/bookmark/', BookmarkCtrl.addBookmark);
-    router.get('/bookmark/:userId/', BookmarkCtrl.getBookmarks);
+    router.get('/bookmark/:sessionId/', BookmarkCtrl.getBookmarks);
     router.delete('/bookmark/', BookmarkCtrl.removeBookmark);
 };

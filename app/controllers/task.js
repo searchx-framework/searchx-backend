@@ -11,6 +11,7 @@ const codes = require('../../static/data/codes.json');
 
 const numMembers = 2;
 const namePool = ['Bailey', 'Jules', 'Alex', 'Micah', 'Kyle', 'Charlie', 'Drew', 'Logan', 'Taylor', 'Hayden', 'Nico', 'Jaden', 'Jordan', 'Riley', 'Rowan', 'Parker']; // http://www.cosmopolitan.com/lifestyle/a57226/popular-unisex-baby-names/
+const colors = ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'];
 
 ////
 
@@ -49,7 +50,10 @@ const initializeGroupMembers = function(groupId) {
     Array(numMembers).fill().forEach((_,i) => {
         const index = groupId * numMembers + i;
         const userId = keys[index];
-        members[userId] = names[i];
+        members[userId] = {
+            name: names[i],
+            color: colors[i]
+        };
     });
 
     return members;

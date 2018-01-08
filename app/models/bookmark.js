@@ -12,6 +12,10 @@ const BookmarkSchema = new Schema({
         type: String,
         required: true
     },
+    sessionId: {
+        type: String,
+        required: true
+    },
     userId: {
         type: String,
         required: true
@@ -21,6 +25,10 @@ const BookmarkSchema = new Schema({
         required: true
     },
     date: {
+        type: Date,
+        required: true
+    },
+    created: {
         type: Date,
         required: true
     }

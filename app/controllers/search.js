@@ -1,22 +1,21 @@
 'use strict';
 
-var config = require('../config/config');
-var cache = require('./cache');
-var bookmark = require('./bookmark');
-var scrap = require('./scrap');
+const config = require('../config/config');
+const cache = require('./cache');
+const bookmark = require('./bookmark');
+const scrap = require('./scrap');
 
-var request  = require('request');
-var Bing     = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"});
-var async    = require('async');
+const Bing     = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"});
+const async    = require('async');
 
 exports.searchWeb = function(req, res) {
-    var searchQuery = req.query.query || '';
-    var userId = req.query.userId || '';
+    const searchQuery = req.query.query || '';
+    const sessionId = req.query.sessionId || '';
 
     cache.getSearchResultsFromCache(searchQuery, 'web', parseInt(req.query.page), function(status, response) {
         if (status) {
-            addMetadata(response.results, userId, function(err, results) {
-                var result = {
+            addMetadata(response.results, sessionId, function(err, results) {
+                const result = {
                     'results': results,
                     'matches': response.matches,
                     'id': response.id
@@ -28,16 +27,16 @@ exports.searchWeb = function(req, res) {
         } else {
             Bing.web(searchQuery, constructOptions(req.query, 'web'), function(error, response, body) {
                 if (body && body.webPages) {
-                    var date = new Date();
-                    var id = searchQuery + '_' + req.query.page + '_web_' + date.getTime();
-                    var result = {
+                    const date = new Date();
+                    const id = searchQuery + '_' + req.query.page + '_web_' + date.getTime();
+                    const result = {
                         results: body.webPages.value,
                         matches: body.webPages.totalEstimatedMatches,
                         id: id
                     };
 
                     cache.addSearchResultsToCache(searchQuery, 'web', parseInt(req.query.page), date, result, body);
-                    addMetadata(body.webPages.value, userId, function(err, results) {
+                    addMetadata(body.webPages.value, sessionId, function(err, results) {
                         result.results = results;
                         scrap.scrapPages(result.results);
                         res.status(200).json(result);
@@ -55,22 +54,22 @@ exports.searchWeb = function(req, res) {
 };
 
 exports.searchNews = function(req, res) {
-    var searchQuery = req.query.query || '';
-    var userId = req.query.userId || '';
+    const searchQuery = req.query.query || '';
+    const sessionId = req.query.sessionId || '';
     Bing.news(searchQuery, constructOptions(req.query, 'news'), function(error, response, body) {
 
 
         if (body && body.value) {
-            var date = new Date();
-            var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
-            var result  = {
+            const date = new Date();
+            const id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+            const result  = {
                 'results': body.value,
                 'matches': body.totalEstimatedMatches,
                 'id': id
 
             };
             cache.addSearchResultsToCache(searchQuery, 'news', parseInt(req.query.page), date, result, body);
-            addMetadata(body.value, userId, function(err, results) {
+            addMetadata(body.value, sessionId, function(err, results) {
                 result.results = results;
                 scrap.scrapPages(result.results);
                 res.status(200).json(result);
@@ -86,14 +85,14 @@ exports.searchNews = function(req, res) {
 };
 
 exports.searchImages = function(req, res) {
-    var searchQuery = req.query.query || '';
-    var userId = req.query.userId || '';
+    const searchQuery = req.query.query || '';
+    const sessionId = req.query.sessionId || '';
 
     cache.getSearchResultsFromCache(searchQuery, 'images', parseInt(req.query.page), function(status, response) {
         if (status) {
 
-            addMetadata(response.results, userId, function(err, results) {
-                var result = {
+            addMetadata(response.results, sessionId, function(err, results) {
+                const result = {
                     'results': results,
                     'matches': response.matches,
                     'id': response.id
@@ -108,9 +107,9 @@ exports.searchImages = function(req, res) {
         } else {
             Bing.images(searchQuery, constructOptions(req.query, 'images'), function(error, response, body) {
                 if (body && body.value) {
-                    var date = new Date();
-                    var id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
-                    var result  = {
+                    const date = new Date();
+                    const id = searchQuery + '_' + req.query.page + '_news_' + date.getTime();
+                    const result  = {
                         'results': body.value,
                         'matches': body.totalEstimatedMatches,
                         'id': id
@@ -122,7 +121,7 @@ exports.searchImages = function(req, res) {
 
                     cache.addSearchResultsToCache(searchQuery, 'images', parseInt(req.query.page), date, result, body);
 
-                    addMetadata(body.value, userId, function(err, results) {
+                    addMetadata(body.value, sessionId, function(err, results) {
                         result.results = results;
                         scrap.scrapPages(result.results);
                         res.status(200).json(result);
@@ -140,13 +139,13 @@ exports.searchImages = function(req, res) {
 };
 
 exports.searchVideos = function(req, res) {
-    var searchQuery = req.query.query || '';
-    var userId = req.query.userId || '';
+    const searchQuery = req.query.query || '';
+    const sessionId = req.query.sessionId || '';
     cache.getSearchResultsFromCache(searchQuery, 'videos', parseInt(req.query.page), function(status, response) {
         if (status) {
 
-            addMetadata(response.results, userId, function(err, results) {
-                var result = {
+            addMetadata(response.results, sessionId, function(err, results) {
+                const result = {
                     'results': results,
                     'matches': response.matches,
                     'id': response.id
@@ -159,9 +158,9 @@ exports.searchVideos = function(req, res) {
         } else {
             Bing.video(searchQuery, constructOptions(req.query, 'videos'), function(error, response, body) {
                 if (body && body.value) {
-                    var date = new Date();
-                    var id = searchQuery + '_' + req.query.page + '_videos_' + date.getTime();
-                    var result  = {
+                    const date = new Date();
+                    const id = searchQuery + '_' + req.query.page + '_videos_' + date.getTime();
+                    const result  = {
                         'results': body.value,
                         'matches': body.totalEstimatedMatches,
                         'id': id
@@ -173,7 +172,7 @@ exports.searchVideos = function(req, res) {
                     }
                     cache.addSearchResultsToCache(searchQuery, 'videos',  parseInt(req.query.page), date, result, body);
 
-                    addMetadata(body.value, userId, function(err, results) {
+                    addMetadata(body.value, sessionId, function(err, results) {
                         result.results = results;
                         scrap.scrapPages(result.results);
                         res.status(200).json(result);
@@ -194,18 +193,23 @@ exports.searchVideos = function(req, res) {
  *
  * @params
  */
-var addMetadata = function(results, userId, finish) {
+const addMetadata = function(results, sessionId, finish) {
     // This is your async worker function
     // It takes the item first and the callback second
     
     function fillWithBookmark(result, callback) {
-        
-        bookmark.isBookmarked(userId, result.url, function(data) {
-            result.bookmark = data;
+        bookmark.isBookmarked(sessionId, result.url, function(data) {
+            result.bookmark = false;
+
+            if (data.userId) {
+                result.bookmark = true;
+                result.bookmarkUserId = data.userId;
+                result.bookmarkTime = data.date;
+            }
+
             callback(null, result);
         });
     }
-
 
     async.map(results, fillWithBookmark, finish);
 };
@@ -218,11 +222,12 @@ var addMetadata = function(results, userId, finish) {
  *
  * @params The query parameters passed to the API via GET
  */
-var constructOptions = function(params, vertical) {
-    var count = vertical === 'images' || vertical === 'videos' ? 12: 10;
+const constructOptions = function(params, vertical) {
+    const count = vertical === 'images' || vertical === 'videos' ? 12: 10;
     // System defined
-    var mkt = 'en-US';
-    var offset = (params.page-1)*count;
+    const mkt = 'en-US';
+    const offset = (params.page-1)*count;
+
     return {
         offset: offset,
         count: count,

@@ -50,8 +50,8 @@ module.exports = function(io) {
             socket.broadcast.to(socket.groupId).volatile.emit('searchState', data);
         });
 
-        socket.on('pushBookmarkUpdate', () => {
-            socket.broadcast.to(socket.groupId).volatile.emit('bookmarkUpdate', {});
+        socket.on('pushBookmarkUpdate', (data) => {
+            socket.broadcast.to(socket.groupId).volatile.emit('bookmarkUpdate', data);
         });
     });
 };

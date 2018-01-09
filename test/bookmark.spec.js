@@ -13,9 +13,10 @@ var shouldHttp = require('should-http');
 var request    = supertest(config.url + ':' + config.port + '/v1');
 
 
-var bookmark = require('../app/models/bookmark');
+var session = require('../app/models/session');
+var bookmark = session.bookmark;
 var User = require('../app/models/user');
-var BookmarkCrl = require('../app/controllers/bookmark');
+var BookmarkCrl = require('../app/controllers/session');
 
 var mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)

@@ -2,7 +2,7 @@
 
 const config = require('../config/config');
 const cache = require('./cache');
-const bookmark = require('./bookmark');
+const session = require('./session');
 const scrap = require('./scrap');
 
 const Bing     = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"});
@@ -198,7 +198,7 @@ const addMetadata = function(results, sessionId, finish) {
     // It takes the item first and the callback second
     
     function fillWithBookmark(result, callback) {
-        bookmark.isBookmarked(sessionId, result.url, function(data) {
+        session.isBookmarked(sessionId, result.url, function(data) {
             result.bookmark = false;
 
             if (data.userId) {

@@ -1,6 +1,7 @@
 'use strict';
 
 const Task = require('../app/controllers/task');
+const Session = require('../app/controllers/session');
 
 module.exports = function(io) {
 
@@ -46,8 +47,9 @@ module.exports = function(io) {
 
         ////
 
-        socket.on('pushSearchState', (data) => {
+        socket.on('pushSearchState', async (data) => {
             socket.broadcast.to(socket.groupId).volatile.emit('searchState', data);
+            Session.pushQueryHistory(data.sessionId, data.userId, data.state.query);
         });
 
         socket.on('pushBookmarkUpdate', (data) => {

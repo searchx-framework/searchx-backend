@@ -2,7 +2,7 @@
 
 const LogCtrl         = require('../controllers/log');
 const SearchCtrl      = require('../controllers/search');
-const BookmarkCtrl    = require('../controllers/bookmark');
+const SessionCtrl     = require('../controllers/session');
 const TaskCtrl        = require('../controllers/task');
 
 module.exports = function(router) {
@@ -27,13 +27,12 @@ module.exports = function(router) {
     router.get('/search/videos', SearchCtrl.searchVideos);
 
     // User resource
+    router.get('/users/:userId/task', TaskCtrl.getUserTask);
     router.post('/users/:userId/logs', LogCtrl.createLog);
 
-    // Task Resource
-    router.get('/task/:userId', TaskCtrl.getUserTask);
-
-    // Bookmark resource
-    router.post('/bookmark/', BookmarkCtrl.addBookmark);
-    router.get('/bookmark/:sessionId/', BookmarkCtrl.getBookmarks);
-    router.delete('/bookmark/', BookmarkCtrl.removeBookmark);
+    // Session resource
+    router.get('/session/:sessionId/bookmark', SessionCtrl.getBookmarks);
+    router.post('/session/:sessionId/bookmark', SessionCtrl.addBookmark);
+    router.delete('/session/:sessionId/bookmark', SessionCtrl.removeBookmark);
+    router.get('/session/:sessionId/query', SessionCtrl.getQueryHistory);
 };

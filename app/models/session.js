@@ -29,9 +29,14 @@ const BookmarkSchema = new Schema({
         type: Date,
         required: true
     },
+
+    starred: {
+        type: Boolean,
+        default: false
+    },
     deleted: {
         type: Boolean,
-        required: true
+        default: false
     },
 });
 

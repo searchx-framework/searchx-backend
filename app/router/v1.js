@@ -33,6 +33,7 @@ module.exports = function(router) {
     // Session resource
     router.get('/session/:sessionId/bookmark', SessionCtrl.getBookmarks);
     router.post('/session/:sessionId/bookmark', SessionCtrl.addBookmark);
+    router.post('/session/:sessionId/bookmark/star', SessionCtrl.starBookmark);
     router.delete('/session/:sessionId/bookmark', SessionCtrl.removeBookmark);
     router.get('/session/:sessionId/query', SessionCtrl.getQueryHistory);
 };

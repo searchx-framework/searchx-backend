@@ -21,7 +21,6 @@ exports.addBookmark = function(req, res) {
                 const now = new Date();
                 data.created = now;
                 data.date = now;
-                data.deleted = false;
 
                 const B = new Bookmark(data);
                 B.save(function(error) {
@@ -81,6 +80,7 @@ exports.removeBookmark = function(req,res) {
 
         } else {
             if (doc) {
+                doc.starred = false;
                 doc.deleted = true;
                 doc.save((err) => {
                     if(err) {
@@ -99,13 +99,58 @@ exports.removeBookmark = function(req,res) {
     });
 };
 
+exports.starBookmark = function(req, res) {
+    const data = req.body;
+    data.sessionId = req.params.sessionId;
+
+    if (data.sessionId === null) {
+        res.status(401).json({
+            error: true,
+            message: 'Could not star/unstar bookmark.'
+        });
+    }
+
+    ////
+
+    const query = {
+        url: data.url,
+        sessionId: data.sessionId
+    };
+
+    Bookmark.findOne(query, function(err, doc) {
+        if (err) {
+            res.status(401).json({
+                error: true,
+                message: 'Could not star/unstar bookmark.'
+            });
+
+        } else {
+            if (doc) {
+                doc.starred = !doc.starred;
+                doc.save((err) => {
+                    if(err) {
+                        console.log(err);
+                    }
+                });
+                res.status(201).json({error: false});
+
+            } else {
+                res.status(401).json({
+                    error: true,
+                    message: 'Could not star/unstar bookmark.'
+                });
+            }
+        }
+    });
+};
+
 ////
 
 exports.getBookmarks = function(req, res) {
     const sessionId = req.params.sessionId;
     Bookmark.find(
-            {sessionId: sessionId, deleted: false },
-            {url:1, title: 1, date: 1, userId: 1, _id: 0}
+            {sessionId: sessionId, deleted: false},
+            {url:1, title: 1, date: 1, userId: 1, starred: 1, _id: 0}
         )
         .sort({date: 1})
         .exec(function(error, data) {

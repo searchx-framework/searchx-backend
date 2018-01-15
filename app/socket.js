@@ -1,48 +1,60 @@
 'use strict';
 
+const redis = require('./config/initializers/redis');
 const Task = require('../app/controllers/task');
 const Session = require('../app/controllers/session');
+
+////
+
+const REDIS_USER_SOCKET = "userSocket";
+
+const getUserSocket = async function(userId) {
+    const key = REDIS_USER_SOCKET + "-" + userId;
+    return await redis.getAsync(key);
+};
+
+const setUserSocket = async function(userId, socketId) {
+    const key = REDIS_USER_SOCKET + "-" + userId;
+    await redis.setAsync(key, socketId);
+};
+
+////
 
 module.exports = function(io) {
 
     const gio = io.of('/group');
     gio.on('connection', (socket) => {
 
-        socket.on('register', (data) => {
-            console.log(data.userId + ' has connected');
-            const groupId = Task.getGroupId(data.userId);
+        socket.on('register', async (data) => {
+            console.log(data.userId + ' has connected ' + "(" + socket.id + ")");
+            await setUserSocket(data.userId, socket.id);
 
-            socket.groupId = groupId;
-            socket.join(groupId);
+            socket.groupId = data.groupId;
+            socket.join(data.groupId);
         });
 
         ////
 
         socket.on('pushPretestScores', async (data) => {
-            await Task.savePretestScores(data.userId, data.sessionId, data.scores);
-            const topicId = await Task.getGroupTopic(socket.groupId);
-            const sessionId = await Task.getGroupSession(socket.groupId);
+            const group = await Task.getAvailableGroup(data.userId, data.scores);
 
-            if (topicId) {
-                gio.to(socket.groupId).emit('groupTopic', {
-                    groupId: socket.groupId,
-                    sessionId: sessionId,
-                    topicId: topicId
+            if (group !== null) {
+                group.members.forEach(async (member) => {
+                    const socketId = await getUserSocket(member.userId);
+                    gio.to(socketId).emit('groupData', {
+                        group: group
+                    });
+
+                    Task.popPretestScores(member.userId)
                 });
+            }
+            else  {
+                await Task.pushPretestScores(data.userId, data.sessionId, data.scores);
             }
         });
 
-        socket.on('pushGroupTimeout', async () => {
-            const topicId = await Task.disableGroup(socket.groupId);
-            const sessionId = await Task.getGroupSession(socket.groupId);
-
-            if (topicId) {
-                gio.to(socket.groupId).emit('groupTopic', {
-                    groupId: socket.groupId,
-                    sessionId: sessionId,
-                    topicId: topicId
-                });
-            }
+        socket.on('pushGroupTimeout', async (data) => {
+            await Task.popPretestScores(data.userId);
         });
 
         ////

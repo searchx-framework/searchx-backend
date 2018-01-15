@@ -1,17 +1,28 @@
 'use strict';
 
 const underscore = require('underscore');
+const redis = require('../config/initializers/redis');
 const mongoose = require('mongoose');
 const Group    = mongoose.model('Group');
 
+////
+
 const topics = require('../../static/data/topics.json');
-const codes = require('../../static/data/codes.json');
+Object.keys(topics).forEach((index) => {
+    topics[index].id = index;
+});
 
 ////
 
-const numMembers = 2;
+const NUM_MEMBERS = 2;
+const NUM_TOPICS = 4;
+const ACCEPTABLE_SCORE_RANK = Math.ceil((NUM_TOPICS-1) / 2);
+
 const namePool = ['Bailey', 'Jules', 'Alex', 'Micah', 'Kyle', 'Charlie', 'Drew', 'Logan', 'Taylor', 'Hayden', 'Nico', 'Jaden', 'Jordan', 'Riley', 'Rowan', 'Parker']; // http://www.cosmopolitan.com/lifestyle/a57226/popular-unisex-baby-names/
-const colors = ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'];
+const colorPool = ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'];
+
+const REDIS_PREV_TOPIC_IDS = "prevTopicIds";
+const REDIS_PRETEST_SCORES_QUEUE = "pretestScores";
 
 ////
 
@@ -19,222 +30,167 @@ function sample(a, n) {
     return underscore.take(underscore.shuffle(a), n);
 }
 
-function sampleTopics(n) {
-    const properTopics = underscore.omit(topics, "0");
-    let samples = sample(properTopics, n + 1);
-    samples['1'] = topics['0'];
+async function sampleTopicsByPretest(a, n) {
+    let samples = [];
 
+    const pretestScores = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
+    if (pretestScores !== null && pretestScores.length > 0) {
+        const oldestScoreIds = pretestScores[0].scores.map(x => x.topicId).slice(0,-1);
+        const validTopics = underscore.omit(a, oldestScoreIds);
+
+        samples = sample(validTopics, n - oldestScoreIds.length);
+        oldestScoreIds.forEach(id => samples.push(topics[id]));
+        return samples;
+    }
+
+    return null;
+}
+
+async function sampleTopicsByHistory(a, n) {
+    let samples = [];
+
+    const prevTopicIds = JSON.parse(await redis.getAsync(REDIS_PREV_TOPIC_IDS));
+    if (prevTopicIds !== null) {
+        const validTopics = underscore.omit(a, prevTopicIds);
+
+        samples = sample(validTopics, n - prevTopicIds.length);
+        prevTopicIds.forEach(id => samples.push(topics[id.toString()]));
+        return samples;
+    }
+
+    return null;
+}
+
+async function sampleTopics(n) {
+    let validTopics = underscore.omit(topics, '0');
+
+    let samples = await sampleTopicsByPretest(validTopics, n);
+    if (samples === null) samples = await sampleTopicsByHistory(validTopics, n);
+    if (samples === null) samples = sample(validTopics, n);
+
+    const savedTopicIds = samples.slice(1,-1).map(x => x.id);
+    await redis.setAsync(REDIS_PREV_TOPIC_IDS, JSON.stringify(savedTopicIds));
+
+    samples[0] = samples[1];
+    samples[1] = topics[0];
     return samples;
 }
 
 ////
 
-// TODO : improve generation of group ID
-const getGroupId = function(userId) {
-    let index = 0;
-    for (let key in codes) {
-        index += 1;
-        if (key === userId) break;
-    }
+const initializeGroup = async function(topicId, members) {
+    const group = new Group({
+        created: new Date(),
+        members: initializeGroupMembers(members),
+        topic: topics[topicId]
+    });
 
-    return Math.ceil(index/numMembers) - 1;
+    group.save();
+    return group;
+};
+
+const initializeGroupMembers = function(members) {
+    const names = sample(namePool, NUM_MEMBERS);
+    return members.map((member, i) => {
+        return {
+            userId: member,
+            name: names[i % names.length],
+            color: colorPool[i % colorPool.length]
+        };
+    });
 };
 
 ////
 
-const initializeGroupMembers = function(groupId) {
-    const keys = Object.keys(codes);
-    const names = sample(namePool, numMembers);
-    let members = {};
-
-    Array(numMembers).fill().forEach((_,i) => {
-        const index = groupId * numMembers + i;
-        const userId = keys[index];
-        members[userId] = {
-            name: names[i],
-            color: colors[i]
-        };
-    });
-
-    return members;
-};
-
-const initializeGroup = function(groupId, callback) {
-    const query = Group.findOne({'groupId': groupId});
-
-    query.lean().exec()
-        .then((data) => {
-            if (!data) {
-                const group = {
-                    groupId: groupId,
-                    created: new Date(),
-                    topics: sampleTopics(3),
-                    members: initializeGroupMembers(groupId)
-                };
-
-                new Group(group).save((err) => {
-                    if (err) {
-                        console.log(err);
-                        callback(true, {});
-                    } else {
-                        callback(false, group);
-                    }
-                });
-
-            } else {
-                callback(false, data);
+const getGroupIdByUser = async function(userId) {
+    const query = {
+        members: {
+            $elemMatch: {
+                userId: userId
             }
-        })
-        .catch((err) => {
-            console.log(err);
-            callback(true, {});
-        });
+        }
+    };
+
+    const group = await Group.find(query, {}, {sort: {created: -1}});
+    if (group.length > 0) {
+        return group[0]._id;
+    }
+
+    return null;
 };
 
 const getGroupById = async function(groupId) {
-    const query = Group.findOne({'groupId': groupId});
+    const query = Group.findOne({'_id': groupId});
     return await query.exec()
         .catch((err) => console.log(err));
 };
 
 ////
 
-exports.getGroupId = function(userId) {
-    return getGroupId(userId);
+exports.getAvailableGroup = async function(userId, scores) {
+    const topicId = scores[0].topicId;
+    const results = await this.popPretestScores(userId);
+    if (results === null) return null;
+
+    let members = [userId];
+    results.forEach(x => {
+        Array(ACCEPTABLE_SCORE_RANK).fill().forEach((_, i) => {
+            if (x.scores[i].topicId === topicId) members.push(x.userId);
+        });
+    });
+
+    if (members.length >= NUM_MEMBERS) {
+        return await initializeGroup(topicId, members.slice(0, NUM_MEMBERS));
+    }
+
+    return null;
 };
 
-exports.getGroupMembers = async function(groupId) {
-    const group = await getGroupById(groupId);
-    return group.members;
+exports.pushPretestScores = async function(userId, sessionId, scores) {
+    let results = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
+    if (results === null) results = [];
+
+    let found = false;
+    results.forEach(result => {
+        if (result.userId === userId) {
+            found = true;
+            result.scores = scores;
+        }
+    });
+
+    if (!found) {
+        results.push({
+            userId: userId,
+            scores: scores
+        });
+    }
+
+    await redis.setAsync(REDIS_PRETEST_SCORES_QUEUE, JSON.stringify(results));
+    return results;
 };
 
-exports.getGroupSession = async function(groupId) {
-    const group = await getGroupById(groupId);
-    return group.sessionId;
+exports.popPretestScores = async function(userId) {
+    let results = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
+    if (results !== null) {
+        results = results.filter(x => x.userId !== userId);
+        await redis.setAsync(REDIS_PRETEST_SCORES_QUEUE, JSON.stringify(results));
+    }
+
+    return results;
 };
 
 ////
 
-exports.savePretestScores = async function(userId, sessionId, scores) {
-    const groupId = getGroupId(userId);
-    const group = await getGroupById(groupId);
-
-    if (group) {
-        group.scores[userId] = scores;
-        group.markModified('scores');
-
-        if (!group.sessionId) {
-            group.sessionId = sessionId;
-        }
-
-        await group.save((err) => {
-            if (err) console.log(err);
-        });
-    }
-};
-
-exports.getGroupTopic = async function(groupId) {
-    const group = await getGroupById(groupId);
-
-    if (group) {
-        if (group.assignedTopicId) {
-            return group.assignedTopicId;
-        }
-
-        ////
-
-        const nscores = Object.keys(group.scores).length;
-        const nmembers = Object.keys(group.members).length;
-        if (nscores < nmembers) {
-            return null;
-        }
-
-        ////
-
-        let totals = {};
-        Object.values(group.scores).forEach((member) => {
-            Object.keys(member).forEach((i) => {
-                if (i !== '1') { // skip test score
-                    if (!totals[i]) totals[i] = 0;
-                    totals[i] += member[i];
-                }
-            });
-        });
-
-        const items = Object.keys(totals)
-            .map((key) => {
-                return [key, totals[key]];
-            });
-
-        items.sort((a,b) => {
-            return a[1] - b[1];
-        });
-
-        const topicId = items[0][0];
-
-        ////
-
-        group.assignedTopicId = topicId;
-        await group.save((err) => {
-            if (err) console.log(err);
-        });
-
-        return topicId;
-    }
-
-    return '-1';
-};
-
-exports.disableGroup = async function(groupId) {
-    const group = await getGroupById(groupId);
-
-    if (group) {
-        if (!group.assignedTopicId) {
-            group.assignedTopicId = '-1';
-            await group.save((err) => {
-                if (err) console.log(err);
-            });
-        }
-
-        return group.assignedTopicId
-    }
-
-    return '-1';
-};
-
-////
-
-exports.getUserTask = function(req, res) {
+exports.getUserTask = async function(req, res) {
     const userId = req.params.userId;
-    const collaborative = req.query.collaborative === 'true';
+    const data = {
+        topics: await sampleTopics(NUM_TOPICS)
+    };
 
-    if(!codes[userId]) {
-        res.status(503).json({
-            error: true,
-            message: 'Invalid ID.'
-        });
-    } else {
-
-        if (collaborative) {
-            const groupId = getGroupId(userId);
-            initializeGroup(groupId, (err, data) => {
-                if(err) {
-                    res.status(503).json({
-                        error: true,
-                        message: 'The request resulted in a backend time out or backend error. The team is investigating the issue. We are sorry for the inconvenience.'
-                    });
-                } else {
-                    data.code = codes[userId];
-                    res.status(200).json(data);
-                }
-            });
-
-        } else {
-            const data = {
-                topics: sampleTopics(3),
-                code: codes[userId]
-            };
-            res.status(200).json(data);
-        }
+    const groupId = await getGroupIdByUser(userId);
+    if (groupId !== null) {
+        data.group = await getGroupById(groupId);
     }
+
+    res.status(200).json(data);
 };

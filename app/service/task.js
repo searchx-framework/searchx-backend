@@ -7,7 +7,6 @@ const config = require('../config/config');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
 
-
 ////
 
 const topics = require('../../static/data/topics.json');
@@ -17,12 +16,11 @@ Object.keys(topics).forEach((index) => {
 
 ////
 
-const NUM_TOPICS = config.numTopics;
-const NUM_MEMBERS = config.numMembers;
-const ACCEPTABLE_SCORE_RANK = Math.ceil((NUM_TOPICS-1) / 2);
-
-const namePool = ['Bailey', 'Jules', 'Alex', 'Micah', 'Kyle', 'Charlie', 'Drew', 'Logan', 'Taylor', 'Hayden', 'Nico', 'Jaden', 'Jordan', 'Riley', 'Rowan', 'Parker']; // http://www.cosmopolitan.com/lifestyle/a57226/popular-unisex-baby-names/
-const colorPool = ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'];
+const numTopics = config.numTopics;
+const numMembers = config.numMembers;
+const namePool = config.namePool;
+const colorPool = config.colorPool;
+const acceptableRank = Math.ceil((numTopics-1) / 2);
 
 const REDIS_PREV_TOPIC_IDS = "prevTopicIds";
 const REDIS_PRETEST_SCORES_QUEUE = "pretestScores";
@@ -93,7 +91,7 @@ const initializeGroup = async function(topicId, members) {
 };
 
 const initializeGroupMembers = function(members) {
-    const names = sample(namePool, NUM_MEMBERS);
+    const names = sample(namePool, numMembers);
     return members.map((member, i) => {
         return {
             userId: member,
@@ -132,7 +130,7 @@ const getGroupById = async function(groupId) {
 
 exports.getUserTask = async function(userId) {
     const data = {
-        topics: await sampleTopics(NUM_TOPICS)
+        topics: await sampleTopics(numTopics)
     };
 
     const groupId = await getGroupIdByUser(userId);
@@ -150,13 +148,13 @@ exports.getAvailableGroup = async function(userId, scores) {
 
     let members = [userId];
     results.forEach(x => {
-        Array(ACCEPTABLE_SCORE_RANK).fill().forEach((_, i) => {
+        Array(acceptableRank).fill().forEach((_, i) => {
             if (x.scores[i].topicId === topicId) members.push(x.userId);
         });
     });
 
-    if (members.length >= NUM_MEMBERS) {
-        return await initializeGroup(topicId, members.slice(0, NUM_MEMBERS));
+    if (members.length >= numMembers) {
+        return await initializeGroup(topicId, members.slice(0, numMembers));
     }
 
     return null;

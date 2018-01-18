@@ -22,8 +22,8 @@ const io           = require('socket.io').listen(http);
 
 // Init
 require('./app/config/initializers/mongoose')(config.db);
-require('./app/router/v1')(router);
-require('./app/socket')(io);
+require('./app/api/routes/v1/rest')(router);
+require('./app/api/routes/v1/socket')(io);
 
 // Engine
 app.engine('html', swig.renderFile);

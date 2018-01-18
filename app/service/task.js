@@ -2,8 +2,11 @@
 
 const underscore = require('underscore');
 const redis = require('../config/initializers/redis');
+const config = require('../config/config');
+
 const mongoose = require('mongoose');
-const Group    = mongoose.model('Group');
+const Group = mongoose.model('Group');
+
 
 ////
 
@@ -14,8 +17,8 @@ Object.keys(topics).forEach((index) => {
 
 ////
 
-const NUM_MEMBERS = 2;
-const NUM_TOPICS = 4;
+const NUM_TOPICS = config.numTopics;
+const NUM_MEMBERS = config.numMembers;
 const ACCEPTABLE_SCORE_RANK = Math.ceil((NUM_TOPICS-1) / 2);
 
 const namePool = ['Bailey', 'Jules', 'Alex', 'Micah', 'Kyle', 'Charlie', 'Drew', 'Logan', 'Taylor', 'Hayden', 'Nico', 'Jaden', 'Jordan', 'Riley', 'Rowan', 'Parker']; // http://www.cosmopolitan.com/lifestyle/a57226/popular-unisex-baby-names/
@@ -127,6 +130,19 @@ const getGroupById = async function(groupId) {
 
 ////
 
+exports.getUserTask = async function(userId) {
+    const data = {
+        topics: await sampleTopics(NUM_TOPICS)
+    };
+
+    const groupId = await getGroupIdByUser(userId);
+    if (groupId !== null) {
+        data.group = await getGroupById(groupId);
+    }
+
+    return data;
+};
+
 exports.getAvailableGroup = async function(userId, scores) {
     const topicId = scores[0].topicId;
     const results = await this.popPretestScores(userId);
@@ -145,6 +161,8 @@ exports.getAvailableGroup = async function(userId, scores) {
 
     return null;
 };
+
+////
 
 exports.pushPretestScores = async function(userId, sessionId, scores) {
     let results = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
@@ -177,20 +195,4 @@ exports.popPretestScores = async function(userId) {
     }
 
     return results;
-};
-
-////
-
-exports.getUserTask = async function(req, res) {
-    const userId = req.params.userId;
-    const data = {
-        topics: await sampleTopics(NUM_TOPICS)
-    };
-
-    const groupId = await getGroupIdByUser(userId);
-    if (groupId !== null) {
-        data.group = await getGroupById(groupId);
-    }
-
-    res.status(200).json(data);
 };

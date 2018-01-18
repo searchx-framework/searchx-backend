@@ -1,5 +1,5 @@
 {
-  "name": "pienapple-api",
+  "name": "searchx-api",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,16 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martynasb/pienapple-api.git"
+    "url": "git+https://github.com/felipemoraes/searchx-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/martynasb/pienapple-api/issues"
+    "url": "https://github.com/felipemoraes/searchx-api/issues"
   },
-  "homepage": "https://github.com/martynasb/pienapple-api#readme",
+  "homepage": "https://github.com/felipemoraes/searchx-api#readme",
   "dependencies": {
-    "async": "^2.6.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "connect-mongo": "^1.3.2",
@@ -30,13 +29,11 @@
     "fs": "0.0.2",
     "istanbul": "^0.4.5",
     "kue": "^0.9.6",
-    "lodash": "^3.10.1",
     "md5": "^2.2.1",
     "mocha": "^2.5.3",
-    "mongoose": "^4.13.4",
+    "mongoose": "^4.13.9",
     "node-bing-api": "^3.2.2",
     "node-jquery-param": "0.0.2",
-    "oauth2orize": "^1.11.0",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",

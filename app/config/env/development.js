@@ -1,12 +1,10 @@
 'use strict';
 
 module.exports = {
-    db: 'mongodb://localhost/searchx',
-    url: 'http://localhost',
     port: 4443,
+    url: 'http://localhost',
     client: 'http://localhost:3000',
+    db: 'mongodb://localhost/searchx',
     redis: 'redis://localhost:6379',
-    imageDir: 'img',
-    bingAccessKey: '6a47ff2459f545e9ba21a27635136674', /* fe.moraesg@outlook.com */
-    cacheFreshness: 3600,
+    bingAccessKey: '2314c33bc76242e3bfcf404938a0155d', /* sindunuragarp@gmail.com */
 };

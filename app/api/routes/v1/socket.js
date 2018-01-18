@@ -1,8 +1,8 @@
 'use strict';
 
-const redis = require('./config/initializers/redis');
-const Task = require('../app/controllers/task');
-const Session = require('../app/controllers/session');
+const redis = require('../../../config/initializers/redis');
+const Task = require('../../../service/task');
+const Session = require('../../../service/session');
 
 ////
 
@@ -61,7 +61,8 @@ module.exports = function(io) {
 
         socket.on('pushSearchState', async (data) => {
             socket.broadcast.to(socket.groupId).volatile.emit('searchState', data);
-            Session.pushQueryHistory(data.sessionId, data.userId, data.state.query);
+            Session.pushQueryHistory(data.sessionId, data.userId, data.state.query)
+                .catch((err) => console.log(err));
         });
 
         socket.on('pushBookmarkUpdate', (data) => {

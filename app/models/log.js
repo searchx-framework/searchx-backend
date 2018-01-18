@@ -8,9 +8,16 @@ const LogSchema = new Schema({
         type: String,
         required: true
     },
+    sessionId: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         required: true
+    },
+    task: {
+        type: Schema.Types.Mixed
     },
     event: {
         type: String,
@@ -19,9 +26,6 @@ const LogSchema = new Schema({
     meta: {
         type: Schema.Types.Mixed,
         required: true
-    },
-    task: {
-        type: Schema.Types.Mixed
     }
 });
 

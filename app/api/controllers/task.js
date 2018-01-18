@@ -4,7 +4,9 @@ const Task = require('../../service/task');
 
 exports.getUserTask = function(req, res) {
     const userId = req.params.userId;
-    Task.getUserTask(userId)
+    const collaborative = req.query.collaborative === 'true';
+
+    Task.getUserTask(userId, collaborative)
         .then((data) => {
             res.status(200).json(data);
         })

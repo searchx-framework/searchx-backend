@@ -35,26 +35,34 @@ module.exports = function(io) {
 
         ////
 
-        socket.on('pushPretestScores', async (data) => {
-            const group = await Task.getAvailableGroup(data.userId, data.scores);
-
+        socket.on('pushStartPretest', async (data) => {
+            const group = await Task.getUserGroup(data.userId);
             if (group !== null) {
-                group.members.forEach(async (member) => {
-                    const socketId = await getUserSocket(member.userId);
-                    gio.to(socketId).emit('groupData', {
-                        group: group
-                    });
+                socket.groupId = group._id;
+                socket.join(group._id);
 
-                    Task.popPretestScores(member.userId)
+                group.members.forEach(async (member) => {
+                    if (member.userId !== data.userId) {
+                        const socketId = await getUserSocket(member.userId);
+                        gio.to(socketId).emit('startPretest', {});
+                    }
                 });
             }
-            else  {
-                await Task.pushPretestScores(data.userId, data.sessionId, data.scores);
+        });
+
+        socket.on('pushPretestScores', async (data) => {
+            await Task.savePretestScores(data.userId, data.scores);
+            const group = await Task.setGroupTopic(data.userId);
+
+            if (group !== null) {
+                gio.to(socket.groupId).emit('groupData', {
+                    group: group
+                });
             }
         });
 
         socket.on('pushGroupTimeout', async (data) => {
-            await Task.popPretestScores(data.userId);
+            await Task.removeUserFromGroup(data.userId);
         });
 
         ////

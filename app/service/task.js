@@ -1,13 +1,17 @@
 'use strict';
 
 const underscore = require('underscore');
-const redis = require('../config/initializers/redis');
 const config = require('../config/config');
 
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
 
 ////
+
+const nTopics = config.numTopics;
+const nMembers = config.numMembers;
+const namePool = config.namePool;
+const colorPool = config.colorPool;
 
 const topics = require('../../static/data/topics.json');
 Object.keys(topics).forEach((index) => {
@@ -16,94 +20,50 @@ Object.keys(topics).forEach((index) => {
 
 ////
 
-const numTopics = config.numTopics;
-const numMembers = config.numMembers;
-const namePool = config.namePool;
-const colorPool = config.colorPool;
-const acceptableRank = Math.ceil((numTopics-1) / 2);
-
-const REDIS_PREV_TOPIC_IDS = "prevTopicIds";
-const REDIS_PRETEST_SCORES_QUEUE = "pretestScores";
-
-////
-
 function sample(a, n) {
     return underscore.take(underscore.shuffle(a), n);
 }
 
-async function sampleTopicsByPretest(a, n) {
-    let samples = [];
-
-    const pretestScores = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
-    if (pretestScores !== null && pretestScores.length > 0) {
-        const oldestScoreIds = pretestScores[0].scores.map(x => x.topicId).slice(0,-1);
-        const validTopics = underscore.omit(a, oldestScoreIds);
-
-        samples = sample(validTopics, n - oldestScoreIds.length);
-        oldestScoreIds.forEach(id => samples.push(topics[id]));
-        return samples;
-    }
-
-    return null;
-}
-
-async function sampleTopicsByHistory(a, n) {
-    let samples = [];
-
-    const prevTopicIds = JSON.parse(await redis.getAsync(REDIS_PREV_TOPIC_IDS));
-    if (prevTopicIds !== null) {
-        const validTopics = underscore.omit(a, prevTopicIds);
-
-        samples = sample(validTopics, n - prevTopicIds.length);
-        prevTopicIds.forEach(id => samples.push(topics[id.toString()]));
-        return samples;
-    }
-
-    return null;
-}
-
-async function sampleTopics(n) {
+function sampleTopics(n) {
     let validTopics = underscore.omit(topics, '0');
+    let samples = sample(validTopics, n);
 
-    let samples = await sampleTopicsByPretest(validTopics, n);
-    if (samples === null) samples = await sampleTopicsByHistory(validTopics, n);
-    if (samples === null) samples = sample(validTopics, n);
-
-    const savedTopicIds = samples.slice(1,-1).map(x => x.id);
-    await redis.setAsync(REDIS_PREV_TOPIC_IDS, JSON.stringify(savedTopicIds));
-
-    samples[0] = samples[1];
     samples[1] = topics[0];
     return samples;
 }
 
 ////
 
-const initializeGroup = async function(topicId, members) {
+const initializeGroup = async function() {
     const group = new Group({
         created: new Date(),
-        members: initializeGroupMembers(members),
-        topic: topics[topicId]
+        topics: sampleTopics(nTopics)
     });
 
-    group.save();
+    await group.save();
     return group;
 };
 
-const initializeGroupMembers = function(members) {
-    const names = sample(namePool, numMembers);
+const addGroupMembersData = function(members) {
+    const names = sample(namePool, nMembers);
     return members.map((member, i) => {
-        return {
-            userId: member,
-            name: names[i % names.length],
-            color: colorPool[i % colorPool.length]
-        };
+        member.name = names[i % names.length];
+        member.color = colorPool[i % colorPool.length];
+        return member;
     });
 };
 
 ////
 
-const getGroupIdByUser = async function(userId) {
+const getGroupById = async function(groupId) {
+    const query = Group.findOne({'_id': groupId});
+    return await query.exec()
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
+const getGroupIdByUserId = async function(userId) {
     const query = {
         members: {
             $elemMatch: {
@@ -120,77 +80,125 @@ const getGroupIdByUser = async function(userId) {
     return null;
 };
 
-const getGroupById = async function(groupId) {
-    const query = Group.findOne({'_id': groupId});
-    return await query.exec()
-        .catch((err) => console.log(err));
-};
-
-////
-
-exports.getUserTask = async function(userId) {
-    const data = {
-        topics: await sampleTopics(numTopics)
+const getAvailableGroup = async function() {
+    const query = {
+        topic: {$exists: false},
+        nMembers: {$lt: nMembers}
     };
 
-    const groupId = await getGroupIdByUser(userId);
-    if (groupId !== null) {
-        data.group = await getGroupById(groupId);
+    let group = await Group.findOne(query, {}, {sort: {created: 1}});
+    if (group === null) {
+        group = await initializeGroup();
     }
 
-    return data;
-};
-
-exports.getAvailableGroup = async function(userId, scores) {
-    const topicId = scores[0].topicId;
-    const results = await this.popPretestScores(userId);
-    if (results === null) return null;
-
-    let members = [userId];
-    results.forEach(x => {
-        Array(acceptableRank).fill().forEach((_, i) => {
-            if (x.scores[i].topicId === topicId) members.push(x.userId);
-        });
-    });
-
-    if (members.length >= numMembers) {
-        return await initializeGroup(topicId, members.slice(0, numMembers));
-    }
-
-    return null;
+    return group;
 };
 
 ////
 
-exports.pushPretestScores = async function(userId, sessionId, scores) {
-    let results = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
-    if (results === null) results = [];
-
-    let found = false;
-    results.forEach(result => {
-        if (result.userId === userId) {
-            found = true;
-            result.scores = scores;
+exports.getUserTask = async function(userId, collaborative) {
+    if (!collaborative) {
+        return {
+            topics: sampleTopics(nTopics)
         }
-    });
+    }
 
-    if (!found) {
-        results.push({
+    const groupId = await getGroupIdByUserId(userId);
+    if (groupId !== null) {
+        return await getGroupById(groupId);
+    }
+
+    const group = await getAvailableGroup();
+    group.members.push({userId: userId});
+    group.nMembers = group.members.length;
+
+    group.markModified('members');
+    await group.save();
+    return group;
+};
+
+exports.getUserGroup = async function(userId) {
+    const groupId = await getGroupIdByUserId(userId);
+    if (groupId === null) {
+        return null;
+    }
+
+    return await getGroupById(groupId);
+};
+
+////
+
+exports.savePretestScores = async function(userId, scores) {
+    const groupId = await getGroupIdByUserId(userId);
+    if (groupId === null) {
+        return;
+    }
+
+    const group = await getGroupById(groupId);
+    if (group.scores.filter(x => x.userId === userId).length <= 0) {
+        group.scores.push({
             userId: userId,
             scores: scores
         });
-    }
 
-    await redis.setAsync(REDIS_PRETEST_SCORES_QUEUE, JSON.stringify(results));
-    return results;
+        group.markModified('scores');
+        await group.save();
+    }
 };
 
-exports.popPretestScores = async function(userId) {
-    let results = JSON.parse(await redis.getAsync(REDIS_PRETEST_SCORES_QUEUE));
-    if (results !== null) {
-        results = results.filter(x => x.userId !== userId);
-        await redis.setAsync(REDIS_PRETEST_SCORES_QUEUE, JSON.stringify(results));
+exports.setGroupTopic = async function(userId) {
+    const groupId = await getGroupIdByUserId(userId);
+    if (groupId === null) {
+        return null;
     }
 
-    return results;
+    const group = await getGroupById(groupId);
+
+    const membersComplete = group.members.length >= nMembers;
+    const pretestComplete = group.scores.length >= nMembers;
+    if (!membersComplete || !pretestComplete) {
+        return null;
+    }
+
+    ////
+
+    let totals = {};
+    group.scores.forEach(member => {
+        member.scores.forEach(score => {
+            const i = score.topicId;
+            if (!totals[i]) totals[i] = 0;
+            totals[i] += score.score;
+        })
+    });
+
+    let minScore = Infinity;
+    let minId = null;
+    Object.keys(totals).forEach(topicId => {
+        if (totals[topicId] < minScore) {
+            minId = topicId;
+        }
+    });
+
+    group.topic = topics[minId.toString()];
+    group.members = addGroupMembersData(group.members);
+    group.markModified("members");
+    await group.save();
+
+    return group;
+};
+
+exports.removeUserFromGroup = async function(userId) {
+    const groupId = await getGroupIdByUserId(userId);
+    if (groupId === null) {
+        return;
+    }
+
+    const group = await getGroupById(groupId);
+    group.members = group.members.filter(x => x.userId !== userId);
+    group.scores = group.scores.filter(x => x.userId !== userId);
+    group.nMembers = group.members.length;
+
+    group.markModified('members');
+    group.markModified('scores');
+    await group.save();
 };

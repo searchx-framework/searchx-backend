@@ -48,17 +48,6 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/static'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session({
-    resave: true,
-    saveUninitialized: true,
-    secret: 'gFCfcFnpwVIP682neT0KoPUymH6XVE669yMi8sZrbV',
-    name: 'searchx.api.sid',
-    cookie: {maxAge: 3600000*24*365},
-    store: new connectMongo({
-        url: 'mongodb://heroku_dv02792b:ub5gq9n1aabpjna4nsofhp403k@ds047474.mongolab.com:47474/heroku_dv02792b',
-        collection: 'sessions'
-    })
-}));
 app.use(passport.initialize());
 app.use(passport.session());
 

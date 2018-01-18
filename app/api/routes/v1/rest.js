@@ -1,9 +1,9 @@
 'use strict';
 
-const LogCtrl         = require('../controllers/log');
-const SearchCtrl      = require('../controllers/search');
-const SessionCtrl     = require('../controllers/session');
-const TaskCtrl        = require('../controllers/task');
+const LogCtrl         = require('../../controllers/log');
+const SearchCtrl      = require('../../controllers/search');
+const SessionCtrl     = require('../../controllers/session');
+const TaskCtrl        = require('../../controllers/task');
 
 module.exports = function(router) {
     // Set Content-Type for all responses
@@ -21,10 +21,7 @@ module.exports = function(router) {
     });
 
     // Search resource
-    router.get('/search/web', SearchCtrl.searchWeb);
-    router.get('/search/news', SearchCtrl.searchNews);
-    router.get('/search/images', SearchCtrl.searchImages);
-    router.get('/search/videos', SearchCtrl.searchVideos);
+    router.get('/search/:vertical', SearchCtrl.search);
 
     // User resource
     router.get('/users/:userId/task', TaskCtrl.getUserTask);

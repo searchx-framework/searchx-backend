@@ -4,21 +4,20 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load environment configurations
-var config   = require('../app/config/config');
+const config   = require('../app/config/config');
 
 // Load dependencies
-var supertest  = require('supertest');
-var should     = require('should');
-var shouldHttp = require('should-http');
-var request    = supertest(config.url + ':' + config.port + '/v1');
+const supertest  = require('supertest');
+const should     = require('should');
+const shouldHttp = require('should-http');
+const request    = supertest(config.url + ':' + config.port + '/v1');
 
+const session = require('../app/models/session');
+const bookmark = session.bookmark;
+const User = require('../app/models/user');
+const BookmarkService = require('../app/service/session');
 
-var session = require('../app/models/session');
-var bookmark = session.bookmark;
-var User = require('../app/models/user');
-var BookmarkCrl = require('../app/controllers/session');
-
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -28,14 +27,14 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 // Test the resource
 describe('Bookmark resource', function() {
   
-    var bookmark1  = {
+    const bookmark1  = {
          url : "https://www.test.nl",
          title : "teste",
          userId : '908727'
     }; 
 
   
-    var bookmark2  = {
+    const bookmark2  = {
         url : "https://www.test.nl",
         title : "teste",
         userId : '908727'
@@ -77,15 +76,11 @@ describe('Bookmark resource', function() {
             });
     });
 
-    it('should return correct bookmark number for url', function(done) {
-        BookmarkCrl.isBookmarked(bookmark1.userId, bookmark1.url,
-            function(r) {
-                r.should.be.exactly(true);
+    it('should return correct bookmark for url', function(done) {
+        BookmarkService.getBookmark(bookmark1.userId, bookmark1.url)
+            .then((r) => {
+                r.toObject().should.be.exactly(bookmark1);
                 done();
-            }
-        );
-        
+            });
     });
-
-
 });

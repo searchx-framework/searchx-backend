@@ -20,7 +20,7 @@ const CacheSchema = new Schema({
         type: Number,
         required: true
     },
-    results: {
+    data: {
         type: Schema.Types.Mixed,
         required: true
     },

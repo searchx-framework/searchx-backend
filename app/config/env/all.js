@@ -10,7 +10,7 @@ module.exports = {
         name: 'SearchX API'
     },
 
-    outDir: 'out',
+    outDir: './out',
     cacheFreshness: 3600,
     scrapFreshness: 60 * 60 * 24,
 

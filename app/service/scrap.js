@@ -1,12 +1,18 @@
 const queue = require('../config/initializers/kue');
 const puppeteer = require('puppeteer');
 const request = require('request');
+
 const fs = require('fs');
+const http = require('http');
+const https = require('https');
 
 const mongoose = require('mongoose');
 const Page = mongoose.model('Page');
 
 const config = require('../config/config');
+if (!fs.existsSync(config.outDir)) {
+    fs.mkdirSync(config.outDir);
+}
 
 ////
 
@@ -43,11 +49,65 @@ exports.processScrapPage = async function(url) {
     }
 
     try {
-        await savePage(url);
+        if(isFile(url)) {
+            await saveFile(url);
+        } else {
+            await savePage(url);
+        }
     }
     catch(err) {
         saveHtmlFallback(url);
     }
+};
+
+////
+
+const getExtension = function(url) {
+    return url
+        .split('?')[0]
+        .split('/').pop()
+        .split('.').pop();
+};
+
+const isFile = function(url) {
+    let extension = getExtension(url);
+    if(extension === undefined) return false;
+
+    extension = extension.toLowerCase();
+    return extension === 'pdf' || extension === 'jpg' || extension === 'png';
+};
+
+const saveFile = async function(url) {
+    const id = await upsertPage(url, {
+        'url': url,
+        'timestamp': Math.floor(Date.now())
+    });
+
+    ////
+
+    const extension = getExtension(url);
+    const dir = config.outDir + '/files/';
+    const path = dir + id + '.' + extension;
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
+    const protocol = url.split(':')[0];
+    const stream  = fs.createWriteStream(path);
+
+    if (protocol === 'https') {
+        https.get(url, (res) => res.pipe(stream))
+            .on('error', (err) => console.log(err));
+    } else {
+        http.get(url, (res) => res.pipe(stream))
+            .on('error', (err) => console.log(err));
+    }
+
+    ////
+
+    upsertPage(url, {
+        'file': path
+    });
 };
 
 ////
@@ -61,22 +121,24 @@ const savePage = async function(url) {
     const body = await page.content();
     const id = await upsertPage(url, {
         'url': url,
-        'html': body,
-        'timestamp': Math.floor(Date.now())
+        'timestamp': Math.floor(Date.now()),
+        'html': body
     });
 
-    const dir = config.outDir + '/img/';
+    const dir = config.outDir + '/screenshots/';
     const filepath = dir + id + '.png';
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
 
     await page.screenshot({fullPage: true, path: filepath});
-    await upsertPage(url, {
+    await browser.close();
+
+    ////
+
+    upsertPage(url, {
         'screenshot': filepath
     });
-
-    await browser.close();
 };
 
 const saveHtmlFallback = function(url) {

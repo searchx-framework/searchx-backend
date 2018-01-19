@@ -14,12 +14,13 @@ const PageSchema = new Schema({
         default: Date.now()
     },
     html: {
-        type: String,
-        required: false
+        type: String
     },
     screenshot: {
-        type: String,
-        required: false
+        type: String
+    },
+    file: {
+        type: String
     }
 });
 

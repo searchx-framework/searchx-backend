@@ -61,7 +61,7 @@ module.exports = function(io) {
             }
         });
 
-        socket.on('pushGroupTimeout', async (data) => {
+        socket.on('pushUserLeave', async (data) => {
             await Task.removeUserFromGroup(data.userId);
         });
 

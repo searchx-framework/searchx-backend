@@ -194,6 +194,10 @@ exports.removeUserFromGroup = async function(userId) {
     }
 
     const group = await getGroupById(groupId);
+    if (group.hasOwnProperty('topic')) {
+        return;
+    }
+
     group.members = group.members.filter(x => x.userId !== userId);
     group.scores = group.scores.filter(x => x.userId !== userId);
     group.nMembers = group.members.length;

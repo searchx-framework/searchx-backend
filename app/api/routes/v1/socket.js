@@ -55,6 +55,7 @@ module.exports = function(io) {
             const group = await Task.setGroupTopic(data.userId);
 
             if (group !== null) {
+                console.log('Group ' + group._id + ' has been assigned topic "' + group.topic.title + '"');
                 gio.to(socket.groupId).emit('groupData', {
                     group: group
                 });
@@ -62,6 +63,7 @@ module.exports = function(io) {
         });
 
         socket.on('pushUserLeave', async (data) => {
+            console.log(data.userId + ' has been removed ' + "(" + socket.id + ")");
             await Task.removeUserFromGroup(data.userId);
         });
 

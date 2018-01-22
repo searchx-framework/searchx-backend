@@ -5,12 +5,10 @@ const Schema   = mongoose.Schema;
 
 const BookmarkSchema = new Schema({
     sessionId: {
-        type: String,
-        required: true
+        type: String
     },
     userId: {
-        type: String,
-        required: true
+        type: String
     },
     created: {
         type: Date,
@@ -42,12 +40,10 @@ const BookmarkSchema = new Schema({
 
 const QueryHistorySchema = new Schema({
     sessionId: {
-        type: String,
-        required: true
+        type: String
     },
     userId: {
-        type: String,
-        required: true
+        type: String
     },
     created: {
         type: Date,

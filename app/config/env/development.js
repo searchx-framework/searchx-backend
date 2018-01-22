@@ -6,5 +6,5 @@ module.exports = {
     client: 'http://localhost:3000',
     db: 'mongodb://localhost/searchx',
     redis: 'redis://localhost:6379',
-    bingAccessKey: '2314c33bc76242e3bfcf404938a0155d', /* sindunuragarp@gmail.com */
+    bingAccessKey: '2dc977d4fe444173be6155559264e442', /* f.moraes */
 };

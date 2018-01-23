@@ -5,16 +5,13 @@ const Schema   = mongoose.Schema;
 
 const LogSchema = new Schema({
     userId: {
-        type: String,
-        required: true
+        type: String
     },
     sessionId: {
-        type: String,
-        required: true
+        type: String
     },
     date: {
-        type: Date,
-        required: true
+        type: Date
     },
     task: {
         type: Schema.Types.Mixed
@@ -24,8 +21,7 @@ const LogSchema = new Schema({
         required: true
     },
     meta: {
-        type: Schema.Types.Mixed,
-        required: true
+        type: Schema.Types.Mixed
     }
 });
 

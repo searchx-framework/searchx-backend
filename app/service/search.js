@@ -68,7 +68,7 @@ function searchAsync(query, pageNumber, vertical) {
  * @params {body} result body received from the api call
  */
 function formatResults(vertical, body) {
-    if (!body || !(body.value || body.webPages.value)) {
+    if (!body && !(body.value || body.webPages.value)) {
         throw new Error('No results from search api.');
     }
 

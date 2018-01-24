@@ -10,6 +10,8 @@ exports.createLog = async function(userId, eventData) {
             error = true;
             break;
         }
+
+        eventData[i].date = new Date();
     }
 
     if (error) {

@@ -16,5 +16,5 @@ exports.createLog = async function(userId, eventData) {
         throw new Error('Bad Request')
     }
 
-    await Log.insertMany(eventData);
+    Log.insertMany(eventData);
 };

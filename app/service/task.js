@@ -175,6 +175,7 @@ exports.setGroupTopic = async function(userId) {
     let minId = null;
     Object.keys(totals).forEach(topicId => {
         if (totals[topicId] < minScore) {
+            minScore = totals[topicId];
             minId = topicId;
         }
     });

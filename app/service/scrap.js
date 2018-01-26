@@ -110,11 +110,51 @@ const saveFile = async function(url) {
     });
 };
 
+const saveHtmlFallback = function(url) {
+    request(url, function (error, response, body) {
+        upsertPage(url, {
+            'url': url,
+            'html': body,
+            'timestamp': Math.floor(Date.now())
+        })
+    });
+};
+
 ////
 
+let browser = null;
+let browserStarting = false;
+
+const waitForNewPage = async function() {
+    while (browserStarting) {
+        await sleep(1000);
+        if (!browserStarting) {
+            break;
+        }
+    }
+
+    if (browser === null) {
+        browserStarting = true;
+        browser = await puppeteer.launch();
+        browserStarting = false;
+    }
+
+    try {
+        return await browser.newPage();
+    } catch(err) {
+        console.log(err);
+    }
+
+    browser = null;
+    return null;
+};
+
+const sleep = function(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 const savePage = async function(url) {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    const page = await waitForNewPage();
     await page.goto(url, {waitUntil: 'networkidle2',  timeout: 100000});
     await page.setViewport({width: 1360, height: 768});
 
@@ -132,22 +172,12 @@ const savePage = async function(url) {
     }
 
     await page.screenshot({fullPage: true, path: filepath});
-    await browser.close();
+    await page.close();
 
     ////
 
     upsertPage(url, {
         'screenshot': filepath
-    });
-};
-
-const saveHtmlFallback = function(url) {
-    request(url, function (error, response, body) {
-        upsertPage(url, {
-            'url': url,
-            'html': body,
-            'timestamp': Math.floor(Date.now())
-        })
     });
 };
 

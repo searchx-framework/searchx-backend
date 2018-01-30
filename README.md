@@ -1,32 +1,49 @@
-# Current build
+# SearchX API
 
-![Travis CI build status]()
+The API is responsible for fetching search requests to the search provider and managing the application's data.
 
-# Pienapple API
+---
+## Set up instructions
 
-- URL: http://api.pienapple.com
-- API Specification: http://docs.pienapple.com
+- Install NodeJS: https://nodejs.org/en/ (at least version 8.0)
+```
+sudo apt install npm
 
-# Set up instructions
+// Check if node is installed
+which node
+```
 
-- Install NodeJS: https://nodejs.org/en/
 - Install MongoDB: https://www.mongodb.com/
+```
+sudo apt install mongodb-server
+
+// Start MongoDB
+mongod
+
+// Check if MongoDB is running
+mongo 
+```
+
 - Install Redis: https://redis.io/
+```
+sudo apt install redis-server
+
+// Start Redis
+redis-server
+
+// Check if Redis is running
+redis-cli
+> PING (should return PONG) 
 
 ```
+
+- Set up Server
+```
 // Clone the repository
-git clone https://github.com/felipemoraes/pienapple-api.git
+git clone https://github.com/felipemoraes/searchx-api.git
 
 // Install dependencies
 npm install
-
-// In a new terminal window, start the external and internal databases
-
-// Start MongoDB locally
-mongod
-
-// Start Redis locally
-redis-server
 
 // For development, inside app/env/config/development.js set:
 -  MongoDB and redis address
@@ -42,14 +59,27 @@ module.exports = {
     bingAccessKey: 'XXXXXX'
 };
 
+// Install foreman
+npm -g install foreman
+
 // Start the development server
-foreman start -f Procfile.development -e environment.development
+./run.sh
+
+// Check if API is running (curl or through browser)
+curl http://localhost:3001/v1
 ```
 
-// Now open the browser at http://localhost:3001/v1/ and check if API is alive
-
-# API Specification 
+---
+## Running tests
 ```
+// Perform all the steps above and run:
+npm test
+```
+
+---
+## API Specification 
+```
+// Search
 [address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]
 - address: address set in the configuration file
 - vertical: web, images, videos, news
@@ -57,10 +87,23 @@ foreman start -f Procfile.development -e environment.development
 - page: page number
 ```
 
-# Running tests
-```
+---
+## Modifications
 
-// Perform all the steps above and run:
-npm test
+### Changing the search provider
+The code responsible for communicating with the search provider can be found under `app/service/search.js`.
+The functions that will need to be modified are `searchAsync` which encapsulates the api request to the search provider 
+and `formatResults` which transforms the results received into the format we use.
 
-```
+### Adding additional topics
+The learning topics that are passed to the front end is defined inside `static/data/topics.json`.
+To add a new topic, you can add a new entry to the json file.
+
+### Increasing group size
+The `numMembers` configuration can be changed inside `app/config/all.js`.
+Additionally, you might also need to add more colors into the `colorPool` configuration.
+
+---
+## License
+
+[MIT](https://opensource.org/licenses/MIT)

@@ -4,18 +4,18 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load environment configurations
-var config = require('../app/config/config');
+const config = require('../app/config/config');
 
 // Load dependencies
-var supertest = require('supertest');
-var should = require('should');
-var shouldHttp = require('should-http');
-var request = supertest(config.url + ':' + config.port + '/v1');
+const supertest = require('supertest');
+const should = require('should');
+const shouldHttp = require('should-http');
+const request = supertest(config.url + ':' + config.port + '/v1');
 
-var Log = require('../app/models/log');
-var LogCtrl = require('../app/controllers/log');
+const Log = require('../app/models/log');
+const LogCtrl = require('../app/api/controllers/log');
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -23,9 +23,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 // Test the resource
 describe('Log', function () {
 
-    var uid = '123';
-    var eventQueue = [];
-    var tid = "A"
+    const uid = '123';
+    const tid = "A";
+    let eventQueue = [];
 
     it('should handle the addition of a log entry', function (done) {
 

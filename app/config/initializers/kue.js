@@ -1,11 +1,11 @@
 'use strict';
 
-var kue    = require('kue');
-var url    = require('url');
-var config = require('../config');
-var redisUrl = url.parse(config.redis);
+const kue    = require('kue');
+const url    = require('url');
+const config = require('../config');
+const redisUrl = url.parse(config.redis);
 
-var queue = null;
+let queue = null;
 if(redisUrl.auth){
     queue = kue.createQueue({
         redis: {
@@ -22,8 +22,8 @@ if(redisUrl.auth){
         }
     });
 }
-queue.watchStuckJobs();
 
+queue.watchStuckJobs();
 queue.on('error', function(err){
     console.log('Error: Redis is down: ', err);
 });

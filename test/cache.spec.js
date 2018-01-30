@@ -4,39 +4,39 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load environment configurations
-var config   = require('../app/config/config');
+const config   = require('../app/config/config');
 
 // Load dependencies
-var supertest  = require('supertest');
-var should     = require('should');
+const supertest  = require('supertest');
+const should     = require('should');
 
-var Cache = require('../app/models/cache');
-var cache = require('../app/controllers/cache');
+const Cache = require('../app/models/cache');
+const cache = require('../app/service/cache');
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)
 
 describe('cache', function(){
-    var query1 = "business"
-    var query2 = "business-2";    
-    var vertical = "web";
-    var page = 2;
-    var results1  = {
+    const query1 = "business";
+    const query2 = "business-2";
+    const vertical = "web";
+    const page = 2;
+    const results1  = {
         'results' : ["RES"],
         'matches' : 1,
         'id': 'id'
     }; 
-    var results2  = {
+    const results2  = {
         'results' : ["RES-2"],
         'matches' : 1,
         'id': 'id'
     }; 
 
-    var body = {
+    const body = {
         'results' : ["RES"],
         'matches' : 1,
         'id': 'id'
-    }
+    };
 
     //before the test runs, make sure the cache is clean
     before(function() {
@@ -53,7 +53,7 @@ describe('cache', function(){
     }); 
 
     it('should handle an addition to the cache', function(done){
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, body); 
+        const b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, body);
         b1.should.be.true();
         done();
     });
@@ -64,7 +64,7 @@ describe('cache', function(){
             res.should.be.deepEqual(results1);
             done();
         });
-    })
+    });
 
     it('should recognize an uncached result', function(done){
         cache.getSearchResultsFromCache(query2, vertical, page, function(isHit, res){
@@ -72,7 +72,7 @@ describe('cache', function(){
             res.should.deepEqual({});
             done();
         });
-    })  
+    });
 
     it('should retrieve the most recent cache entry', function(done){
         cache.addSearchResultsToCache(query1, vertical, page, new Date(), results2, body);
@@ -85,48 +85,48 @@ describe('cache', function(){
                 done();
             });            
         }, 500); 
-    })   
+    });
     
     it('should reject non-sensical additions to the cache (null as param)', function (done) {
-        var b1 = cache.addSearchResultsToCache(null);
+        const b1 = cache.addSearchResultsToCache(null);
         b1.should.be.false();
         done();
     });
 
     it('should reject non-sensical addition to the cache (result string)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), "RES", body);
+        const b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), "RES", body);
         b1.should.be.false();
         done();
     });    
 
     it('should reject non-sensical addition to the cache (body string)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, "BODY");
+        const b1 = cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, "BODY");
         b1.should.be.false();
         done();
     });
 
     it('should reject non-sensical addition to the cache (function as param)', function (done) {
-        var b1 = cache.addSearchResultsToCache(function () { return 1; });
+        const b1 = cache.addSearchResultsToCache(function () { return 1; });
         b1.should.be.false();
         done();
     });    
 
 
     it('should reject non-sensical addition to the cache (single string as param)', function (done) {
-        var b1 = cache.addSearchResultsToCache("unexpected input");
+        const b1 = cache.addSearchResultsToCache("unexpected input");
         b1.should.be.false();
         done();
     });  
     
     it('should reject non-sensical addition to the cache (negative page number in param)', function (done) {
-        var b1 = cache.addSearchResultsToCache(query1, vertical, -1000, new Date(), results1, body);
+        const b1 = cache.addSearchResultsToCache(query1, vertical, -1000, new Date(), results1, body);
         b1.should.be.false();
         done();
     });    
 
 
     it('should reject non-sensical addition to the cache (null query)', function (done) {
-        var b1 = cache.addSearchResultsToCache(null, vertical, page, new Date(), results1, body);
+        const b1 = cache.addSearchResultsToCache(null, vertical, page, new Date(), results1, body);
         b1.should.be.false();
         done();
     });  
@@ -137,7 +137,7 @@ describe('cache', function(){
             res.should.deepEqual({});
         });
         done();
-    })  
+    });
     
     it('should return no cache hit when the input is non-sensical (undefined query)', function (done) {
         cache.getSearchResultsFromCache(undefined, vertical, page, function (isHit, res) {
@@ -145,7 +145,7 @@ describe('cache', function(){
             res.should.deepEqual({});
         });
         done();
-    }) 
+    });
     
 
     it('should throw error when the input is non-sensical (lack of params)', function (done) {
@@ -157,7 +157,7 @@ describe('cache', function(){
         } catch (e) {
             done();
         }
-    })  
+    });
     
 
     it('should return no cache hit when the input is non-sensical (function params)', function (done) {
@@ -166,7 +166,7 @@ describe('cache', function(){
             res.should.deepEqual({});
         });
          done();
-    })     
+    });
 
 
     it('should return no cache hit when the input is non-sensical (null page)', function (done) {
@@ -176,5 +176,5 @@ describe('cache', function(){
         });
         done();
     })     
-})
+});
 

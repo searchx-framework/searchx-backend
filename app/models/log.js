@@ -1,27 +1,27 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema   = mongoose.Schema;
 
-var LogSchema = new Schema({
+const LogSchema = new Schema({
     userId: {
-        type: String,
-        required: true
+        type: String
+    },
+    sessionId: {
+        type: String
     },
     date: {
-        type: Date,
-        required: true
+        type: Date
+    },
+    task: {
+        type: Schema.Types.Mixed
     },
     event: {
         type: String,
         required: true
     },
     meta: {
-        type: Schema.Types.Mixed,
-        required: true
-    },
-    task: {
-        type: Object
+        type: Schema.Types.Mixed
     }
 });
 

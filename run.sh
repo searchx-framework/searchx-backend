@@ -1,1 +1,1 @@
-nf start -f Procfile.development -e environment.development
+nf start -f Procfile -e environment.development

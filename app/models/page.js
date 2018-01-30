@@ -1,9 +1,9 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema   = mongoose.Schema;
 
-var PageSchema = new Schema({
+const PageSchema = new Schema({
     url: {
         type: String,
         required: true
@@ -14,12 +14,13 @@ var PageSchema = new Schema({
         default: Date.now()
     },
     html: {
-        type: String,
-        required: false
+        type: String
     },
     screenshot: {
-        type: String,
-        required: false
+        type: String
+    },
+    file: {
+        type: String
     }
 });
 

@@ -4,22 +4,26 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load the config
-var config = require('./app/config/config');
+const config = require('./app/config/config');
 
 // Load dependencies
-var express      = require('express');
-var session      = require('express-session');
-var connectMongo = require('connect-mongo')(session);
-var bodyParser   = require('body-parser');
-var app          = express();
-var router       = express.Router();
-var swig         = require('swig');
-var passport     = require('passport');
-var fs           = require('fs');
+const express      = require('express');
+const session      = require('express-session');
+const connectMongo = require('connect-mongo')(session);
+const bodyParser   = require('body-parser');
+const swig         = require('swig');
+const passport     = require('passport');
+
+// Setup server
+const app          = express();
+const router       = express.Router();
+const http         = require('http').Server(app);
+const io           = require('socket.io').listen(http);
 
 // Init
 require('./app/config/initializers/mongoose')(config.db);
-require('./app/router/v1')(router);
+require('./app/api/routes/v1/rest')(router);
+require('./app/api/routes/v1/socket')(io);
 
 // Engine
 app.engine('html', swig.renderFile);
@@ -44,28 +48,17 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/static'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session({
-    resave: true,
-    saveUninitialized: true,
-    secret: 'gFCfcFnpwVIP682neT0KoPUymH6XVE669yMi8sZrbV',
-    name: 'searchx.api.sid',
-    cookie: {maxAge: 3600000*24*365},
-    store: new connectMongo({
-        url: 'mongodb://heroku_dv02792b:ub5gq9n1aabpjna4nsofhp403k@ds047474.mongolab.com:47474/heroku_dv02792b',
-        collection: 'sessions'
-    })
-}));
-
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/v1', router);
 
+// Routes
+app.use('/v1', router);
 app.get('/', function(req, res) {
     res.redirect(config.client);
 });
 
 // Start the server
 console.log('Starting Server');
-var server = app.listen(app.get('port'), function() {
+http.listen(app.get('port'), function() {
     console.log('SearchX API is running on port', app.get('port'));
 });

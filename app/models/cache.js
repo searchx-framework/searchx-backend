@@ -1,9 +1,9 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema   = mongoose.Schema;
 
-var CacheSchema = new Schema({
+const CacheSchema = new Schema({
     date: {
         type: Date,
         required: true
@@ -20,7 +20,7 @@ var CacheSchema = new Schema({
         type: Number,
         required: true
     },
-    results: {
+    data: {
         type: Schema.Types.Mixed,
         required: true
     },

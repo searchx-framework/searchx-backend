@@ -1,6 +1,7 @@
 'use strict';
 
-const Session = require('../../service/session');
+const bookmark = require('../../../services/session/bookmark');
+const queryhistory = require('../../../services/session/queryhistory');
 
 ////
 
@@ -8,7 +9,7 @@ exports.addBookmark = function(req, res) {
     const data = req.body;
     const sessionId = req.params.sessionId;
 
-    Session.addBookmark(sessionId, data)
+    bookmark.addBookmark(sessionId, data)
         .then(() => {
             res.status(201).json({
                 error: false
@@ -28,7 +29,7 @@ exports.removeBookmark = function(req,res) {
     const url = req.body.url;
     const sessionId = req.params.sessionId;
 
-    Session.removeBookmark(sessionId, url)
+    bookmark.removeBookmark(sessionId, url)
         .then(() => {
             res.status(201).json({
                 error: false
@@ -48,7 +49,7 @@ exports.starBookmark = function(req, res) {
     const url = req.body.url;
     const sessionId = req.params.sessionId;
 
-    Session.starBookmark(sessionId, url)
+    bookmark.starBookmark(sessionId, url)
         .then(() => {
             res.status(201).json({
                 error: false
@@ -69,7 +70,7 @@ exports.starBookmark = function(req, res) {
 exports.getBookmarks = function(req, res) {
     const sessionId = req.params.sessionId;
 
-    Session.getBookmarks(sessionId)
+    bookmark.getBookmarks(sessionId)
         .then((docs) => {
             res.status(201).json({
                 error: false,
@@ -89,7 +90,7 @@ exports.getBookmarks = function(req, res) {
 exports.getQueryHistory = function(req, res) {
     const sessionId = req.params.sessionId;
 
-    Session.getQueryHistory(sessionId)
+    queryhistory.getQueryHistory(sessionId)
         .then((docs) => {
             res.status(201).json({
                 error: false,

@@ -1,12 +1,12 @@
 'use strict';
 
-const Log = require('../../service/log');
+const log = require('../../../services/log');
 
 exports.createLog = function(req, res) {
     const userId = req.params.userId;
     const eventData = req.body.data;
 
-    Log.createLog(userId, eventData)
+    log.createLog(userId, eventData)
         .then(() => {
             res.status(201).json({
                 error: false

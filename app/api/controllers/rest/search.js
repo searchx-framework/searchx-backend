@@ -1,19 +1,19 @@
 'use strict';
 
-const Search = require('../../service/search');
-const Scrap = require('../../service/scrap');
+const search = require('../../../services/search');
+const scrap = require('../../../services/scrap');
 
 exports.search = function(req, res) {
     const userId = req.query.userId || '';
     const sessionId = req.query.sessionId || '';
 
     const query = req.query.query || '';
-    const pageNumber = parseInt(req.query.page) || 1;
     const vertical = req.params.vertical;
+    const pageNumber = parseInt(req.query.page) || 1;
 
-    Search.search(query, pageNumber, vertical, sessionId)
+    search.search(query, vertical, pageNumber, sessionId)
         .then((data) => {
-            Scrap.scrapPage(data.results);
+            scrap.scrapPage(data.results);
             res.status(200).json(data);
         })
         .catch((err) => {

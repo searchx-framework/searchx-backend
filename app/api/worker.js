@@ -1,6 +1,6 @@
 'use strict';
 
-const Scrap = require('../service/scrap');
+const Scrap = require('../services/scrap');
 
 ////
 

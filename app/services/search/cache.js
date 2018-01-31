@@ -2,17 +2,17 @@
 
 const mongoose = require('mongoose');
 const Cache = mongoose.model('Cache');
-const Utils = require('../utils');
+const Utils = require('../../utils');
 
 ////
 
-exports.addSearchResultsToCache = function(query, vertical, page, date, data, body){
+exports.addSearchResultsToCache = function(query, vertical, page, date, data){
     if (arguments.length !== 6) {
         console.log('Could not create a new cache - Arguments.');
         return false;
     }
 
-    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data) || !Utils.isObject(body)) {
+    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data)) {
         console.log('Could not create a new cache - types.');
         return false;
     }
@@ -22,8 +22,7 @@ exports.addSearchResultsToCache = function(query, vertical, page, date, data, bo
             query: query,
             vertical: vertical,
             page:  page,
-            data: data,
-            body: body
+            data: data
     });
 
     C.save(function(error) {

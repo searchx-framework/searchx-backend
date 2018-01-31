@@ -1,9 +1,9 @@
 'use strict';
 
-const LogCtrl         = require('../../controllers/log');
-const SearchCtrl      = require('../../controllers/search');
-const SessionCtrl     = require('../../controllers/session');
-const TaskCtrl        = require('../../controllers/task');
+const LogCtrl         = require('../../controllers/rest/log');
+const SearchCtrl      = require('../../controllers/rest/search');
+const SessionCtrl     = require('../../controllers/rest/session');
+const TaskCtrl        = require('../../controllers/rest/task');
 
 module.exports = function(router) {
     // Set Content-Type for all responses

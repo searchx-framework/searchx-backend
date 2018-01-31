@@ -91,18 +91,23 @@ npm test
 # Modifications
 
 ### Changing the search provider
-The code responsible for communicating with the search provider can be found under `app/service/search.js`.
-The functions that will need to be modified are `searchAsync` which encapsulates the api request to the search provider 
-and `formatResults` which transforms the results received into the format we use.
+Communication with the search provider is encapsulated under `app/service/search/provider.js`.
+You would need to change `fetch` to request the appropriate resource to the search provider
+and `formatResults` to transform the results received into the format we use.
 
-### Adding additional topics
+### Modifying the learning task
+1. Adding new topics   
 The learning topics that are passed to the front end is defined inside `static/data/topics.json`.
 To add a new topic, you can add a new entry to the json file.
 
-### Increasing group size
+2. Increasing group size   
 The `numMembers` configuration can be changed inside `app/config/all.js`.
 Additionally, you might also need to add more colors into the `colorPool` configuration.
 
+### Creating a custom task
+To define a new task in the backend, you can add a new service inside `app/service/task/` 
+and then change `index.js` to serve the task description from the new service.
+
 # License
 
-[MIT](https://opensource.org/licenses/MIT)
+[MIT](https://opensource.org/licenses/MIT) License

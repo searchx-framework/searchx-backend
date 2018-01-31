@@ -13,7 +13,7 @@ const shouldHttp = require('should-http');
 const request = supertest(config.url + ':' + config.port + '/v1');
 
 const Log = require('../app/models/log');
-const LogCtrl = require('../app/api/controllers/log');
+const LogCtrl = require('../app/api/controllers/rest/log');
 
 const mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)

@@ -8,8 +8,6 @@ const config = require('./app/config/config');
 
 // Load dependencies
 const express      = require('express');
-const session      = require('express-session');
-const connectMongo = require('connect-mongo')(session);
 const bodyParser   = require('body-parser');
 const swig         = require('swig');
 const passport     = require('passport');

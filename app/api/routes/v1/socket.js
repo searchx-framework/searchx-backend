@@ -1,82 +1,28 @@
 'use strict';
 
-const redis = require('../../../config/initializers/redis');
-const Task = require('../../../service/task');
-const Session = require('../../../service/session');
-
-////
-
-const REDIS_USER_SOCKET = "userSocket";
-
-const getUserSocket = async function(userId) {
-    const key = REDIS_USER_SOCKET + "-" + userId;
-    return await redis.getAsync(key);
-};
-
-const setUserSocket = async function(userId, socketId) {
-    const key = REDIS_USER_SOCKET + "-" + userId;
-    await redis.setAsync(key, socketId);
-};
+const session = require('../../controllers/socket/session');
+const learning = require('../../controllers/socket/learning');
 
 ////
 
 module.exports = function(io) {
-
-    const gio = io.of('/group');
+    const gio = io.of('/session');
     gio.on('connection', (socket) => {
 
+        // Register
         socket.on('register', async (data) => {
             console.log(data.userId + ' has connected ' + "(" + socket.id + ")");
-            await setUserSocket(data.userId, socket.id);
-
-            socket.groupId = data.groupId;
-            socket.join(data.groupId);
+            socket.sessionId = data.sessionId;
+            socket.join(data.sessionId);
         });
 
-        ////
+        // Session
+        socket.on('pushSearchState', (data) => session.broadcastSearchState(socket, gio, data));
+        socket.on('pushBookmarkUpdate', (data) => session.broadcastBookmarkUpdate(socket, gio, data));
 
-        socket.on('pushStartPretest', async (data) => {
-            const group = await Task.getUserGroup(data.userId);
-            if (group !== null) {
-                socket.groupId = group._id;
-                socket.join(group._id);
-
-                group.members.forEach(async (member) => {
-                    if (member.userId !== data.userId) {
-                        const socketId = await getUserSocket(member.userId);
-                        gio.to(socketId).emit('startPretest', {});
-                    }
-                });
-            }
-        });
-
-        socket.on('pushPretestScores', async (data) => {
-            await Task.savePretestScores(data.userId, data.scores);
-            const group = await Task.setGroupTopic(data.userId);
-
-            if (group !== null) {
-                console.log('Group ' + group._id + ' has been assigned topic "' + group.topic.title + '"');
-                gio.to(socket.groupId).emit('groupData', {
-                    group: group
-                });
-            }
-        });
-
-        socket.on('pushUserLeave', async (data) => {
-            console.log(data.userId + ' has been removed ' + "(" + socket.id + ")");
-            await Task.removeUserFromGroup(data.userId);
-        });
-
-        ////
-
-        socket.on('pushSearchState', async (data) => {
-            socket.broadcast.to(socket.groupId).volatile.emit('searchState', data);
-            Session.pushQueryHistory(data.sessionId, data.userId, data.state.query)
-                .catch((err) => console.log(err));
-        });
-
-        socket.on('pushBookmarkUpdate', (data) => {
-            socket.broadcast.to(socket.groupId).volatile.emit('bookmarkUpdate', data);
-        });
+        // Task
+        socket.on('pushStartPretest', (data) => learning.handleStartPretest(socket, gio, data));
+        socket.on('pushPretestScores', (data) => learning.handlePretestScores(socket, gio, data));
+        socket.on('pushUserLeave', (data) => learning.handleUserLeave(socket, gio, data));
     });
 };

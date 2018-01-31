@@ -11,7 +11,7 @@ const supertest  = require('supertest');
 const should     = require('should');
 
 const Cache = require('../app/models/cache');
-const cache = require('../app/service/cache');
+const cache = require('../app/services/search/cache');
 
 const mongoose = require('mongoose');
 mongoose.connect(config.db);//FIX (deprecated)

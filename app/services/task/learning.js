@@ -1,7 +1,7 @@
 'use strict';
 
 const underscore = require('underscore');
-const config = require('../config/config');
+const config = require('../../config/config');
 
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
@@ -13,7 +13,7 @@ const nMembers = config.numMembers;
 const namePool = config.namePool;
 const colorPool = config.colorPool;
 
-const topics = require('../../static/data/topics.json');
+const topics = require('../../../static/data/topics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });
@@ -96,7 +96,7 @@ const getAvailableGroup = async function() {
 
 ////
 
-exports.getUserTask = async function(userId, collaborative) {
+exports.getTask = async function(userId, collaborative) {
     if (!collaborative) {
         return {
             topics: sampleTopics(nTopics)
@@ -117,7 +117,7 @@ exports.getUserTask = async function(userId, collaborative) {
     return group;
 };
 
-exports.getUserGroup = async function(userId) {
+exports.getGroup = async function(userId) {
     const groupId = await getGroupIdByUserId(userId);
     if (groupId === null) {
         return null;

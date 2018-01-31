@@ -1,12 +1,12 @@
 'use strict';
 
-const Task = require('../../service/task');
+const task = require('../../../services/task');
 
 exports.getUserTask = function(req, res) {
     const userId = req.params.userId;
     const collaborative = req.query.collaborative === 'true';
 
-    Task.getUserTask(userId, collaborative)
+    task.getUserTask(userId, collaborative)
         .then((data) => {
             res.status(200).json(data);
         })

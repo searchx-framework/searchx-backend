@@ -10,7 +10,6 @@ const Group = mongoose.model('Group');
 
 const nTopics = config.numTopics;
 const nMembers = config.numMembers;
-const namePool = config.namePool;
 const colorPool = config.colorPool;
 
 const topics = require('../../../static/data/topics.json');
@@ -45,9 +44,7 @@ const initializeGroup = async function() {
 };
 
 const addGroupMembersData = function(members) {
-    const names = sample(namePool, nMembers);
     return members.map((member, i) => {
-        member.name = names[i % names.length];
         member.color = colorPool[i % colorPool.length];
         return member;
     });

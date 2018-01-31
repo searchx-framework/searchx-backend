@@ -1,9 +1,12 @@
-# SearchX API
+# SearchX Backend
 
-The API is responsible for fetching search requests to the search provider and managing the application's data.
+SearchX is a scalable collaborative search system being developed by [Lambda Lab](http://www.wis.ewi.tudelft.nl/projects/learning-analytics/) of [TU Delft](https://www.tudelft.nl/).
+It is based on [Pineapple Search](http://onlinelibrary.wiley.com/doi/10.1002/pra2.2016.14505301122/full) and is further developed to facilitate collaborative search and sensemaking.
 
----
-## Set up instructions
+The backend is responsible for fetching search requests to the search provider and managing the application's data. 
+It is built on NodeJS and exposes its endpoints through [express](https://expressjs.com/) (API) and [socket.io](https://socket.io/) (Websockets).
+
+# Setup
 
 - Install NodeJS: https://nodejs.org/en/ (at least version 8.0)
 ```
@@ -51,10 +54,10 @@ npm install
 -  API port and address
 
 module.exports = {
-    db: 'mongodb://localhost/pienapple',
+    port: 4443,
     url: 'http://localhost',
-    port: 3001,
     client: 'http://localhost:3000',
+    db: 'mongodb://localhost/searchx',
     redis: 'redis://localhost:6379',
     bingAccessKey: 'XXXXXX'
 };
@@ -66,17 +69,15 @@ npm -g install foreman
 ./run.sh
 
 // Check if API is running (curl or through browser)
-curl http://localhost:3001/v1
+curl http://localhost:4443/v1
 ```
 
----
 ## Running tests
 ```
 // Perform all the steps above and run:
 npm test
 ```
 
----
 ## API Specification 
 ```
 // Search
@@ -87,8 +88,7 @@ npm test
 - page: page number
 ```
 
----
-## Modifications
+# Modifications
 
 ### Changing the search provider
 The code responsible for communicating with the search provider can be found under `app/service/search.js`.
@@ -103,7 +103,6 @@ To add a new topic, you can add a new entry to the json file.
 The `numMembers` configuration can be changed inside `app/config/all.js`.
 Additionally, you might also need to add more colors into the `colorPool` configuration.
 
----
-## License
+# License
 
 [MIT](https://opensource.org/licenses/MIT)

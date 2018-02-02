@@ -93,7 +93,7 @@ const getAvailableGroup = async function() {
 
 ////
 
-exports.getTask = async function(userId, collaborative) {
+exports.getUserTask = async function(userId, collaborative) {
     if (!collaborative) {
         return {
             topics: sampleTopics(nTopics)

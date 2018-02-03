@@ -16,10 +16,10 @@ const bookmark = require('../session/bookmark');
 exports.search = async function(query, vertical, pageNumber, sessionId) {
     let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber);
     if (!data) {
-        const data = await provider.fetch(query, vertical, pageNumber);
         const date = new Date();
-
+        data = await provider.fetch(query, vertical, pageNumber);
         data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
+
         cache.addSearchResultsToCache(query, vertical, pageNumber, date, data);
     } else {
         data = data.data;

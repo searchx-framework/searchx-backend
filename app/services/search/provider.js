@@ -18,7 +18,7 @@ exports.fetch = function(query, vertical, pageNumber) {
         const callback = function(err, res, body) {
             if (err !== null) return reject(err);
 
-            const data = formatResults(body);
+            const data = formatResults(vertical, body);
             resolve(data);
         };
 

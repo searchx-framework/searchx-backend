@@ -7,7 +7,7 @@ const Utils = require('../../utils');
 ////
 
 exports.addSearchResultsToCache = function(query, vertical, page, date, data){
-    if (arguments.length !== 6) {
+    if (arguments.length !== 5) {
         console.log('Could not create a new cache - Arguments.');
         return false;
     }

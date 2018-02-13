@@ -1,108 +1,68 @@
 'use strict';
 
-const bookmark = require('../../../services/session/bookmark');
 const queryhistory = require('../../../services/session/queryhistory');
+const bookmark = require('../../../services/session/bookmark');
+
+const resolve = function(promise, res, errorMessage) {
+    promise
+        .then((data) => {
+            res.status(201).json({
+                error: false,
+                results: data
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(401).json({
+                error: true,
+                message: errorMessage
+            });
+        });
+};
 
 ////
 
-exports.addBookmark = function(req, res) {
-    const data = req.body;
+exports.getQueryHistory = function(req, res) {
     const sessionId = req.params.sessionId;
-
-    bookmark.addBookmark(sessionId, data)
-        .then(() => {
-            res.status(201).json({
-                error: false
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-
-            res.status(401).json({
-                error: true,
-                message: 'Could not create a new bookmark.'
-            });
-        });
-};
-
-exports.removeBookmark = function(req,res) {
-    const url = req.body.url;
-    const sessionId = req.params.sessionId;
-
-    bookmark.removeBookmark(sessionId, url)
-        .then(() => {
-            res.status(201).json({
-                error: false
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-
-            res.status(401).json({
-                error: true,
-                message: 'Could not delete bookmark.'
-            });
-        });
-};
-
-exports.starBookmark = function(req, res) {
-    const url = req.body.url;
-    const sessionId = req.params.sessionId;
-
-    bookmark.starBookmark(sessionId, url)
-        .then(() => {
-            res.status(201).json({
-                error: false
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-
-            res.status(401).json({
-                error: true,
-                message: 'Could not star/unstar bookmark.'
-            });
-        });
+    resolve(
+        queryhistory.getQueryHistory(sessionId),
+        res, 'Could not get query history.'
+    );
 };
 
 ////
 
 exports.getBookmarks = function(req, res) {
     const sessionId = req.params.sessionId;
-
-    bookmark.getBookmarks(sessionId)
-        .then((docs) => {
-            res.status(201).json({
-                error: false,
-                results: docs
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-
-            res.status(401).json({
-                error: true,
-                message: 'Could not get bookmarks.'
-            });
-        });
+    resolve(
+        bookmark.getBookmarks(sessionId),
+        res, 'Could not get bookmarks.'
+    );
 };
 
-exports.getQueryHistory = function(req, res) {
+exports.addBookmark = function(req, res) {
+    const data = req.body;
     const sessionId = req.params.sessionId;
+    resolve(
+        bookmark.addBookmark(sessionId, data),
+        res, 'Could not create a new bookmark.'
+    );
+};
 
-    queryhistory.getQueryHistory(sessionId)
-        .then((docs) => {
-            res.status(201).json({
-                error: false,
-                results: docs
-            });
-        })
-        .catch((err) => {
-            console.log(err);
+exports.removeBookmark = function(req,res) {
+    const url = req.body.url;
+    const sessionId = req.params.sessionId;
+    resolve(
+        bookmark.removeBookmark(sessionId, url),
+        res, 'Could not delete bookmark.'
+    );
+};
 
-            res.status(401).json({
-                error: true,
-                message: 'Could not get query history.'
-            });
-        });
+exports.starBookmark = function(req, res) {
+    const url = req.body.url;
+    const sessionId = req.params.sessionId;
+    resolve(
+        bookmark.starBookmark(sessionId, url),
+        res, 'Could not star/unstar bookmark.'
+    );
 };

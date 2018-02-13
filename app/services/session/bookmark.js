@@ -31,10 +31,6 @@ exports.addBookmark = async function(sessionId, data) {
 };
 
 exports.removeBookmark = async function(sessionId, url) {
-    if (sessionId === null) {
-        throw new Error('Invalid Session Id');
-    }
-
     const doc = await Bookmark.findOne({
         url: url,
         sessionId: sessionId
@@ -50,10 +46,6 @@ exports.removeBookmark = async function(sessionId, url) {
 };
 
 exports.starBookmark = async function(sessionId, url) {
-    if (sessionId === null) {
-        throw new Error('Invalid Session Id');
-    }
-
     const doc = await Bookmark.findOne({
         url: url,
         sessionId: sessionId

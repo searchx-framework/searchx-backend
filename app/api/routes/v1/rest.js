@@ -28,9 +28,14 @@ module.exports = function(router) {
     router.post('/users/:userId/logs', LogCtrl.createLog);
 
     // Session resource
+    router.get('/session/:sessionId/query', SessionCtrl.getQueryHistory);
     router.get('/session/:sessionId/bookmark', SessionCtrl.getBookmarks);
     router.post('/session/:sessionId/bookmark', SessionCtrl.addBookmark);
     router.post('/session/:sessionId/bookmark/star', SessionCtrl.starBookmark);
     router.delete('/session/:sessionId/bookmark', SessionCtrl.removeBookmark);
-    router.get('/session/:sessionId/query', SessionCtrl.getQueryHistory);
+
+    // Document resource
+    router.get('/session/:sessionId/annotation', SessionCtrl.getAnnotation);
+    router.post('/session/:sessionId/annotation', SessionCtrl.addAnnotation);
+    router.delete('/session/:sessionId/annotation', SessionCtrl.removeAnnotation);
 };

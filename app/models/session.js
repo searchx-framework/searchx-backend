@@ -3,6 +3,24 @@
 const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
+const QueryHistorySchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+
+    query: {
+        type: String,
+        required: true
+    },
+});
+
 const BookmarkSchema = new Schema({
     sessionId: {
         type: String
@@ -38,7 +56,7 @@ const BookmarkSchema = new Schema({
     },
 });
 
-const QueryHistorySchema = new Schema({
+const AnnotationSchema = new Schema({
     sessionId: {
         type: String
     },
@@ -49,13 +67,23 @@ const QueryHistorySchema = new Schema({
         type: Date,
         required: true
     },
-    query: {
+
+    url: {
         type: String,
         required: true
+    },
+    annotation: {
+        type: String,
+        required: true
+    },
+    deleted: {
+        type: Boolean,
+        default: false
     },
 });
 
 module.exports = {
-    Bookmark: mongoose.model('Bookmark', BookmarkSchema),
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
+    Bookmark: mongoose.model('Bookmark', BookmarkSchema),
+    Annotation: mongoose.model('Annotation', AnnotationSchema),
 };

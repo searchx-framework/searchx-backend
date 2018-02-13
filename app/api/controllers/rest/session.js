@@ -2,6 +2,7 @@
 
 const queryhistory = require('../../../services/session/queryhistory');
 const bookmark = require('../../../services/session/bookmark');
+const annotation = require('../../../services/session/annotation');
 
 const resolve = function(promise, res, errorMessage) {
     promise
@@ -20,7 +21,7 @@ const resolve = function(promise, res, errorMessage) {
         });
 };
 
-////
+//// QUERY HISTORY
 
 exports.getQueryHistory = function(req, res) {
     const sessionId = req.params.sessionId;
@@ -30,7 +31,7 @@ exports.getQueryHistory = function(req, res) {
     );
 };
 
-////
+//// BOOKMARKS
 
 exports.getBookmarks = function(req, res) {
     const sessionId = req.params.sessionId;
@@ -64,5 +65,35 @@ exports.starBookmark = function(req, res) {
     resolve(
         bookmark.starBookmark(sessionId, url),
         res, 'Could not star/unstar bookmark.'
+    );
+};
+
+//// ANNOTATIONS
+
+exports.getAnnotation = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const url = req.query.url;
+    resolve(
+        annotation.getAnnotations(sessionId, url),
+        res, 'Could not get annotations.'
+    );
+};
+
+exports.addAnnotation = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const data = req.body;
+    resolve(
+        annotation.addAnnotation(sessionId, data),
+        res, 'Could not create a new annotation.'
+    );
+};
+
+exports.removeAnnotation = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const url = req.body.url;
+    const annotationId = req.body.annotationId;
+    resolve(
+        annotation.removeAnnotation(sessionId, url, annotationId),
+        res, 'Could not delete annotation.'
     );
 };

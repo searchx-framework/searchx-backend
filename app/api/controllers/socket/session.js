@@ -11,3 +11,7 @@ exports.broadcastSearchState = async function(socket, io, data) {
 exports.broadcastBookmarkUpdate = async function(socket, io, data) {
     socket.broadcast.to(socket.sessionId).volatile.emit('bookmarkUpdate', data);
 };
+
+exports.broadcastPageMetadataUpdate = async function(socket, io, data) {
+    socket.broadcast.to(socket.sessionId).volatile.emit('pageMetadataUpdate', data);
+};

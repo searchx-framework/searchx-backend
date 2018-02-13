@@ -1,5 +1,5 @@
 {
-  "name": "searchx-api",
+  "name": "searchx-backend",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -7,16 +7,6 @@
     "test": "./node_modules/.bin/mocha --timeout 15000",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/felipemoraes/searchx-api.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/felipemoraes/searchx-api/issues"
-  },
-  "homepage": "https://github.com/felipemoraes/searchx-api#readme",
   "dependencies": {
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",

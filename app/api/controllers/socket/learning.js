@@ -1,7 +1,7 @@
 'use strict';
 
 const redis = require('../../../config/initializers/redis');
-const task = require('../../../services/task/learning');
+const task = require('../../../services/session/task/learning');
 
 ////
 

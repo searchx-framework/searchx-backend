@@ -1,7 +1,7 @@
 'use strict';
 
 const underscore = require('underscore');
-const config = require('../../config/config');
+const config = require('../../../config/config');
 
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
@@ -12,7 +12,7 @@ const nTopics = config.numTopics;
 const nMembers = config.numMembers;
 const colorPool = config.colorPool;
 
-const topics = require('../../../static/data/topics.json');
+const topics = require('../../../../static/data/topics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });

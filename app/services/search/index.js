@@ -2,7 +2,7 @@
 
 const provider = require('./provider');
 const cache = require('./cache');
-const bookmark = require('../session/bookmark');
+const bookmark = require('../feature/bookmark');
 
 
 /*

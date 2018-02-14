@@ -1,9 +1,9 @@
 'use strict';
 
-const LogCtrl         = require('../../controllers/rest/log');
-const SearchCtrl      = require('../../controllers/rest/search');
-const SessionCtrl     = require('../../controllers/rest/session');
-const TaskCtrl        = require('../../controllers/rest/task');
+const log = require('../../controllers/rest/log');
+const search = require('../../controllers/rest/search');
+const feature = require('../../controllers/rest/feature');
+const session = require('../../controllers/rest/session');
 
 module.exports = function(router) {
     // Set Content-Type for all responses
@@ -21,21 +21,21 @@ module.exports = function(router) {
     });
 
     // Search resource
-    router.get('/search/:vertical', SearchCtrl.search);
+    router.get('/search/:vertical', search.search);
 
     // User resource
-    router.get('/users/:userId/task', TaskCtrl.getUserTask);
-    router.post('/users/:userId/logs', LogCtrl.createLog);
+    router.get('/users/:userId/task', session.getUserTask);
+    router.post('/users/:userId/logs', log.createLog);
 
     // Session resource
-    router.get('/session/:sessionId/query', SessionCtrl.getQueryHistory);
-    router.get('/session/:sessionId/bookmark', SessionCtrl.getBookmarks);
-    router.post('/session/:sessionId/bookmark', SessionCtrl.addBookmark);
-    router.post('/session/:sessionId/bookmark/star', SessionCtrl.starBookmark);
-    router.delete('/session/:sessionId/bookmark', SessionCtrl.removeBookmark);
+    router.get('/session/:sessionId/query', feature.getQueryHistory);
+    router.get('/session/:sessionId/bookmark', feature.getBookmarks);
+    router.post('/session/:sessionId/bookmark', feature.addBookmark);
+    router.post('/session/:sessionId/bookmark/star', feature.starBookmark);
+    router.delete('/session/:sessionId/bookmark', feature.removeBookmark);
 
     // Document resource
-    router.get('/session/:sessionId/annotation', SessionCtrl.getAnnotation);
-    router.post('/session/:sessionId/annotation', SessionCtrl.addAnnotation);
-    router.delete('/session/:sessionId/annotation', SessionCtrl.removeAnnotation);
+    router.get('/session/:sessionId/annotation', feature.getAnnotation);
+    router.post('/session/:sessionId/annotation', feature.addAnnotation);
+    router.delete('/session/:sessionId/annotation', feature.removeAnnotation);
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-const session = require('../../controllers/socket/session');
+const feature = require('../../controllers/socket/feature');
 const learning = require('../../controllers/socket/learning');
 
 ////
@@ -17,9 +17,9 @@ module.exports = function(io) {
         });
 
         // Session
-        socket.on('pushSearchState', (data) => session.broadcastSearchState(socket, gio, data));
-        socket.on('pushBookmarkUpdate', (data) => session.broadcastBookmarkUpdate(socket, gio, data));
-        socket.on('pushPageMetadataUpdate', (data) => session.broadcastPageMetadataUpdate(socket, gio, data));
+        socket.on('pushSearchState', (data) => feature.broadcastSearchState(socket, gio, data));
+        socket.on('pushBookmarkUpdate', (data) => feature.broadcastBookmarkUpdate(socket, gio, data));
+        socket.on('pushPageMetadataUpdate', (data) => feature.broadcastPageMetadataUpdate(socket, gio, data));
 
         // Task
         socket.on('pushStartPretest', (data) => learning.handleStartPretest(socket, gio, data));

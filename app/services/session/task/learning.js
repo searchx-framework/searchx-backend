@@ -1,6 +1,7 @@
 'use strict';
 
 const underscore = require('underscore');
+const randomColor = require('randomcolor');
 const config = require('../../../config/config');
 
 const mongoose = require('mongoose');
@@ -10,7 +11,6 @@ const Group = mongoose.model('Group');
 
 const nTopics = config.numTopics;
 const nMembers = config.numMembers;
-const colorPool = config.colorPool;
 
 const topics = require('../../../../static/data/topics.json');
 Object.keys(topics).forEach((index) => {
@@ -45,7 +45,7 @@ const initializeGroup = async function() {
 
 const addGroupMembersData = function(members) {
     return members.map((member, i) => {
-        member.color = colorPool[i % colorPool.length];
+        member.color = randomColor({luminosity: 'dark'});
         return member;
     });
 };

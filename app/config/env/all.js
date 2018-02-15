@@ -16,5 +16,4 @@ module.exports = {
 
     numTopics: 4,
     numMembers: 2,
-    colorPool: ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'],
 };

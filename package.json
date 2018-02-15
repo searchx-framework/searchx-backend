@@ -30,6 +30,7 @@
     "passport-local": "^1.0.0",
     "path": "^0.11.14",
     "puppeteer": "^0.13.0",
+    "randomcolor": "^0.5.3",
     "redis": "^2.8.0",
     "request": "^2.83.0",
     "should": "^7.1.1",

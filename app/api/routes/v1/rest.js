@@ -24,7 +24,8 @@ module.exports = function(router) {
     router.get('/search/:vertical', search.search);
 
     // User resource
-    router.get('/users/:userId/task', session.getUserTask);
+    router.get('/users/:userId/task/:task', session.getUserTask);
+    router.get('/users/:userId/task/:task/data', session.getUserData);
     router.post('/users/:userId/logs', log.createLog);
 
     // Session resource

@@ -22,9 +22,9 @@ const resolve = function(req, res, promise, errorMessage) {
 exports.getUserTask = function(req, res) {
     const userId = req.params.userId;
     const task = req.params.task;
-    const collaborative = req.query.collaborative === 'true';
+    const params = req.query;
     resolve(req, res,
-        session.getUserTask(userId, task, collaborative),
+        session.getUserTask(userId, task, params),
         'Could not get user task.'
     );
 };

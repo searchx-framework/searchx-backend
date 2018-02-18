@@ -2,6 +2,7 @@
 
 const redis = require('../../../config/initializers/redis');
 const task = require('../../../services/session/task/learning');
+const helper = require('../../../services/session/helper');
 
 ////
 
@@ -19,10 +20,10 @@ const setUserSocket = async function(userId, socketId) {
 
 ////
 
-exports.handleStartPretest = async function(socket, io, data) {
+exports.handlePretestStart = async function(socket, io, data) {
     await setUserSocket(data.userId, socket.id);
 
-    const group = await task.getGroup(data.userId);
+    const group = await helper.getGroupByUserId(data.userId, data.taskId);
     if (group !== null) {
         socket.sessionId = group._id;
         socket.join(group._id);
@@ -30,25 +31,25 @@ exports.handleStartPretest = async function(socket, io, data) {
         group.members.forEach(async (member) => {
             if (member.userId !== data.userId) {
                 const socketId = await getUserSocket(member.userId);
-                io.to(socketId).emit('startPretest', {});
+                io.to(socketId).emit('pretestStart', {});
             }
         });
     }
 };
 
-exports.handlePretestScores = async function(socket, io, data) {
-    await task.savePretestScores(data.userId, data.scores);
+exports.handlePretestSubmit = async function(socket, io, data) {
+    await task.savePretestResults(data.userId, data.taskId, data.results);
     const group = await task.setGroupTopic(data.userId);
 
     if (group !== null) {
-        console.log('Group ' + group._id + ' has been assigned topic "' + group.topic.title + '"');
+        console.log(`Group ${group._id} has been assigned topic "${group.topic.title}" (${group.task})`);
         io.to(socket.sessionId).emit('groupData', {
             group: group
         });
     }
 };
 
-exports.handleUserLeave = async function(socket, io, data) {
-    console.log(data.userId + ' has been removed ' + "(" + socket.id + ")");
-    await task.removeUserFromGroup(data.userId);
+exports.handlePretestLeave = async function(socket, io, data) {
+    await task.removeUserFromGroup(data.userId, data.taskId);
+    console.log(`${data.userId} has been removed (${data.taskId})`);
 };

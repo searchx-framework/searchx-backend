@@ -1,23 +1,19 @@
 'use strict';
 
-const underscore = require('underscore');
-const randomColor = require('randomcolor');
-const config = require('../../../config/config');
+const TASK_ID = "vocab-learning";
+const NUM_TOPICS = 3;
 
+const underscore = require('underscore');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
+const helper = require('../helper');
 
 ////
-
-const nTopics = config.numTopics;
-const nMembers = config.numMembers;
 
 const topics = require('../../../../static/data/topics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });
-
-////
 
 function sample(a, n) {
     return underscore.take(underscore.shuffle(a), n);
@@ -33,54 +29,25 @@ function sampleTopics(n) {
 
 ////
 
-const initializeGroup = async function() {
-    const group = new Group({
-        created: new Date(),
-        topics: sampleTopics(nTopics)
-    });
-
-    await group.save();
-    return group;
-};
-
-const addGroupMembersData = function(members) {
-    return members.map((member, i) => {
-        member.color = randomColor({luminosity: 'dark'});
-        return member;
-    });
-};
-
-////
-
-const getGroupById = async function(groupId) {
-    const query = Group.findOne({'_id': groupId});
-    return await query.exec()
-        .catch((err) => {
-            console.log(err);
-        });
-};
-
-const getGroupIdByUserId = async function(userId) {
-    const query = {
-        members: {
-            $elemMatch: {
-                userId: userId
+const getAvailableGroup = async function(size) {
+    const initializeGroup = async function() {
+        const group = new Group({
+            created: new Date(),
+            task: TASK_ID,
+            meta: {
+                size: size,
+                topics: sampleTopics(NUM_TOPICS)
             }
-        }
+        });
+
+        await group.save();
+        return group;
     };
 
-    const group = await Group.find(query, {}, {sort: {created: -1}});
-    if (group.length > 0) {
-        return group[0]._id;
-    }
-
-    return null;
-};
-
-const getAvailableGroup = async function() {
     const query = {
         topic: {$exists: false},
-        nMembers: {$lt: nMembers}
+        "meta.size": size,
+        "meta.nMembers": {$lt: nMembers}
     };
 
     let group = await Group.findOne(query, {}, {sort: {created: 1}});
@@ -91,68 +58,79 @@ const getAvailableGroup = async function() {
     return group;
 };
 
-////
-
-exports.getUserTask = async function(userId, collaborative) {
-    if (!collaborative) {
-        return {
-            topics: sampleTopics(nTopics)
-        }
+exports.getUserTask = async function(userId, params) {
+    let group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group !== null) {
+        return group;
     }
 
-    const groupId = await getGroupIdByUserId(userId);
-    if (groupId !== null) {
-        return await getGroupById(groupId);
-    }
+    const size = params.size;
+    group = await getAvailableGroup(size);
 
-    const group = await getAvailableGroup();
-    group.members.push({userId: userId});
-    group.nMembers = group.members.length;
-
+    group.members.push(helper.initializeMember(userId, {}));
+    group.meta.nMembers = group.members.length;
     group.markModified('members');
+    group.markModified('meta');
+
     await group.save();
     return group;
 };
 
-exports.getGroup = async function(userId) {
-    const groupId = await getGroupIdByUserId(userId);
-    if (groupId === null) {
-        return null;
-    }
-
-    return await getGroupById(groupId);
-};
-
 ////
 
-exports.savePretestScores = async function(userId, scores) {
-    const groupId = await getGroupIdByUserId(userId);
-    if (groupId === null) {
+function getScoresFromResults(results) {
+    function formatScores(scores) {
+        return Object.keys(scores)
+            .filter((key) => key !== '0')
+            .map(key => {
+                return {
+                    topicId: key,
+                    score: scores[key]
+                };
+            })
+            .sort((a,b) => a.score - b.score);
+    }
+
+    let scores = {};
+    Object.keys(results).forEach((result) => {
+        const v = result.split("-");
+        if (v[0] === "Q") {
+            if(!scores[v[1]]) scores[v[1]] = 0;
+            scores[v[1]] += parseInt(results[result]);
+        }
+    });
+
+    return formatScores(scores);
+}
+
+exports.savePretestResults = async function(userId, results) {
+    const group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group === null) {
         return;
     }
 
-    const group = await getGroupById(groupId);
-    if (group.scores.filter(x => x.userId === userId).length <= 0) {
-        group.scores.push({
+    const scores = getScoresFromResults(results);
+    if (group.meta.scores.filter(x => x.userId === userId).length <= 0) {
+        group.meta.scores.push({
             userId: userId,
             scores: scores
         });
 
-        group.markModified('scores');
+        group.markModified('meta');
         await group.save();
     }
+
+    return null;
 };
 
 exports.setGroupTopic = async function(userId) {
-    const groupId = await getGroupIdByUserId(userId);
-    if (groupId === null) {
+    const group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group === null) {
         return null;
     }
 
-    const group = await getGroupById(groupId);
-
     const membersComplete = group.members.length >= nMembers;
-    const pretestComplete = group.scores.length >= nMembers;
+    const pretestComplete = group.meta.scores.length >= nMembers;
     if (!membersComplete || !pretestComplete) {
         return null;
     }
@@ -160,7 +138,7 @@ exports.setGroupTopic = async function(userId) {
     ////
 
     let totals = {};
-    group.scores.forEach(member => {
+    group.meta.scores.forEach(member => {
         member.scores.forEach(score => {
             const i = score.topicId;
             if (!totals[i]) totals[i] = 0;
@@ -178,7 +156,6 @@ exports.setGroupTopic = async function(userId) {
     });
 
     group.topic = topics[minId.toString()];
-    group.members = addGroupMembersData(group.members);
     group.markModified("members");
     await group.save();
 
@@ -186,21 +163,16 @@ exports.setGroupTopic = async function(userId) {
 };
 
 exports.removeUserFromGroup = async function(userId) {
-    const groupId = await getGroupIdByUserId(userId);
-    if (groupId === null) {
-        return;
-    }
-
-    const group = await getGroupById(groupId);
-    if (group.hasOwnProperty('topic')) {
+    const group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group === null || 'topic' in group) {
         return;
     }
 
     group.members = group.members.filter(x => x.userId !== userId);
-    group.scores = group.scores.filter(x => x.userId !== userId);
-    group.nMembers = group.members.length;
+    group.meta.scores = group.meta.scores.filter(x => x.userId !== userId);
+    group.meta.nMembers = group.members.length;
 
     group.markModified('members');
-    group.markModified('scores');
+    group.markModified('meta');
     await group.save();
 };

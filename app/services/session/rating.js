@@ -10,9 +10,6 @@ exports.getRating = async function(sessionId, url, userId) {
     const total = rating.length == 0 ? 0 : rating.map(x => x.rating).reduce((x, y) => x + y);
     const own = rating.filter(x => x.userId === userId);
 
-    console.log(total);
-    console.log(own);
-
     return {
         rating: own.length == 0 ? 0 : own[0].rating,
         total: total,

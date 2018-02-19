@@ -11,7 +11,7 @@ exports.search = function(req, res) {
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
 
-    search.search(query, vertical, pageNumber, sessionId)
+    search.search(query, vertical, pageNumber, sessionId, userId)
         .then((data) => {
             scrap.scrapPage(data.results);
             res.status(200).json(data);

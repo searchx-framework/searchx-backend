@@ -3,6 +3,9 @@
 const provider = require('./provider');
 const cache = require('./cache');
 const bookmark = require('../session/bookmark');
+const annotation = require('../session/annotation');
+const rating = require('../session/rating');
+const view = require('../session/view');
 
 
 /*
@@ -13,7 +16,7 @@ const bookmark = require('../session/bookmark');
  * @params {vertical} type of search results (web, images, etc)
  * @params {sessionId} session id of user
  */
-exports.search = async function(query, vertical, pageNumber, sessionId) {
+exports.search = async function(query, vertical, pageNumber, sessionId, userId) {
     let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber);
     if (!data) {
         const date = new Date();
@@ -25,28 +28,25 @@ exports.search = async function(query, vertical, pageNumber, sessionId) {
         data = data.data;
     }
 
-    data.results = await addMetadata(data.results, sessionId);
+    data.results = await addMetadata(data.results, sessionId, userId);
     return data;
 };
 
 
 /*
- * Add metadata from search results
+ * Add metadata to search results
  *
  * @params {results} formatted query results from api
  * @params {sessionId} session id of user
  */
-async function addMetadata(results, sessionId) {
+async function addMetadata(results, sessionId, userId) {
     const promises = results.map(async (result) => {
-        try {
-            const data = await bookmark.getBookmark(sessionId, result.url);
-            result.bookmark = true;
-            result.bookmarkUserId = data.userId;
-            result.bookmarkTime = data.date;
-        }
-        catch(err) {
-            result.bookmark = false;
-        }
+        result.metadata = {
+            bookmark: await bookmark.getBookmark(sessionId, result.url),
+            annotations: (await annotation.getAnnotations(sessionId, result.url)).length,
+            rating: (await rating.getRating(sessionId, result.url, userId)).total,
+            views: await view.getViews(sessionId, result.url),
+        };
 
         return result;
     });

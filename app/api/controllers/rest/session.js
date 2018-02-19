@@ -4,6 +4,7 @@ const queryhistory = require('../../../services/session/queryhistory');
 const bookmark = require('../../../services/session/bookmark');
 const annotation = require('../../../services/session/annotation');
 const rating = require('../../../services/session/rating');
+const view = require('../../../services/session/view');
 
 const resolve = function(req, res, promise, errorMessage) {
     promise

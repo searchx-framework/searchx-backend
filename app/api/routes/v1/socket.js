@@ -18,6 +18,7 @@ module.exports = function(io) {
 
         // Session
         socket.on('pushSearchState', (data) => session.broadcastSearchState(socket, gio, data));
+        socket.on('pushViewState', (data) => session.broadcastViewState(socket, gio, data));
         socket.on('pushBookmarkUpdate', (data) => session.broadcastBookmarkUpdate(socket, gio, data));
         socket.on('pushPageMetadataUpdate', (data) => session.broadcastPageMetadataUpdate(socket, gio, data));
 

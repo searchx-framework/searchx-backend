@@ -104,9 +104,28 @@ const RatingSchema = new Schema({
     },
 });
 
+const ViewSchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+
+    url: {
+        type: String,
+        required: true
+    },
+});
+
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
     Annotation: mongoose.model('Annotation', AnnotationSchema),
     Rating: mongoose.model('Rating', RatingSchema),
+    View: mongoose.model('View', ViewSchema),
 };

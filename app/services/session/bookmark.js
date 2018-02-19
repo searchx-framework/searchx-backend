@@ -77,10 +77,10 @@ exports.getBookmark = async function(sessionId, url) {
         deleted: false
     };
 
-    const docs = await Bookmark.find(query);
-    if (docs.length === 0) {
-        throw new Error('Bookmark Not Found');
+    const docs = await Bookmark.find(query, {date: 1, userId: 1, starred: 1, _id: 0});
+    if (docs.length !== 0) {
+        return docs[0];
     }
 
-    return docs[0];
+    return null;
 };

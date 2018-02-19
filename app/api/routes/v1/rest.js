@@ -38,4 +38,6 @@ module.exports = function(router) {
     router.get('/session/:sessionId/annotation', SessionCtrl.getAnnotation);
     router.post('/session/:sessionId/annotation', SessionCtrl.addAnnotation);
     router.delete('/session/:sessionId/annotation', SessionCtrl.removeAnnotation);
+    router.get('/session/:sessionId/rating', SessionCtrl.getRating);
+    router.post('/session/:sessionId/rating', SessionCtrl.submitRating);
 };

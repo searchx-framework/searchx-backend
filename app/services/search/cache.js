@@ -6,15 +6,21 @@ const Utils = require('../../utils');
 
 ////
 
-exports.addSearchResultsToCache = function(query, vertical, page, date, data){
+exports.addSearchResultsToCache = async function(query, vertical, page, date, data){
     if (arguments.length !== 5) {
         console.log('Could not create a new cache - Arguments.');
-        return false;
+        throw {
+            name: 'Bad Request',
+            message: 'Missing required arguments.'
+        };
     }
 
     if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data)) {
         console.log('Could not create a new cache - types.');
-        return false;
+        throw {
+            name: 'Bad Request',
+            message: 'Invalid arguments.'
+        };
     }
 
     const C = new Cache({
@@ -25,15 +31,7 @@ exports.addSearchResultsToCache = function(query, vertical, page, date, data){
             data: data
     });
 
-    C.save(function(error) {
-        if (error) {
-            console.log('Could not create a new cache.');
-            console.log(error);
-            return false;
-        }
-    });
-
-    return true;
+    await C.save();
 };
 
 exports.getSearchResultsFromCache = async function(query, vertical, pageNumber){

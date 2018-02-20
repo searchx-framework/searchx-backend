@@ -1,18 +1,16 @@
 'use strict';
 
-const log = require('../../controllers/rest/log');
-const search = require('../../controllers/rest/search');
-const feature = require('../../controllers/rest/feature');
-const session = require('../../controllers/rest/session');
+const LogCtrl         = require('../../controllers/rest/log');
+const SearchCtrl      = require('../../controllers/rest/search');
+const FeatureCtrl     = require('../../controllers/rest/feature');
+const SessionCtrl     = require('../../controllers/rest/session');
 
 module.exports = function(router) {
-    // Set Content-Type for all responses
     router.use(function(req, res, next) {
        res.header('Content-Type', 'application/json');
        next();
     });
 
-    // Test response
     router.get('/', function(req, res) {
         res.status(418).json({
             error: false,
@@ -20,23 +18,25 @@ module.exports = function(router) {
         });
     });
 
-    // Search resource
-    router.get('/search/:vertical', search.search);
+    // Search
+    router.get('/search/:vertical', SearchCtrl.search);
 
-    // User resource
-    router.get('/users/:userId/task/:task', session.getUserTask);
-    router.get('/users/:userId/task/:task/data', session.getUserData);
-    router.post('/users/:userId/logs', log.createLog);
+    // User
+    router.get('/users/:userId/task', SessionCtrl.getUserTask);
+    router.post('/users/:userId/logs', LogCtrl.createLog);
 
-    // Session resource
-    router.get('/session/:sessionId/query', feature.getQueryHistory);
-    router.get('/session/:sessionId/bookmark', feature.getBookmarks);
-    router.post('/session/:sessionId/bookmark', feature.addBookmark);
-    router.post('/session/:sessionId/bookmark/star', feature.starBookmark);
-    router.delete('/session/:sessionId/bookmark', feature.removeBookmark);
+    // Feature
+    router.get('/session/:sessionId/query', FeatureCtrl.getQueryHistory);
 
-    // Document resource
-    router.get('/session/:sessionId/annotation', feature.getAnnotation);
-    router.post('/session/:sessionId/annotation', feature.addAnnotation);
-    router.delete('/session/:sessionId/annotation', feature.removeAnnotation);
+    router.get('/session/:sessionId/bookmark', FeatureCtrl.getBookmarks);
+    router.post('/session/:sessionId/bookmark', FeatureCtrl.addBookmark);
+    router.post('/session/:sessionId/bookmark/star', FeatureCtrl.starBookmark);
+    router.delete('/session/:sessionId/bookmark', FeatureCtrl.removeBookmark);
+
+    router.get('/session/:sessionId/annotation', FeatureCtrl.getAnnotation);
+    router.post('/session/:sessionId/annotation', FeatureCtrl.addAnnotation);
+    router.delete('/session/:sessionId/annotation', FeatureCtrl.removeAnnotation);
+
+    router.get('/session/:sessionId/rating', FeatureCtrl.getRating);
+    router.post('/session/:sessionId/rating', FeatureCtrl.submitRating);
 };

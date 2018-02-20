@@ -82,8 +82,50 @@ const AnnotationSchema = new Schema({
     },
 });
 
+const RatingSchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+
+    url: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
+});
+
+const ViewSchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+
+    url: {
+        type: String,
+        required: true
+    },
+});
+
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
     Annotation: mongoose.model('Annotation', AnnotationSchema),
+    Rating: mongoose.model('Rating', RatingSchema),
+    View: mongoose.model('View', ViewSchema),
 };

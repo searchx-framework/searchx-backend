@@ -1,9 +1,7 @@
 'use strict';
 
-const session = require('../../controllers/socket/session');
-const learning = require('../../controllers/socket/learning');
-
-////
+const FeatureCtrl = require('../../controllers/socket/feature');
+const SessionCtrl = require('../../controllers/socket/session');
 
 module.exports = function(io) {
     const gio = io.of('/session');
@@ -16,15 +14,15 @@ module.exports = function(io) {
             socket.join(data.sessionId);
         });
 
-        // Session
-        socket.on('pushSearchState', (data) => session.broadcastSearchState(socket, gio, data));
-        socket.on('pushViewState', (data) => session.broadcastViewState(socket, gio, data));
-        socket.on('pushBookmarkUpdate', (data) => session.broadcastBookmarkUpdate(socket, gio, data));
-        socket.on('pushPageMetadataUpdate', (data) => session.broadcastPageMetadataUpdate(socket, gio, data));
+        // Feature
+        socket.on('pushSearchState', (data) => FeatureCtrl.broadcastSearchState(socket, gio, data));
+        socket.on('pushViewState', (data) => FeatureCtrl.broadcastViewState(socket, gio, data));
+        socket.on('pushBookmarkUpdate', (data) => FeatureCtrl.broadcastBookmarkUpdate(socket, gio, data));
+        socket.on('pushPageMetadataUpdate', (data) => FeatureCtrl.broadcastPageMetadataUpdate(socket, gio, data));
 
-        // Task
-        socket.on('pushStartPretest', (data) => learning.handleStartPretest(socket, gio, data));
-        socket.on('pushPretestScores', (data) => learning.handlePretestScores(socket, gio, data));
-        socket.on('pushUserLeave', (data) => learning.handleUserLeave(socket, gio, data));
+        // Pretest
+        socket.on('pushStartPretest', (data) => SessionCtrl.handleStartPretest(socket, gio, data));
+        socket.on('pushPretestScores', (data) => SessionCtrl.handlePretestScores(socket, gio, data));
+        socket.on('pushUserLeave', (data) => SessionCtrl.handleUserLeave(socket, gio, data));
     });
 };

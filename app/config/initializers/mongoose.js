@@ -1,13 +1,13 @@
 'use strict';
 
 // Initializing system variables
-var fs = require('fs');
-var path = require('path');
-var mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
+const mongoose = require('mongoose');
 
 module.exports = function(dbString) {
     // Bootstrap db connection
-    var db = mongoose.connect(dbString);
+    const db = mongoose.connect(dbString, {useMongoClient: true});
     mongoose.Promise = global.Promise;
     mongoose.connection.on('error', function(err){
         console.log('MongoDB is Down, Error:');
@@ -15,12 +15,10 @@ module.exports = function(dbString) {
     });
 
     // Bootstrap models
-    var rootPath = path.normalize(__dirname + '/../../..');
-    var models_path = rootPath + '/app/models';
-    var walk = function(path) {
+    const walk = function(path) {
         fs.readdirSync(path).forEach(function(file) {
-            var newPath = path + '/' + file;
-            var stat = fs.statSync(newPath);
+            const newPath = path + '/' + file;
+            const stat = fs.statSync(newPath);
             if (stat.isFile()) {
                 if (/(.*)\.(js$|coffee$)/.test(file)) {
                     require(newPath);
@@ -30,5 +28,8 @@ module.exports = function(dbString) {
             }
         });
     };
+
+    const rootPath = path.normalize(__dirname + '/../../..');
+    const models_path = rootPath + '/app/models';
     walk(models_path);
 };

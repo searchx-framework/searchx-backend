@@ -12,7 +12,7 @@ const should = require('should');
 const Log = require('../app/models/log');
 const log = require('../app/services/log');
 
-describe('Log', function () {
+describe('log', function () {
     const uid = '123';
     const sid = '123';
     let eventQueue = [];

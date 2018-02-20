@@ -23,7 +23,10 @@ exports.search = async function(query, vertical, pageNumber, sessionId, userId) 
         data = await provider.fetch(query, vertical, pageNumber);
         data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
 
-        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data);
+        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data)
+            .catch(err => {
+                console.log(err);
+            });
     } else {
         data = data.data;
     }

@@ -2,10 +2,10 @@
 
 const provider = require('./provider');
 const cache = require('./cache');
-const bookmark = require('../session/bookmark');
-const annotation = require('../session/annotation');
-const rating = require('../session/rating');
-const view = require('../session/view');
+const bookmark = require('../feature/bookmark');
+const annotation = require('../feature/annotation');
+const rating = require('../feature/rating');
+const view = require('../feature/view');
 
 
 /*

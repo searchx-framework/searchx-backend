@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
 const LogSchema = new Schema({
+    event: {
+        type: String,
+        required: true
+    },
     userId: {
         type: String
     },
@@ -15,10 +19,6 @@ const LogSchema = new Schema({
     },
     task: {
         type: Schema.Types.Mixed
-    },
-    event: {
-        type: String,
-        required: true
     },
     meta: {
         type: Schema.Types.Mixed

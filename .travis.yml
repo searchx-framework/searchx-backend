@@ -1,9 +1,10 @@
 language: node_js
 node_js:
-  - "0.12"
+  - "8"
 
 services:
   - mongodb
+  - redis-server
 before_script:
   - sleep 5
   - node server.js &

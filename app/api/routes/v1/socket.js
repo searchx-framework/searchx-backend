@@ -1,26 +1,28 @@
 'use strict';
 
-const feature = require('../../controllers/socket/feature');
-const session = require('../../controllers/socket/session');
-
-////
+const FeatureCtrl = require('../../controllers/socket/feature');
+const SessionCtrl = require('../../controllers/socket/session');
 
 module.exports = function(io) {
     const gio = io.of('/session');
     gio.on('connection', (socket) => {
 
+        // Register
         socket.on('register', async (data) => {
             console.log(data.userId + ' has connected ' + "(" + socket.id + ")");
             socket.sessionId = data.sessionId;
             socket.join(data.sessionId);
         });
 
-        socket.on('pushSearchState', (data) => feature.broadcastSearchState(socket, gio, data));
-        socket.on('pushBookmarkUpdate', (data) => feature.broadcastBookmarkUpdate(socket, gio, data));
-        socket.on('pushPageMetadataUpdate', (data) => feature.broadcastPageMetadataUpdate(socket, gio, data));
+        // Feature
+        socket.on('pushSearchState', (data) => FeatureCtrl.broadcastSearchState(socket, gio, data));
+        socket.on('pushViewState', (data) => FeatureCtrl.broadcastViewState(socket, gio, data));
+        socket.on('pushBookmarkUpdate', (data) => FeatureCtrl.broadcastBookmarkUpdate(socket, gio, data));
+        socket.on('pushPageMetadataUpdate', (data) => FeatureCtrl.broadcastPageMetadataUpdate(socket, gio, data));
 
-        socket.on('pushPretestStart', (data) => session.handlePretestStart(socket, gio, data));
-        socket.on('pushPretestSubmit', (data) => session.handlePretestSubmit(socket, gio, data));
-        socket.on('pushPretestLeave', (data) => session.handlePretestLeave(socket, gio, data));
+        // Pretest
+        socket.on('pushPretestStart', (data) => SessionCtrl.handlePretestStart(socket, gio, data));
+        socket.on('pushPretestSubmit', (data) => SessionCtrl.handlePretestSubmit(socket, gio, data));
+        socket.on('pushPretestLeave', (data) => SessionCtrl.handlePretestLeave(socket, gio, data));
     });
 };

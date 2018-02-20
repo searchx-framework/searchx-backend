@@ -3,20 +3,14 @@
 const mongoose = require('mongoose');
 const Log = mongoose.model('Log');
 
-exports.createLog = async function(userId, eventData) {
-    let error = false;
-    for (let i = 0; i < eventData.length; i++) {
-        if (typeof eventData[i] !== 'object' || eventData[i].userId !== userId){
-            error = true;
-            break;
+exports.createLog = async function(userId, queue) {
+    queue.forEach(event => {
+        if (typeof event !== 'object' || event.userId !== userId){
+            throw new Error('Bad Request')
         }
 
-        eventData[i].date = new Date();
-    }
+        event.date = new Date();
+    });
 
-    if (error) {
-        throw new Error('Bad Request')
-    }
-
-    Log.insertMany(eventData);
+    Log.insertMany(queue);
 };

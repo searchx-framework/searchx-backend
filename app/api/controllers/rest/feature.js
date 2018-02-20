@@ -3,8 +3,9 @@
 const queryhistory = require('../../../services/feature/queryhistory');
 const bookmark = require('../../../services/feature/bookmark');
 const annotation = require('../../../services/feature/annotation');
+const rating = require('../../../services/feature/rating');
 
-const resolve = function(promise, res, errorMessage) {
+const resolve = function(req, res, promise, errorMessage) {
     promise
         .then((data) => {
             res.status(201).json({
@@ -25,9 +26,9 @@ const resolve = function(promise, res, errorMessage) {
 
 exports.getQueryHistory = function(req, res) {
     const sessionId = req.params.sessionId;
-    resolve(
+    resolve(req, res,
         queryhistory.getQueryHistory(sessionId),
-        res, 'Could not get query history.'
+        'Could not get query history.'
     );
 };
 
@@ -35,36 +36,36 @@ exports.getQueryHistory = function(req, res) {
 
 exports.getBookmarks = function(req, res) {
     const sessionId = req.params.sessionId;
-    resolve(
+    resolve(req, res,
         bookmark.getBookmarks(sessionId),
-        res, 'Could not get bookmarks.'
+        'Could not get bookmarks.'
     );
 };
 
 exports.addBookmark = function(req, res) {
     const data = req.body;
     const sessionId = req.params.sessionId;
-    resolve(
+    resolve(req, res,
         bookmark.addBookmark(sessionId, data),
-        res, 'Could not create a new bookmark.'
+        'Could not create a new bookmark.'
     );
 };
 
 exports.removeBookmark = function(req,res) {
     const url = req.body.url;
     const sessionId = req.params.sessionId;
-    resolve(
+    resolve(req, res,
         bookmark.removeBookmark(sessionId, url),
-        res, 'Could not delete bookmark.'
+        'Could not delete bookmark.'
     );
 };
 
 exports.starBookmark = function(req, res) {
     const url = req.body.url;
     const sessionId = req.params.sessionId;
-    resolve(
+    resolve(req, res,
         bookmark.starBookmark(sessionId, url),
-        res, 'Could not star/unstar bookmark.'
+        'Could not star/unstar bookmark.'
     );
 };
 
@@ -73,18 +74,18 @@ exports.starBookmark = function(req, res) {
 exports.getAnnotation = function(req, res) {
     const sessionId = req.params.sessionId;
     const url = req.query.url;
-    resolve(
+    resolve(req, res,
         annotation.getAnnotations(sessionId, url),
-        res, 'Could not get annotations.'
+        'Could not get annotations.'
     );
 };
 
 exports.addAnnotation = function(req, res) {
     const sessionId = req.params.sessionId;
     const data = req.body;
-    resolve(
+    resolve(req, res,
         annotation.addAnnotation(sessionId, data),
-        res, 'Could not create a new annotation.'
+        'Could not create a new annotation.'
     );
 };
 
@@ -92,8 +93,29 @@ exports.removeAnnotation = function(req, res) {
     const sessionId = req.params.sessionId;
     const url = req.body.url;
     const annotationId = req.body.annotationId;
-    resolve(
+    resolve(req, res,
         annotation.removeAnnotation(sessionId, url, annotationId),
-        res, 'Could not delete annotation.'
+        'Could not delete annotation.'
+    );
+};
+
+//// RATING
+
+exports.getRating = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const url = req.query.url;
+    const userId = req.query.userId;
+    resolve(req, res,
+        rating.getRating(sessionId, url, userId),
+        'Could not get ratings.'
+    );
+};
+
+exports.submitRating = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const data = req.body;
+    resolve(req, res,
+        rating.submitRating(sessionId, data),
+        'Could not save rating data.'
     );
 };

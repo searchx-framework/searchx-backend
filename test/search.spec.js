@@ -1,97 +1,58 @@
 'use strict';
 
-// Default to testing environment if not set
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
-// Load environment configurations
-var config   = require('../app/config/config');
-
-// Load dependencies
-var supertest  = require('supertest');
-var should     = require('should');
-var shouldHttp = require('should-http');
-var request    = supertest(config.url + ':' + config.port + '/v1');
-
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const config   = require('../app/config/config');
+require('../app/config/initializers/mongoose')(config.db);
 
-// Test the resource
-describe('Search resource', function() {
+const should = require('should');
+const search = require('../app/services/search');
 
-    it('should handle web search', function(done) {
-        request
-            .get('/search/web')
-            .query({
-                query: 'business',
-                page: 1
-            })
-            .end(function(err, res) {
-                
-                if (err) {
-                    throw err;
-                }
-                should(res).have.property('status',200);
-                should(res).have.property('body');
-                should(res.body).have.property('results');
-                should(res.body.results.length).be.exactly(10);
-                done();
-            });
+describe('search', function() {
+    const uid = '123';
+    const sid = '123';
+
+    it('should handle web search', async function(done) {
+        try {
+            const res = await search.search('business', 'web', 1, sid, uid);
+            res.should.have.property('results');
+            res.results.length.should.be.exactly(10);
+            done();
+        } catch(err) {
+            console.log(err);
+        }
     });
 
-    it('should handle news search', function(done) {
-        request
-            .get('/search/news')
-            .query({
-                query: 'business',
-                page: 1
-            })
-            .end(function(err, res) {
-                if (err) {
-                    throw err;
-                }
-                should(res).have.property('status',200);
-                should(res).have.property('body');
-                should(res.body).have.property('results');
-                should(res.body.results.length).be.exactly(10);
-                done();
-            });
+    it('should handle news search', async function(done) {
+        try {
+            const res = await search.search('business', 'news', 1, sid, uid);
+            res.should.have.property('results');
+            res.results.length.should.be.exactly(10);
+            done();
+        } catch(err) {
+            console.log(err);
+        }
     });
 
-    it('should handle image search', function(done) {
-        request
-            .get('/search/images')
-            .query({
-                query: 'business',
-                page: 1
-            })
-            .end(function(err, res) {
-                if (err) {
-                    throw err;
-                }
-                should(res).have.property('status',200);
-                should(res).have.property('body');
-                should(res.body).have.property('results');
-                should(res.body.results.length).be.exactly(12);
-                done();
-            });
+    it('should handle image search', async function(done) {
+        try {
+            const res = await search.search('business', 'images', 1, sid, uid);
+            res.should.have.property('results');
+            res.results.length.should.be.exactly(12);
+            done();
+        } catch(err) {
+            console.log(err);
+        }
     });
 
-    it('should handle video search', function(done) {
-        request
-            .get('/search/videos')
-            .query({
-                query: 'business',
-                page: 1
-            })
-            .end(function(err, res) {
-                if (err) {
-                    throw err;
-                }
-                should(res).have.property('status',200);
-                should(res).have.property('body');
-                should(res.body).have.property('results');
-                should(res.body.results.length).be.exactly(12);
-                done();
-            });
+    it('should handle video search', async function(done) {
+        try {
+            const res = await search.search('business', 'videos', 1, sid, uid);
+            res.should.have.property('results');
+            res.results.length.should.be.exactly(12);
+            done();
+        } catch(err) {
+            console.log(err);
+        }
     });
-
 });

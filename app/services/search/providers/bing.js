@@ -1,10 +1,10 @@
+'use strict';
+
 const config = require('../../../config/config');
 const BingApi = require('node-bing-api')({
     accKey: config.bingAccessKey,
     rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"
 });
-
-'use strict';
 
 /*
  * Fetches data from bing
@@ -30,7 +30,7 @@ exports.fetch = function (params, vertical, callback) {
  * @params {vertical} type of search results (web, images, etc)
  * @params {body} result body received from the api call
  */
-exports.formatResults = function(vertical, res, body) {
+exports.formatResults = function (vertical, res, body) {
     if (!body && !(body.value || body.webPages.value)) {
         throw new Error('No results from search api.');
     }

@@ -1,8 +1,12 @@
 'use strict';
 
-const config = require('../../config/config');
-const Bing = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"});
+const bing = require('./providers/bing');
+const elasticsearch = require('./providers/elasticsearch');
 
+const providers = {
+    bing: bing,
+    elasticsearch: elasticsearch
+};
 
 /*
  * Fetches data from search provider and returns the formatted result
@@ -10,57 +14,23 @@ const Bing = require('node-bing-api')({accKey: config.bingAccessKey, rootUri: "h
  * @params {query} the search query
  * @params {vertical} type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
+ * @params {provider} the search provider to use (bing by default)
  */
-exports.fetch = function(query, vertical, pageNumber) {
+exports.fetch = function(query, vertical, pageNumber, providerName) {
+    let provider = providers[providerName];
     const params = [query, constructOptions(vertical, pageNumber)];
 
-    return new Promise(function(resolve, reject) {
-        const callback = function(err, res, body) {
-            if (err !== null) return reject(err);
+    return new Promise(function (resolve, reject) {
+        const callback = function (err, res, body) {
+            if (err) return reject(err);
 
-            const data = formatResults(vertical, body);
+            const data = provider.formatResults(vertical, res, body);
             resolve(data);
         };
 
-        if (vertical === 'web') Bing.web(...params, callback);
-        else if (vertical === 'news') Bing.news(...params, callback);
-        else if (vertical === 'images') Bing.images(...params, callback);
-        else if (vertical === 'videos') Bing.video(...params, callback);
-        else throw {
-                name: 'Bad Request',
-                message: 'Invalid search type!'
-            }
+        provider.fetch(params, vertical, callback);
     });
 };
-
-
-/*
- * Formats result body received from search api call
- *
- * @params {vertical} type of search results (web, images, etc)
- * @params {body} result body received from the api call
- */
-function formatResults(vertical, body) {
-    if (!body && !(body.value || body.webPages.value)) {
-        throw new Error('No results from search api.');
-    }
-
-    if (vertical === 'web') {
-        body = body.webPages
-    }
-
-    if (vertical === 'images' || vertical === 'videos') {
-        for (let i = 0; i < body.value.length; i++) {
-            body.value[i].url = body.value[i].contentUrl;
-        }
-    }
-
-    return {
-        results: body.value,
-        matches: body.totalEstimatedMatches
-    };
-}
-
 
 /*
  * Construct search query options according to search api (bing)

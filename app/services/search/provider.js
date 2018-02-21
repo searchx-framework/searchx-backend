@@ -16,7 +16,7 @@ const providers = {
  * @params {pageNumber} result pagination number
  * @params {provider} the search provider to use (bing by default)
  */
-exports.fetch = function(query, vertical, pageNumber, providerName) {
+exports.fetch = function (query, vertical, pageNumber, providerName) {
     let provider = providers[providerName];
     const params = [query, constructOptions(vertical, pageNumber)];
 
@@ -41,9 +41,9 @@ exports.fetch = function(query, vertical, pageNumber, providerName) {
  * @params The query parameters passed to the API via GET
  */
 function constructOptions(vertical, pageNumber) {
-    const count = (vertical === 'images' || vertical === 'videos') ? 12: 10;
+    const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const mkt = 'en-US';
-    const offset = (pageNumber-1) * count;
+    const offset = (pageNumber - 1) * count;
 
     return {
         offset: offset,

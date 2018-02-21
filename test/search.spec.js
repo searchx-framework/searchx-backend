@@ -9,12 +9,14 @@ const should = require('should');
 const search = require('../app/services/search');
 
 describe('search', function() {
+    this.timeout(10000);
+
     const uid = '123';
     const sid = '123';
 
     it('should handle web search', async function(done) {
         try {
-            const res = await search.search('business', 'web', 1, sid, uid);
+            const res = await search.search('business', 'web', 1, sid, uid, 'bing');
             res.should.have.property('results');
             res.results.length.should.be.exactly(10);
             done();
@@ -25,7 +27,7 @@ describe('search', function() {
 
     it('should handle news search', async function(done) {
         try {
-            const res = await search.search('business', 'news', 1, sid, uid);
+            const res = await search.search('business', 'news', 1, sid, uid, 'bing');
             res.should.have.property('results');
             res.results.length.should.be.exactly(10);
             done();
@@ -36,7 +38,7 @@ describe('search', function() {
 
     it('should handle image search', async function(done) {
         try {
-            const res = await search.search('business', 'images', 1, sid, uid);
+            const res = await search.search('business', 'images', 1, sid, uid, 'bing');
             res.should.have.property('results');
             res.results.length.should.be.exactly(12);
             done();
@@ -47,9 +49,20 @@ describe('search', function() {
 
     it('should handle video search', async function(done) {
         try {
-            const res = await search.search('business', 'videos', 1, sid, uid);
+            const res = await search.search('business', 'videos', 1, sid, uid, 'bing');
             res.should.have.property('results');
             res.results.length.should.be.exactly(12);
+            done();
+        } catch(err) {
+            console.log(err);
+        }
+    });
+
+    it('should handle web search with elasticsearch provider', async function(done) {
+        try {
+            const res = await search.search('business', 'web', 1, sid, uid, 'elasticsearch');
+            res.should.have.property('results');
+            res.results.length.should.be.exactly(10);
             done();
         } catch(err) {
             console.log(err);

@@ -16,14 +16,14 @@ const view = require('../feature/view');
  * @params {vertical} type of search results (web, images, etc)
  * @params {sessionId} session id of user
  */
-exports.search = async function(query, vertical, pageNumber, sessionId, userId) {
-    let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber);
+exports.search = async function(query, vertical, pageNumber, sessionId, userId, providerName) {
+    let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber, providerName);
     if (!data) {
         const date = new Date();
-        data = await provider.fetch(query, vertical, pageNumber);
+        data = await provider.fetch(query, vertical, pageNumber, providerName);
         data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
 
-        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data)
+        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data, providerName)
             .catch(err => {
                 console.log(err);
             });

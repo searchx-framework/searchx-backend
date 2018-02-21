@@ -10,8 +10,9 @@ exports.search = function(req, res) {
     const query = req.query.query || '';
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
+    const providerName = req.query.providerName || 'bing';
 
-    search.search(query, vertical, pageNumber, sessionId, userId)
+    search.search(query, vertical, pageNumber, sessionId, userId, providerName)
         .then((data) => {
             scrap.scrapPage(data.results);
             res.status(200).json(data);

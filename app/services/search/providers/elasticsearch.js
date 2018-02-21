@@ -11,6 +11,8 @@ exports.fetch = function (params, vertical, callback) {
     if (vertical === 'web') esClient.search({
         index: 'clueweb-diskb-00-v2',
         type: 'document',
+        from: params[1].offset,
+        size: params[1].count,
         body: {
             query: {
                 match: {
@@ -44,9 +46,10 @@ exports.formatResults = function (vertical, res, body) {
         // else use parsed content
         const snippet = firstParagraph && firstParagraph.replace(/\s/g, '').length !== 0 ? firstParagraph
             : source['parsed-content'].replace(/\s+/g, " ").substr(0, 200);
+        const title = source.title ? source.title.replace(/\s+/g, " ") : "";
 
         const result = {
-            name: source.title.replace(/\s+/g, " "),
+            name: title,
             url: source['target-uri'],
             displayUrl: source['target-uri'],
             snippet: snippet

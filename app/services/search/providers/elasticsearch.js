@@ -1,5 +1,6 @@
 'use strict';
 
+const cheerio = require('cheerio');
 const elasticsearchApi = require('elasticsearch');
 const esClient = new elasticsearchApi.Client({
     host: 'localhost:9200',
@@ -24,17 +25,26 @@ exports.fetch = function (params, vertical, callback) {
     }
 };
 
-exports.formatResults = function(vertical, res, body) {
+exports.formatResults = function (vertical, res, body) {
     if (!res.hits || res.hits.length === 0) {
         throw new Error('No results from search api.');
     }
     let results = [];
 
-    res.hits.hits.forEach(function (hit){
+    res.hits.hits.forEach(function (hit) {
         const source = hit._source;
         // strip extra whitespace and limit snippet length
         // todo: pre-process the data in elasticsearch so whitespace stripping is not needed
-        const snippet = source['parsed-content'].replace(/\s+/g, " ").substr(3, 200);
+        const $ = cheerio.load(source['raw-content'], {
+            normalizeWhitespace: true
+        });
+
+        const firstParagraph = $('p').first().text().substr(0, 200);
+        // if there is a non-empty (and not only containing whitespace) first paragraph use it as snippet,
+        // else use parsed content
+        const snippet = firstParagraph && firstParagraph.replace(/\s/g, '').length !== 0 ? firstParagraph
+            : source['parsed-content'].replace(/\s+/g, " ").substr(0, 200);
+
         const result = {
             name: source.title.replace(/\s+/g, " "),
             url: source['target-uri'],

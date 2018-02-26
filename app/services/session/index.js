@@ -1,25 +1,40 @@
 'use strict';
 
-const puzzle = require('./task/puzzle');
-const learning = require('./task/learning');
-const helper = require('./helper');
+const exampleGroupSync = require('./task/exampleGroupSync');
+const exampleGroupAsync = require('./task/exampleGroupAsync');
+const helper = require('./groupHelper');
 
-exports.getUserTask = async function(userId, task, params) {
-    switch (task) {
-        case "vocab-learning":
-            return learning.getUserTask(userId, params);
-        case "lecture-puzzle":
-            return puzzle.getUserTask(userId, params);
+function task(taskId) {
+    switch (taskId) {
+        case "example-group-sync":
+            return exampleGroupSync;
+        case "example-group-async":
+            return exampleGroupAsync;
         default:
-            return null;
+            throw {
+                name: "Bad Request",
+                message: "Invalid task id."
+            };
     }
+}
+
+exports.getUserTask = async function(userId, taskId, params) {
+    return task(taskId).getUserTask(userId, params);
 };
 
-exports.getUserData = async function(userId, task) {
-    const group = await helper.getGroupByUserId(userId, task);
+exports.getUserData = async function(userId, taskId) {
+    const group = await helper.getGroupByUserId(userId, taskId);
     if (group !== null) {
         return group.members.filter(x => x.userId === userId)[0];
     }
 
     return null;
+};
+
+exports.handleSyncSubmit = async function(userId, taskId, data) {
+    return task(taskId).handleSyncSubmit(userId, data);
+};
+
+exports.handleSyncLeave = async function(userId, taskId) {
+    return task(taskId).handleSyncLeave(userId);
 };

@@ -10,9 +10,9 @@ exports.getGroupById = async function(groupId) {
         });
 };
 
-exports.getGroupByUserId = async function(userId, task) {
+exports.getGroupByUserId = async function(userId, taskId) {
     const query = {
-        task: task,
+        taskId: taskId,
         members: {
             $elemMatch: {
                 userId: userId

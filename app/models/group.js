@@ -8,18 +8,15 @@ const GroupSchema = new Schema({
         type: Date,
         required: true
     },
-    task: {
-        type: String,
-        required: true
-    },
     members: {
         type: [Schema.Types.Mixed],
         default: []
     },
-    topic: {
-        type: Schema.Types.Mixed
+    taskId: {
+        type: String,
+        required: true
     },
-    meta: {
+    taskData: {
         type: Schema.Types.Mixed
     }
 }, {minimize: false});

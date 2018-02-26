@@ -1,7 +1,7 @@
 'use strict';
 
-const exampleGroupSync = require('./task/exampleGroupSync');
-const exampleGroupAsync = require('./task/exampleGroupAsync');
+const exampleGroupSync = require('./tasks/exampleGroupSync');
+const exampleGroupAsync = require('./tasks/exampleGroupAsync');
 const helper = require('./groupHelper');
 
 function task(taskId) {

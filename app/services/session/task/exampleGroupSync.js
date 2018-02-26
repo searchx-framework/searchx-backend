@@ -1,16 +1,15 @@
 'use strict';
 
-const TASK_ID = "vocab-learning";
-const NUM_TOPICS = 3;
+const TASK_ID = "example-group-sync";
 
 const underscore = require('underscore');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
-const helper = require('../helper');
+const helper = require('../groupHelper');
 
 ////
 
-const topics = require('../../../../static/data/topics.json');
+const topics = require('./data/exampleGroupSyncTopics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });
@@ -29,14 +28,15 @@ function sampleTopics(n) {
 
 ////
 
-const getAvailableGroup = async function(size) {
+const getAvailableGroup = async function(groupSize, topicsSize) {
     const initializeGroup = async function() {
         const group = new Group({
             created: new Date(),
-            task: TASK_ID,
-            meta: {
-                size: size,
-                topics: sampleTopics(NUM_TOPICS)
+            taskId: TASK_ID,
+            taskData: {
+                size: groupSize,
+                topics: sampleTopics(topicsSize),
+                scores: []
             }
         });
 
@@ -45,9 +45,9 @@ const getAvailableGroup = async function(size) {
     };
 
     const query = {
-        topic: {$exists: false},
-        "meta.size": size,
-        "meta.nMembers": {$lt: nMembers}
+        "taskData.topic": {$exists: false},
+        "taskData.size": groupSize,
+        "taskData.nMembers": {$lt: groupSize}
     };
 
     let group = await Group.findOne(query, {}, {sort: {created: 1}});
@@ -64,15 +64,16 @@ exports.getUserTask = async function(userId, params) {
         return group;
     }
 
-    const size = params.size;
-    group = await getAvailableGroup(size);
-
+    const groupSize = parseInt(params.groupSize);
+    const topicsSize = parseInt(params.topicsSize);
+    group = await getAvailableGroup(groupSize, topicsSize);
     group.members.push(helper.initializeMember(userId, {}));
-    group.meta.nMembers = group.members.length;
-    group.markModified('members');
-    group.markModified('meta');
+    group.taskData.nMembers = group.members.length;
 
+    group.markModified('members');
+    group.markModified('taskData');
     await group.save();
+
     return group;
 };
 
@@ -103,34 +104,34 @@ function getScoresFromResults(results) {
     return formatScores(scores);
 }
 
-exports.savePretestResults = async function(userId, results) {
+async function savePretestResults(userId, results) {
     const group = await helper.getGroupByUserId(userId, TASK_ID);
     if (group === null) {
         return;
     }
 
     const scores = getScoresFromResults(results);
-    if (group.meta.scores.filter(x => x.userId === userId).length <= 0) {
-        group.meta.scores.push({
+    if (group.taskData.scores.filter(x => x.userId === userId).length <= 0) {
+        group.taskData.scores.push({
             userId: userId,
             scores: scores
         });
 
-        group.markModified('meta');
+        group.markModified('taskData');
         await group.save();
     }
 
     return null;
-};
+}
 
-exports.setGroupTopic = async function(userId) {
+async function setGroupTopic(userId) {
     const group = await helper.getGroupByUserId(userId, TASK_ID);
     if (group === null) {
         return null;
     }
 
-    const membersComplete = group.members.length >= nMembers;
-    const pretestComplete = group.meta.scores.length >= nMembers;
+    const membersComplete = group.members.length >= group.taskData.size;
+    const pretestComplete = group.taskData.scores.length >= group.taskData.size;
     if (!membersComplete || !pretestComplete) {
         return null;
     }
@@ -138,7 +139,7 @@ exports.setGroupTopic = async function(userId) {
     ////
 
     let totals = {};
-    group.meta.scores.forEach(member => {
+    group.taskData.scores.forEach(member => {
         member.scores.forEach(score => {
             const i = score.topicId;
             if (!totals[i]) totals[i] = 0;
@@ -155,24 +156,30 @@ exports.setGroupTopic = async function(userId) {
         }
     });
 
-    group.topic = topics[minId.toString()];
+    group.taskData.topic = topics[minId.toString()];
     group.markModified("members");
+    group.markModified("taskData");
     await group.save();
 
     return group;
+}
+
+exports.handleSyncSubmit = async function(userId, data) {
+    await savePretestResults(userId, data);
+    return await setGroupTopic(userId);
 };
 
-exports.removeUserFromGroup = async function(userId) {
+exports.handleSyncLeave = async function(userId) {
     const group = await helper.getGroupByUserId(userId, TASK_ID);
-    if (group === null || 'topic' in group) {
+    if (group === null || 'topic' in group.taskData) {
         return;
     }
 
     group.members = group.members.filter(x => x.userId !== userId);
-    group.meta.scores = group.meta.scores.filter(x => x.userId !== userId);
-    group.meta.nMembers = group.members.length;
+    group.taskData.scores = group.taskData.scores.filter(x => x.userId !== userId);
+    group.taskData.nMembers = group.members.length;
 
     group.markModified('members');
-    group.markModified('meta');
+    group.markModified('taskData');
     await group.save();
 };

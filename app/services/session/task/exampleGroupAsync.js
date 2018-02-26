@@ -1,18 +1,18 @@
 'use strict';
 
-const TASK_ID = "lecture-puzzle";
-const MAX_MEMBERS = 10000;
+const TASK_ID = "example-group-async";
+const MAX_MEMBERS = 100;
 
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
-const helper = require('../helper');
+const helper = require('../groupHelper');
 
 const getAvailableGroup = async function() {
     const initializeGroup = async function() {
         const group = new Group({
             created: new Date(),
-            task: TASK_ID,
-            topic: {
+            taskId: TASK_ID,
+            taskData: {
                 "title": "Puzzle 1",
                 "task" : "What album was released three years after the death of the artist that’s tattooed on the upper left arm of the actor who played \"Irish\" Micky Ward in a 2010 film?",
                 "answer": ["legend", "legends"]
@@ -24,7 +24,7 @@ const getAvailableGroup = async function() {
     };
 
     const query = {
-        task: TASK_ID
+        taskId: TASK_ID
     };
 
     let group = await Group.findOne(query, {}, {sort: {created: 1}});

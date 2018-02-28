@@ -1,1 +1,0 @@
-nf start -f Procfile -e environment.development

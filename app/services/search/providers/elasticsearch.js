@@ -1,33 +1,40 @@
 'use strict';
 
-const cheerio = require('cheerio');
 const elasticsearchApi = require('elasticsearch');
 const esClient = new elasticsearchApi.Client({
     host: 'localhost:9200',
     log: 'error'
 });
+const clueweb = require('./es-datasets/clueweb');
+
+const verticals = {
+    web: clueweb
+};
 
 exports.fetch = function (params, vertical, callback) {
-    if (vertical === 'web') esClient.search({
-        index: 'clueweb-diskb-00-v2',
-        type: 'document',
-        from: params[1].offset,
-        size: params[1].count,
-        body: {
-            query: {
-                match: {
-                    'parsed-content': params[0]
+    if (vertical in verticals) {
+        const dataset = verticals[vertical];
+        esClient.search({
+            index: dataset.index,
+            type: 'document',
+            from: params[1].offset,
+            size: params[1].count,
+            body: {
+                query: {
+                    match: {
+                        [dataset.queryField]: params[0]
+                    }
                 }
             }
-        }
-    }, callback);
-    else throw {
+        }, callback);
+    } else throw {
         name: 'Bad Request',
         message: 'Invalid search type!'
     }
 };
 
 exports.formatResults = function (vertical, res, body) {
+    const dataset = verticals[vertical];
     if (!res.hits || res.hits.length === 0) {
         throw new Error('No results from search api.');
     }
@@ -35,26 +42,7 @@ exports.formatResults = function (vertical, res, body) {
 
     res.hits.hits.forEach(function (hit) {
         const source = hit._source;
-        // strip extra whitespace and limit snippet length
-        // todo: pre-process the data in elasticsearch so whitespace stripping is not needed
-        const $ = cheerio.load(source['raw-content'], {
-            normalizeWhitespace: true
-        });
-
-        const firstParagraph = $('p').first().text().substr(0, 200);
-        // if there is a non-empty (and not only containing whitespace) first paragraph use it as snippet,
-        // else use parsed content
-        const snippet = firstParagraph && firstParagraph.replace(/\s/g, '').length !== 0 ? firstParagraph
-            : source['parsed-content'].replace(/\s+/g, " ").substr(0, 200);
-        const title = source.title ? source.title.replace(/\s+/g, " ") : "";
-
-        const result = {
-            name: title,
-            url: source['target-uri'],
-            displayUrl: source['target-uri'],
-            snippet: snippet
-        };
-        results.push(result);
+        results.push(dataset.formatSource(source));
     });
 
     return {

@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 module.exports = function(dbString) {
     // Bootstrap db connection
-    const db = mongoose.connect(dbString, {useMongoClient: true});
+    mongoose.connect(dbString);
     mongoose.Promise = global.Promise;
     mongoose.connection.on('error', function(err){
         console.log('MongoDB is Down, Error:');

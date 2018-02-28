@@ -3,12 +3,10 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const config = require('../app/config/config');
 const mongoose = require('mongoose');
-mongoose.connect(config.db, {useMongoClient: true});
+mongoose.connect(config.db);
 mongoose.Promise = global.Promise;
 
-const supertest = require('supertest');
 const should = require('should');
-
 const Log = require('../app/models/log');
 const log = require('../app/services/log');
 
@@ -35,16 +33,17 @@ describe('log', function() {
         Log.remove(query, () => {});
     });
 
-    it('should handle the addition of a log entry', async function (done) {
+    ////
+
+    it('should handle the addition of a log entry', async function () {
         eventQueue = [];
         eventQueue.push(entry("E1"));
 
         const res = await log.insertLogs(uid, eventQueue);
         res.length.should.be.exactly(1);
-        done();
     });
    
-    it('should handle the addition of multiple log entries', async function (done) {
+    it('should handle the addition of multiple log entries', async function () {
         eventQueue = [];
         eventQueue.push(entry("E1"));
         eventQueue.push(entry("E2"));
@@ -52,10 +51,9 @@ describe('log', function() {
 
         const res = await log.insertLogs(uid, eventQueue);
         res.length.should.be.exactly(3);
-        done();
     });
 
-    it('should filter out non-sensible log entries', async function (done) {
+    it('should filter out non-sensible log entries', async function () {
         eventQueue = [];
         eventQueue.push("test1");
         eventQueue.push("test2");
@@ -63,10 +61,9 @@ describe('log', function() {
 
         const res = await log.insertLogs(uid, eventQueue);
         res.length.should.be.exactly(1);
-        done();
     });
 
-    it('should filter out log entry if url user id and data user id do not match', async function (done) {
+    it('should filter out log entry if url user id and data user id do not match', async function () {
         eventQueue = [];
         const wrongEntry = entry("E1");
         wrongEntry.userId = "100";
@@ -74,7 +71,6 @@ describe('log', function() {
 
         const res = await log.insertLogs(uid, eventQueue);
         res.length.should.be.exactly(0);
-        done();
     });
 });
 

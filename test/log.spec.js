@@ -12,86 +12,69 @@ const should = require('should');
 const Log = require('../app/models/log');
 const log = require('../app/services/log');
 
-describe('log', function () {
+describe('log', function() {
+    let eventQueue = [];
     const uid = '123';
     const sid = '123';
-    let eventQueue = [];
+    const entry = function(event) {
+        return {
+            userId: uid,
+            sessionId: sid,
+            event: "__TEST__" + event,
+            meta: {}
+        }
+    };
+
+    after(function() {
+        const query = {
+            event: {
+                $regex: `__TEST__.*`
+            }
+        };
+
+        Log.remove(query, () => {});
+    });
 
     it('should handle the addition of a log entry', async function (done) {
         eventQueue = [];
-        eventQueue.push({
-            userId: uid,
-            sessionId: sid,
-            event: "EVENT",
-            meta: {},
-            date: new Date()
-        });
+        eventQueue.push(entry("E1"));
 
-        try {
-            await log.createLog(uid, eventQueue);
-            done();
-        } catch(err) {
-            console.log(err);
-        }
-    });
-    
-    it('should reject the addition of a non-sensible log entry', async function (done) {
-        eventQueue = [];
-        eventQueue.push("test");
-
-        try {
-            await log.createLog(uid, eventQueue);
-        } catch(err) {
-            done();
-        }
-    });
-
-    it('should reject the addition of a log entry if url user id and data user id do not match', async function (done) {
-        eventQueue = [];
-        eventQueue.push({
-            userId: "100",
-            event: 'e1',
-            meta: {},
-            date: new Date()
-        });
-
-        try {
-            await log.createLog(uid, eventQueue);
-        } catch(err) {
-            done();
-        }
+        const res = await log.insertLogs(uid, eventQueue);
+        res.length.should.be.exactly(1);
+        done();
     });
    
     it('should handle the addition of multiple log entries', async function (done) {
         eventQueue = [];
-        eventQueue.push({
-            userId: uid,
-            sessionId: sid,
-            event: 'e1',
-            meta: {},
-            date: new Date()
-        });
-        eventQueue.push({
-            userId: uid,
-            sessionId: sid,
-            event: 'e2',
-            meta: {},
-            date: new Date()
-        });
-        eventQueue.push({
-            userId: uid,
-            sessionId: sid,
-            event: 'e3',
-            meta: {},
-            date: new Date()
-        });
+        eventQueue.push(entry("E1"));
+        eventQueue.push(entry("E2"));
+        eventQueue.push(entry("E3"));
 
-        try {
-            await log.createLog(uid, eventQueue);
-            done();
-        } catch(err) {
-            console.log(err);
-        }
+        const res = await log.insertLogs(uid, eventQueue);
+        res.length.should.be.exactly(3);
+        done();
+    });
+
+    it('should filter out non-sensible log entries', async function (done) {
+        eventQueue = [];
+        eventQueue.push("test1");
+        eventQueue.push("test2");
+        eventQueue.push(entry("E1"));
+
+        const res = await log.insertLogs(uid, eventQueue);
+        res.length.should.be.exactly(1);
+        done();
+    });
+
+    it('should filter out log entry if url user id and data user id do not match', async function (done) {
+        eventQueue = [];
+        const wrongEntry = entry("E1");
+        wrongEntry.userId = "100";
+        eventQueue.push(wrongEntry);
+
+        const res = await log.insertLogs(uid, eventQueue);
+        res.length.should.be.exactly(0);
+        done();
     });
 });
 

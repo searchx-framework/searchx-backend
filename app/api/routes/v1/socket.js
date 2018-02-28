@@ -21,8 +21,7 @@ module.exports = function(io) {
         socket.on('pushPageMetadataUpdate', (data) => FeatureCtrl.broadcastPageMetadataUpdate(socket, gio, data));
 
         // Pretest
-        socket.on('pushStartPretest', (data) => SessionCtrl.handleStartPretest(socket, gio, data));
-        socket.on('pushPretestScores', (data) => SessionCtrl.handlePretestScores(socket, gio, data));
-        socket.on('pushUserLeave', (data) => SessionCtrl.handleUserLeave(socket, gio, data));
+        socket.on('pushSyncSubmit', (data) => SessionCtrl.handleSyncSubmit(socket, gio, data));
+        socket.on('pushSyncLeave', (data) => SessionCtrl.handleSyncLeave(socket, gio, data));
     });
 };

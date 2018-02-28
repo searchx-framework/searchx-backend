@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "./node_modules/.bin/nf start -f Procfile -e Procfile.env",
     "test": "./node_modules/.bin/mocha --timeout 15000",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
@@ -19,10 +20,8 @@
     "foreman": "^2.0.0",
     "forever": "^0.15.3",
     "fs": "0.0.2",
-    "istanbul": "^0.4.5",
     "kue": "^0.9.6",
     "md5": "^2.2.1",
-    "mocha": "^2.5.3",
     "mongoose": "^4.13.9",
     "node-bing-api": "^3.2.2",
     "node-jquery-param": "0.0.2",
@@ -34,18 +33,19 @@
     "puppeteer": "^0.13.0",
     "redis": "^2.8.0",
     "request": "^2.83.0",
-    "should": "^7.1.1",
-    "should-http": "0.0.4",
     "socket.io": "^2.0.4",
     "speakingurl": "^7.0.0",
     "stopwords": "0.0.5",
-    "supertest": "^1.2.0",
     "swig": "^1.4.2",
     "underscore": "^1.8.3",
     "url": "^0.11.0",
     "when": "^3.7.8"
   },
   "devDependencies": {
-    "eslint-config-google": "^0.9.1"
+    "mocha": "^2.5.3",
+    "istanbul": "^0.4.5",
+    "supertest": "^1.2.0",
+    "should": "^7.1.1",
+    "should-http": "0.0.4"
   }
 }

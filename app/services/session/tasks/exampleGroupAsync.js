@@ -6,17 +6,15 @@ const MAX_MEMBERS = 100;
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
 const helper = require('../groupHelper');
+const utils = require("../../../utils");
+const puzzles = require('./data/puzzles');
 
 const getAvailableGroup = async function() {
     const initializeGroup = async function() {
         const group = new Group({
             created: new Date(),
             taskId: TASK_ID,
-            taskData: {
-                "title": "Puzzle 1",
-                "task" : "What album was released three years after the death of the artist that’s tattooed on the upper left arm of the actor who played \"Irish\" Micky Ward in a 2010 film?",
-                "answer": ["legend", "legends"]
-            }
+            taskData: utils.sample(puzzles, 1)[0]
         });
 
         await group.save();

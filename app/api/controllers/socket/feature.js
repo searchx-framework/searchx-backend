@@ -1,7 +1,7 @@
 'use strict';
 
-const queryhistory = require('../../../services/feature/queryhistory');
-const view = require('../../../services/feature/view');
+const queryhistory = require('../../../services/features/queryhistory');
+const view = require('../../../services/features/view');
 
 exports.broadcastSearchState = async function(socket, io, data) {
     socket.broadcast.to(socket.sessionId).volatile.emit('searchState', data);

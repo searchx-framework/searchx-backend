@@ -24,7 +24,7 @@ module.exports = function(router) {
     // User
     router.get('/users/:userId/task/:task', SessionCtrl.getUserTask);
     router.get('/users/:userId/task/:task/data', SessionCtrl.getUserData);
-    router.post('/users/:userId/logs', LogCtrl.createLog);
+    router.post('/users/:userId/logs', LogCtrl.insertLogs);
 
     // Feature
     router.get('/session/:sessionId/query', FeatureCtrl.getQueryHistory);

@@ -7,10 +7,14 @@ const esClient = new elasticsearchApi.Client({
 });
 const clueweb = require('./es-datasets/clueweb');
 
+// mapping of vertical to module for elasticsearch dataset
 const verticals = {
     web: clueweb
 };
 
+/*
+ * Fetches data from elasticsearch and returns the formatted result
+ */
 exports.fetch = function (params, vertical, callback) {
     if (vertical in verticals) {
         const dataset = verticals[vertical];
@@ -33,6 +37,9 @@ exports.fetch = function (params, vertical, callback) {
     }
 };
 
+/*
+ * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical
+ */
 exports.formatResults = function (vertical, res, body) {
     const dataset = verticals[vertical];
     if (!res.hits || res.hits.length === 0) {

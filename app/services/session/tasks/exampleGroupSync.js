@@ -6,21 +6,18 @@ const underscore = require('underscore');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
 const helper = require('../groupHelper');
+const utils = require("../../../utils");
 
 ////
 
-const topics = require('./data/exampleGroupSyncTopics.json');
+const topics = require('./data/topics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });
 
-function sample(a, n) {
-    return underscore.take(underscore.shuffle(a), n);
-}
-
 function sampleTopics(n) {
     let validTopics = underscore.omit(topics, '0');
-    let samples = sample(validTopics, n);
+    let samples = utils.sample(validTopics, n);
 
     samples[1] = topics[0];
     return samples;

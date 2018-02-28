@@ -1,5 +1,6 @@
 'use strict';
 
+const underscore = require('underscore');
 const config = require('./config/config');
 
 exports.isAString = function(s) {
@@ -17,4 +18,8 @@ exports.isObject = function(o) {
 exports.isFresh = function(date) {
     const currentDate = new Date;
     return (currentDate - date) / 1000 <= config.cacheFreshness;
+};
+
+exports.sample = function(a, n) {
+    return underscore.take(underscore.shuffle(a), n);
 };

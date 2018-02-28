@@ -3,6 +3,7 @@
 const bing = require('./providers/bing');
 const elasticsearch = require('./providers/elasticsearch');
 
+// mapping of providerName to search provider module
 const providers = {
     bing: bing,
     elasticsearch: elasticsearch
@@ -14,7 +15,7 @@ const providers = {
  * @params {query} the search query
  * @params {vertical} type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
- * @params {provider} the search provider to use (bing by default)
+ * @params {providerName} the name of the search provider to use (bing by default)
  */
 exports.fetch = function (query, vertical, pageNumber, providerName) {
     let provider = providers[providerName];

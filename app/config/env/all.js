@@ -7,14 +7,10 @@ module.exports = {
     rootPath: rootPath,
     port: process.env.PORT || 443,
     app: {
-        name: 'SearchX API'
+        name: 'SearchX Backend'
     },
 
     outDir: './out',
     cacheFreshness: 3600,
     scrapFreshness: 60 * 60 * 24,
-
-    numTopics: 4,
-    numMembers: 2,
-    colorPool: ['Chocolate', 'SlateBlue', 'Coral', 'RoyalBlue', 'Crimson', 'LightSeaGreen', 'DeepPink', 'MediumAquamarine', 'MediumOrchid'],
 };

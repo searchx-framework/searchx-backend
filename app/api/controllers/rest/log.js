@@ -2,11 +2,11 @@
 
 const log = require('../../../services/log');
 
-exports.createLog = function(req, res) {
+exports.insertLogs = function(req, res) {
     const userId = req.params.userId;
     const eventData = req.body.data;
 
-    log.createLog(userId, eventData)
+    log.insertLogs(userId, eventData)
         .then(() => {
             res.status(201).json({
                 error: false
@@ -17,7 +17,7 @@ exports.createLog = function(req, res) {
 
             res.status(400).json({
                 error: true,
-                message: 'Could not create a new log.'
+                message: 'Could not insert logs.'
             });
         });
 };

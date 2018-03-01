@@ -1,9 +1,9 @@
 'use strict';
 
-const queryhistory = require('../../../services/feature/queryhistory');
-const bookmark = require('../../../services/feature/bookmark');
-const annotation = require('../../../services/feature/annotation');
-const rating = require('../../../services/feature/rating');
+const queryhistory = require('../../../services/features/queryhistory');
+const bookmark = require('../../../services/features/bookmark');
+const annotation = require('../../../services/features/annotation');
+const rating = require('../../../services/features/rating');
 
 const resolve = function(req, res, promise, errorMessage) {
     promise

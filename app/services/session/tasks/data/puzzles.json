@@ -1,0 +1,17 @@
+{
+    "1": {
+        "title": "Puzzle 1",
+        "description" : "What album was released three years after the death of the artist that’s tattooed on the upper left arm of the actor who played \"Irish\" Micky Ward in a 2010 film?",
+        "answer": ["legend", "legends"]
+    },
+    "2": {
+        "title": "Puzzle 2",
+        "description" : "In Jeff Savage's book on the 2005 number one pick for the NHL draft, what is the title of the second chapter beginning on page 10?",
+        "answer": ["sid the kid"]
+    },
+    "3": {
+        "title": "Puzzle 3",
+        "description" : "What actress, best known for her role on \"Guiding Light,\" has a sister-in-law that’s been nominated for an Academy Award seventeen times?",
+        "answer" : ["maeve kinkead", "mave kinkead", "mave kinked", "mave kinkad",  "meve kinked", "meve kinkad" ]
+    }
+}

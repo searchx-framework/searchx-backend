@@ -6,10 +6,11 @@ const esClient = new elasticsearchApi.Client({
     log: 'error'
 });
 const clueweb = require('./es-datasets/clueweb');
+const cranfield = require('./es-datasets/cranfield');
 
 // mapping of vertical to module for elasticsearch dataset
 const verticals = {
-    web: clueweb
+    web: cranfield
 };
 
 /*

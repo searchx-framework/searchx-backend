@@ -23,6 +23,10 @@ const CacheSchema = new Schema({
     data: {
         type: Schema.Types.Mixed,
         required: true
+    },
+    provider: {
+        type: String,
+        required: true
     }
 });
 

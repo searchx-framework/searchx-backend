@@ -12,34 +12,20 @@ describe('search', function() {
     const uid = '123';
     const sid = '123';
 
-    it('should handle web search', async function() {
-        const res = await search.search('business', 'web', 1, sid, uid, 'bing');
-        res.should.have.property('results');
-        res.results.length.should.be.exactly(10);
-    });
+    const tests = [
+        {provider: 'bing', verticals: ['web', 'news'], expected: 10},
+        {provider: 'bing', verticals: ['images', 'videos'], expected: 12},
+        {provider: 'elasticsearch', verticals: ['web'], expected: 10}
+    ];
 
-    it('should handle news search', async function() {
-        const res = await search.search('business', 'news', 1, sid, uid, 'bing');
-        res.should.have.property('results');
-        res.results.length.should.be.exactly(10);
-    });
-
-    it('should handle image search', async function() {
-        const res = await search.search('business', 'images', 1, sid, uid, 'bing');
-        res.should.have.property('results');
-        res.results.length.should.be.exactly(12);
-    });
-
-    it('should handle video search', async function() {
-        const res = await search.search('business', 'videos', 1, sid, uid, 'bing');
-        res.should.have.property('results');
-        res.results.length.should.be.exactly(12);
-    });
-
-    it('should handle web search with elasticsearch provider', async function() {
-        const res = await search.search('business', 'web', 1, sid, uid, 'elasticsearch');
-        res.should.have.property('results');
-        res.results.length.should.be.exactly(10);
+    tests.forEach(function (test) {
+        test.verticals.forEach(function (vertical) {
+            it('should handle ' + vertical + ' search with the ' + test.provider + ' provider', async function() {
+                const res = await search.search('business', vertical, 1, sid, uid, test.provider);
+                res.should.have.property('results');
+                res.results.length.should.be.exactly(test.expected);
+            });
+        });
     });
 
     it('should throw an error with a non-existing provider', async function() {

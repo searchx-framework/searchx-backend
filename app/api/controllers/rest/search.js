@@ -2,7 +2,7 @@
 
 const search = require('../../../services/search');
 const scrap = require('../../../services/scrap');
-const config = require('../../config/config');
+const config = require('../../../config/config');
 
 exports.search = function(req, res) {
     const userId = req.query.userId || '';

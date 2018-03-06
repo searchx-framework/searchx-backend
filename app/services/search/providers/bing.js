@@ -13,14 +13,15 @@ const BingApi = require('node-bing-api')({
  * @params {vertical} type of search results (web, images, etc)
  * @params {callback} the callback function that is executed once the request returns
  */
-exports.fetch = function (params, vertical, callback) {
-    if (vertical === 'web') BingApi.web(...params, callback);
-    else if (vertical === 'news') BingApi.news(...params, callback);
-    else if (vertical === 'images') BingApi.images(...params, callback);
-    else if (vertical === 'videos') BingApi.video(...params, callback);
+exports.fetch = function (query, vertical, pageNumber, callback) {
+    const options = constructOptions(vertical, pageNumber);
+    if (vertical === 'web') BingApi.web(query, options, callback);
+    else if (vertical === 'news') BingApi.news(query, options, callback);
+    else if (vertical === 'images') BingApi.images(query, options, callback);
+    else if (vertical === 'videos') BingApi.video(query, options, callback);
     else throw {
             name: 'Bad Request',
-            message: 'Invalid search type!'
+            message: 'Invalid vertical'
         }
 };
 
@@ -50,3 +51,23 @@ exports.formatResults = function (vertical, res, body) {
         matches: body.totalEstimatedMatches
     };
 };
+
+/*
+ * Construct search query options according to search api (bing)
+ *
+ * https://www.npmjs.com/package/node-bing-api
+ * https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/search-the-web
+ *
+ * @params The query parameters passed to the API via GET
+ */
+function constructOptions(vertical, pageNumber) {
+    const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
+    const mkt = 'en-US';
+    const offset = (pageNumber - 1) * count;
+
+    return {
+        offset: offset,
+        count: count,
+        mkt: mkt
+    };
+}

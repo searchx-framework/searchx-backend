@@ -41,4 +41,20 @@ describe('search', function() {
         res.should.have.property('results');
         res.results.length.should.be.exactly(10);
     });
+
+    it('should throw an error with a non-existing provider', async function() {
+        try {
+            const res = await search.search('business', 'web', 1, sid, uid, '56f403a4-e2f3-44c5-bca5-5c430b218a89');
+        } catch (err) {
+            err.name.should.be.exactly('Bad Request');
+        }
+    });
+
+    it('should throw an error with an invalid vertical', async function() {
+        try {
+            const res = await search.search('business', '56f403a4-e2f3-44c5-bca5-5c430b218a89', 1, sid, uid, 'bing');
+        } catch (err) {
+            err.name.should.be.exactly('Bad Request');
+        }
+    });
 });

@@ -18,8 +18,13 @@ const providers = {
  * @params {providerName} the name of the search provider to use (bing by default)
  */
 exports.fetch = function (query, vertical, pageNumber, providerName) {
+    if (!(providerName in providers)) {
+        return Promise.reject({
+            name: 'Bad Request',
+            message: 'Provider does not exist'
+        });
+    }
     let provider = providers[providerName];
-    const params = [query, constructOptions(vertical, pageNumber)];
 
     return new Promise(function (resolve, reject) {
         const callback = function (err, res, body) {
@@ -29,26 +34,6 @@ exports.fetch = function (query, vertical, pageNumber, providerName) {
             resolve(data);
         };
 
-        provider.fetch(params, vertical, callback);
+        provider.fetch(query, vertical, pageNumber, callback);
     });
 };
-
-/*
- * Construct search query options according to search api (bing)
- *
- * https://www.npmjs.com/package/node-bing-api
- * https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/search-the-web
- *
- * @params The query parameters passed to the API via GET
- */
-function constructOptions(vertical, pageNumber) {
-    const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
-    const mkt = 'en-US';
-    const offset = (pageNumber - 1) * count;
-
-    return {
-        offset: offset,
-        count: count,
-        mkt: mkt
-    };
-}

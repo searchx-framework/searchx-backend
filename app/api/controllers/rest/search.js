@@ -2,6 +2,7 @@
 
 const search = require('../../../services/search');
 const scrap = require('../../../services/scrap');
+const config = require('../../config/config');
 
 exports.search = function(req, res) {
     const userId = req.query.userId || '';
@@ -10,7 +11,7 @@ exports.search = function(req, res) {
     const query = req.query.query || '';
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
-    const providerName = req.query.providerName || 'bing';
+    const providerName = req.query.providerName || config.defaultProvider;
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName)
         .then((data) => {

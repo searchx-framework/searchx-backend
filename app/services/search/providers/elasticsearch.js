@@ -16,25 +16,26 @@ const verticals = {
 /*
  * Fetches data from elasticsearch and returns the formatted result
  */
-exports.fetch = function (params, vertical, callback) {
+exports.fetch = function (query, vertical, pageNumber, callback) {
     if (vertical in verticals) {
         const dataset = verticals[vertical];
+        const size = 10;
         esClient.search({
             index: dataset.index,
             type: 'document',
-            from: params[1].offset,
-            size: params[1].count,
+            from: (pageNumber - 1) * size,
+            size: size,
             body: {
                 query: {
                     match: {
-                        [dataset.queryField]: params[0]
+                        [dataset.queryField]: query
                     }
                 }
             }
         }, callback);
     } else throw {
         name: 'Bad Request',
-        message: 'Invalid search type!'
+        message: 'Invalid vertical'
     }
 };
 

@@ -9,7 +9,7 @@ It is built on NodeJS and exposes its endpoints through [express](https://expres
 # Setup
 These instructions are for Ubuntu Linux, but the steps can be adapted for all major platforms.
 
-- Install NodeJS: https://nodejs.org/en/ (at least version 8.0)
+- Install [NodeJS](https://nodejs.org/en/) (at least version 8.0)
 ```
 sudo apt install npm
 
@@ -17,8 +17,9 @@ sudo apt install npm
 which node
 ```
 
-- Install MongoDB: https://www.mongodb.com/
-Execute the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition).
+- Install [MongoDB](https://www.mongodb.com/):
+
+Executing the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition)
 ```
 // Check if MongoDB is running
 mongo
@@ -27,7 +28,7 @@ mongo
 > exit
 ```
 
-- Install Redis: https://redis.io/
+- Install [Redis](https://redis.io/)
 ```
 sudo apt install redis-server
 
@@ -41,8 +42,9 @@ redis-cli
 > QUIT
 ```
 
-- Install Elasticsearch: https://www.elastic.co/products/elasticsearch
-Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html).
+- Install [Elasticsearch](https://www.elastic.co/products/elasticsearch)
+
+Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html)
 
 - Set up Server
 ```

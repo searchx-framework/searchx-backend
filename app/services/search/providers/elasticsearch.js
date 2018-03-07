@@ -32,7 +32,7 @@ exports.fetch = function (query, vertical, pageNumber) {
                     }
                 }
             }
-        }).then(formatResults);
+        }).then(formatResults(vertical));
     } else return Promise.reject({
         name: 'Bad Request',
         message: 'Invalid vertical'
@@ -45,19 +45,19 @@ exports.fetch = function (query, vertical, pageNumber) {
 function formatResults(vertical) {
     return function (result) {
         const dataset = verticals[vertical];
-        if (!res.hits || res.hits.length === 0) {
+        if (!result.hits || result.hits.length === 0) {
             throw new Error('No results from search api.');
         }
         let results = [];
 
-        res.hits.hits.forEach(function (hit) {
+        result.hits.hits.forEach(function (hit) {
             const source = hit._source;
             results.push(dataset.formatSource(source));
         });
 
         return {
             results: results,
-            matches: res.hits.total
+            matches: result.hits.total
         }
     }
 }

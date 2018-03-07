@@ -6,7 +6,10 @@ node_js:
 services:
   - mongodb
   - redis-server
+  - elasticsearch
 before_script:
-  - sleep 5
+  - sleep 10
   - node server.js &
+  - ./node_modules/elasticdump/bin/elasticdump --input=test/data/test_index_mapping.json --output=http://localhost:9200/cranfield --type=mapping
+  - ./node_modules/elasticdump/bin/elasticdump --input=test/data/test_index.json --output=http://localhost:9200/cranfield --type=data
   - sleep 5

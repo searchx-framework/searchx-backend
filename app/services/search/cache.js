@@ -6,8 +6,8 @@ const Utils = require('../../utils');
 
 ////
 
-exports.addSearchResultsToCache = async function(query, vertical, page, date, data){
-    if (arguments.length !== 5) {
+exports.addSearchResultsToCache = async function(query, vertical, page, date, data, provider){
+    if (arguments.length !== 6) {
         console.log('Could not create a new cache - Arguments.');
         throw {
             name: 'Bad Request',
@@ -15,7 +15,7 @@ exports.addSearchResultsToCache = async function(query, vertical, page, date, da
         };
     }
 
-    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data)) {
+    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data) || !Utils.isAString(provider)) {
         console.log('Could not create a new cache - types.');
         throw {
             name: 'Bad Request',
@@ -28,21 +28,22 @@ exports.addSearchResultsToCache = async function(query, vertical, page, date, da
             query: query,
             vertical: vertical,
             page:  page,
-            data: data
+            data: data,
+            provider: provider
     });
 
     await C.save();
 };
 
-exports.getSearchResultsFromCache = async function(query, vertical, pageNumber){
-    if (arguments.length < 3) {
+exports.getSearchResultsFromCache = async function(query, vertical, pageNumber, provider){
+    if (arguments.length < 4) {
         throw {
             name: 'Bad Request',
             message: 'Missing required arguments.'
         };
     }
 
-    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(pageNumber)){
+    if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(pageNumber) || !Utils.isAString(provider)){
         throw {
             name: 'Bad Request',
             message: 'Invalid arguments.'
@@ -52,7 +53,7 @@ exports.getSearchResultsFromCache = async function(query, vertical, pageNumber){
     ////
   
     const data = await Cache
-        .find({query: query, vertical: vertical, page: parseInt(pageNumber)})
+        .find({query: query, vertical: vertical, page: parseInt(pageNumber), provider: provider})
         .sort({date:'descending'})
         .limit(1);
 

@@ -25,6 +25,7 @@ describe('cache', function() {
         'matches' : 1,
         'id': 'id'
     };
+    const providerName = "bing";
 
     before(function() {
         Cache.remove({query: query1});
@@ -37,22 +38,22 @@ describe('cache', function() {
     ////
 
     it('should handle an addition to the cache', async function() {
-        await cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1);
+        await cache.addSearchResultsToCache(query1, vertical, page, new Date(), results1, providerName);
     });
 
     it('should return the just-added result', async function() {
-        const res = await cache.getSearchResultsFromCache(query1, vertical, page);
+        const res = await cache.getSearchResultsFromCache(query1, vertical, page, providerName);
         res.data.should.be.deepEqual(results1);
     });
 
     it('should recognize an uncached result', async function() {
-        const res = await cache.getSearchResultsFromCache(query2, vertical, page);
+        const res = await cache.getSearchResultsFromCache(query2, vertical, page, providerName);
         res.should.be.false();
     });
 
     it('should retrieve the most recent cache entry', async function() {
-        await cache.addSearchResultsToCache(query1, vertical, page, new Date(), results2);
-        const res = await cache.getSearchResultsFromCache(query1, vertical, page);
+        await cache.addSearchResultsToCache(query1, vertical, page, new Date(), results2, providerName);
+        const res = await cache.getSearchResultsFromCache(query1, vertical, page, providerName);
         res.data.should.be.deepEqual(results2);
     });
     
@@ -66,7 +67,7 @@ describe('cache', function() {
 
     it('should reject non-sensical addition to the cache (result string)', async function() {
         try {
-            await cache.addSearchResultsToCache(query1, vertical, page, new Date(), "RES");
+            await cache.addSearchResultsToCache(query1, vertical, page, new Date(), "RES", providerName);
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -90,7 +91,7 @@ describe('cache', function() {
     
     it('should reject non-sensical addition to the cache (negative page number in param)', async function() {
         try {
-            await cache.addSearchResultsToCache(query1, vertical, -1000, new Date(), results1);
+            await cache.addSearchResultsToCache(query1, vertical, -1000, new Date(), results1, providerName);
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -98,7 +99,7 @@ describe('cache', function() {
 
     it('should reject non-sensical addition to the cache (null query)', async function() {
         try {
-            await cache.addSearchResultsToCache(null, vertical, page, new Date(), results1);
+            await cache.addSearchResultsToCache(null, vertical, page, new Date(), results1, providerName);
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -106,7 +107,7 @@ describe('cache', function() {
     
     it('should throw an error when the input is non-sensical (null query/page)', async function() {
         try {
-            await cache.getSearchResultsFromCache(null, vertical, null);
+            await cache.getSearchResultsFromCache(null, vertical, null, providerName);
         } catch (err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -114,7 +115,7 @@ describe('cache', function() {
     
     it('should throw an error when the input is non-sensical (undefined query)', async function() {
         try {
-            await cache.getSearchResultsFromCache(undefined, vertical, page);
+            await cache.getSearchResultsFromCache(undefined, vertical, page, providerName);
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -132,7 +133,7 @@ describe('cache', function() {
 
     it('should throw an error when the input is non-sensical (function params)', async function() {
         try {
-            await cache.getSearchResultsFromCache(function() {}, function() {}, function() {});
+            await cache.getSearchResultsFromCache(function() {}, function() {}, function() {}, function() {});
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -141,7 +142,7 @@ describe('cache', function() {
 
     it('should throw an error when the input is non-sensical (null page)', async function() {
         try {
-            await cache.getSearchResultsFromCache(query1, vertical, null);
+            await cache.getSearchResultsFromCache(query1, vertical, null, providerName);
         } catch(err) {
             err.name.should.be.exactly('Bad Request');
         }

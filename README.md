@@ -102,12 +102,7 @@ module.exports = {
 SearchX can be extended to support new providers for search results, and to define tasks. Tasks define extra functionality that can be used in the frontend for user studies, for example placing users in groups according to predefined criteria, giving them search instructions, and asking them questions on what they found.
 
 ## Search providers
-New search providers can be implemented by adding a file that implements the provider interface in `app/services/search/providers/`. The interface consists of two functions, `fetch` and `formatResults`:
-- The `fetch` function requests the appropriate resource from the search provider
-- `formatResults` transforms the results received into the format we use.
-The new provider also needs to be added in `app/services/search/provider.js`.
-
-The format that `formatResults` needs to return is:
+Two search provider services are included: Bing and Elasticsearch. These services can be found in `app/services/search/providers/`, and can serve as example of how to implement new search providers. New search providers can be implemented by adding a service in to the same folder, and adding it to the provider mapping in `app/services/search/provider.js`. The service must implement the `fetch(query, vertical, pageNumber)` function, which must return a promise resolving to the following data structure if retrieving the search result is successful:
 
 ```
 { matches: <number of matches>,
@@ -121,6 +116,8 @@ The format that `formatResults` needs to return is:
     ...
 ]}
 ```
+
+The set of possible verticals and number of results per page can be defined as desired by the provider implementation.
 
 ## Tasks
 Two example tasks have been added in `app/services/session/tasks/`:

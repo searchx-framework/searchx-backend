@@ -26,14 +26,5 @@ exports.fetch = function (query, vertical, pageNumber, providerName) {
     }
     let provider = providers[providerName];
 
-    return new Promise(function (resolve, reject) {
-        const callback = function (err, res, body) {
-            if (err) return reject(err);
-
-            const data = provider.formatResults(vertical, res, body);
-            resolve(data);
-        };
-
-        provider.fetch(query, vertical, pageNumber, callback);
-    });
+    return provider.fetch(query, vertical, pageNumber);
 };

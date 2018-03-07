@@ -16,11 +16,11 @@ const verticals = {
 /*
  * Fetches data from elasticsearch and returns the formatted result
  */
-exports.fetch = function (query, vertical, pageNumber, callback) {
+exports.fetch = function (query, vertical, pageNumber) {
     if (vertical in verticals) {
         const dataset = verticals[vertical];
         const size = 10;
-        esClient.search({
+        return esClient.search({
             index: dataset.index,
             type: 'document',
             from: (pageNumber - 1) * size,
@@ -32,30 +32,32 @@ exports.fetch = function (query, vertical, pageNumber, callback) {
                     }
                 }
             }
-        }, callback);
-    } else throw {
+        }).then(formatResults);
+    } else return Promise.reject({
         name: 'Bad Request',
         message: 'Invalid vertical'
-    }
+    });
 };
 
 /*
  * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical
  */
-exports.formatResults = function (vertical, res, body) {
-    const dataset = verticals[vertical];
-    if (!res.hits || res.hits.length === 0) {
-        throw new Error('No results from search api.');
-    }
-    let results = [];
+function formatResults(vertical) {
+    return function (result) {
+        const dataset = verticals[vertical];
+        if (!res.hits || res.hits.length === 0) {
+            throw new Error('No results from search api.');
+        }
+        let results = [];
 
-    res.hits.hits.forEach(function (hit) {
-        const source = hit._source;
-        results.push(dataset.formatSource(source));
-    });
+        res.hits.hits.forEach(function (hit) {
+            const source = hit._source;
+            results.push(dataset.formatSource(source));
+        });
 
-    return {
-        results: results,
-        matches: res.hits.total
+        return {
+            results: results,
+            matches: res.hits.total
+        }
     }
-};
+}

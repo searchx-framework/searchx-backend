@@ -52,9 +52,6 @@ git clone https://github.com/felipemoraes/searchx-api.git
 // Install dependencies
 npm install
 
-// Install foreman
-npm -g install foreman
-
 // Start the development server
 npm run start
 
@@ -74,11 +71,12 @@ npm test
 ## API Specification 
 ```
 // Search
-[address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]
+[address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]&provider=[provider]
 - address: address set in the configuration file
 - vertical: web, images, videos, news
 - query: query string
 - page: page number
+- provider: the search provider to use
 ```
 
 ## Configuration
@@ -101,12 +99,15 @@ module.exports = {
 ```
 
 # Modifications
-SearchX can be modified to support new providers for search results, and to define tasks for user studies. Tasks can define extra functionality that can be added to the frontend, for example to give the user search instructions and ask them questions on what they found.
+SearchX can be extended to support new providers for search results, and to define tasks. Tasks define extra functionality that can be used in the frontend for user studies, for example placing users in groups according to predefined criteria, giving them search instructions, and asking them questions on what they found.
 
 ## Search providers
-New search providers can be implemented in `app/services/search/providers/`. The new provider also needs to be added in `app/services/search/provider.js`.
-A provider needs to implement the `fetch` function to request the appropriate resource from the search provider
-and `formatResults` to transform the results received into the format we use. The used format is:
+New search providers can be implemented by adding a file that implements the provider interface in `app/services/search/providers/`. The interface consists of two functions, `fetch` and `formatResults`:
+- The `fetch` function requests the appropriate resource from the search provider
+- `formatResults` transforms the results received into the format we use.
+The new provider also needs to be added in `app/services/search/provider.js`.
+
+The format that `formatResults` needs to return is:
 
 ```
 { matches: <number of matches>,
@@ -122,18 +123,21 @@ and `formatResults` to transform the results received into the format we use. Th
 ```
 
 ## Tasks
-Two example tasks have been added in `app/services/session/tasks/`. You can modify these tasks as follows:
+Two example tasks have been added in `app/services/session/tasks/`:
+- `exampleGroupAsync.js` is a basic example of a task that can be performed by a group. When a new user requests this task, they enter into a group and can try to start solving a search puzzle. When more new users request the task, they join the same group (until it is full) and can collaborate in solving the puzzle. This example is asynchronous, since it users do not need to search at the same time. Please note that the front-end part of this task contains more components to form the complete task (e.g. submitting the answer to the puzzle), but the task specification on the backend is not concerned with them, because they are handled by the standard logging functionality of the backend. See the frontend documentation for the complete task description.
+- `exampleGroupSync.js` is a more elaborate example that shows how tasks can be used to for synchronous collaboration. After a user has completed a pre-test and needs to be assigned to a group, the frontend calls the `pushSyncsubmit` socket (see `app/api/controllers/socket/session.js` for the entry point), which causes the `handleSyncSubmit` function in the example to be called. Users are assigned to groups in a similar fashion to the async example, but the groups are stored in a database to ensure each topic is assigned to a group once. Also, the user is not assigned a task until the group has reached the required number of members, so they have to wait until the group is filled, causing the task to be synchronous. When the group is assigned a task, the socket is used to notify all other group members allowing them to start the task. The notification is automatically handled by SearchX's session management, so the task code only needs to mark the group as modified.
 
-1. Adding new topics   
-The learning topics that are passed to the front end is defined inside `app/services/session/tasks/data/topics.json`.
-To add a new topic, you can add a new entry to the json file.
+You can modify these tasks as follows:
 
-2. Increasing group size   
-The `numMembers` configuration can be changed inside `app/config/env/all.js`.
+1. Increasing group size 
+- For the async example the `MAX_MEMBERS` constant in `exampleGroupAsync.js` can be changed.
+- For the sync example the group size is defined by the frontend.
+
+2. Adding new puzzles or topics
+The puzzles for the asynchronous example are defined in `app/services/session/tasks/data/topics.json`. Learning topics for the synchronous example are defined inside `app/services/session/tasks/data/topics.json`. To add a new topic, you can add a new entry to these json files.
 
 ### Creating a custom task
-To define a new task in the backend, you can add a new service inside `app/services/session/tasks/` 
-and then change `app/services/session/index.js` to serve the task description from the new service.
+To define a new task in the backend, you can add a new service inside `app/services/session/tasks/`  and then change `app/services/session/index.js` to serve the task description from the new service.
 
 # License
 

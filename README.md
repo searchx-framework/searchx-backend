@@ -19,7 +19,7 @@ which node
 
 - Install [MongoDB](https://www.mongodb.com/):
 
-Executing the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition)
+Execute the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition)
 ```
 // Check if MongoDB is running
 mongo

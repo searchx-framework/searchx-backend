@@ -17,19 +17,9 @@ const view = require('../features/view');
  * @params {sessionId} session id of user
  */
 exports.search = async function(query, vertical, pageNumber, sessionId, userId, providerName) {
-    let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber, providerName);
-    if (!data) {
-        const date = new Date();
-        data = await provider.fetch(query, vertical, pageNumber, providerName);
-        data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
-
-        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data, providerName)
-            .catch(err => {
-                console.log(err);
-            });
-    } else {
-        data = data.data;
-    }
+    const date = new Date();
+    let data = await provider.fetch(query, vertical, pageNumber, providerName);
+    data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
 
     data.results = await addMetadata(data.results, sessionId, userId);
     return data;

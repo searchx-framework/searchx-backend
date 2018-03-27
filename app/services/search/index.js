@@ -17,10 +17,12 @@ const view = require('../features/view');
  * @params {sessionId} session id of the user
  * @params {userId} id of the user
  * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
+ * @params {unjudgedOnly} boolean indicating whether to use unjudged-only distribution of labour
  */
-exports.search = async function(query, vertical, pageNumber, sessionId, userId, providerName) {
+exports.search = async function(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, unjudgedOnly) {
     const date = new Date();
-    let data = await regulator.fetch(query, vertical, pageNumber, sessionId, userId, providerName);
+    let data = await regulator.fetch(...arguments);
     data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
 
     data.results = await addMetadata(data.results, sessionId, userId);

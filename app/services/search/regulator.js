@@ -12,8 +12,10 @@ const bookmark = require('../../services/features/bookmark');
  * @params {sessionId} session id of the user
  * @params {userId} id of the user
  * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
+ * @params {unjudgedOnly} boolean indicating whether to use unjudged-only distribution of labour
  */
-exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName) {
+exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, unjudgedOnly) {
     const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
     const bookmarkedUrls = bookmarks.map(bookmark => bookmark.url);
@@ -25,9 +27,11 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     for (let i = 0; i < 10; i++) {
         response = await provider.fetch(query, vertical, pageNumber + i, providerName);
         let filteredResults = response.results;
-        filteredResults = filteredResults.filter(result => {
-            return !bookmarkedUrls.includes(result.url)
-        });
+        if (unjudgedOnly) {
+            filteredResults = filteredResults.filter(result => {
+                return !bookmarkedUrls.includes(result.url)
+            });
+        }
         accumulatedResults = accumulatedResults.concat(filteredResults);
         if (accumulatedResults.length >= count) {
             break

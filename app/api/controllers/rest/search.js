@@ -13,9 +13,9 @@ exports.search = function(req, res) {
     const pageNumber = parseInt(req.query.page) || 1;
     const providerName = req.query.providerName || config.defaultProvider;
     const relevanceFeedback = req.query.relevanceFeedback || 'shared';
-    const unjudgedOnly = req.query.unjudgedOnly === 'true';
+    const distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
 
-    search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, unjudgedOnly)
+    search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {
             scrap.scrapPage(data.results);
             res.status(200).json(data);

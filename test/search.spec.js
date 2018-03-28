@@ -21,7 +21,7 @@ describe('search', function() {
     tests.forEach(function (test) {
         test.verticals.forEach(function (vertical) {
             it('should handle ' + vertical + ' search with the ' + test.provider + ' provider', async function() {
-                const res = await search.search('business', vertical, 1, sid, uid, test.provider);
+                const res = await search.search('business', vertical, 1, sid, uid, test.provider, 'false', 'false');
                 res.should.have.property('results');
                 res.results.length.should.be.exactly(test.expected);
             });
@@ -30,7 +30,7 @@ describe('search', function() {
 
     it('should throw an error with a non-existing provider', async function() {
         try {
-            const res = await search.search('business', 'web', 1, sid, uid, '56f403a4-e2f3-44c5-bca5-5c430b218a89');
+            const res = await search.search('business', 'web', 1, sid, uid, '56f403a4-e2f3-44c5-bca5-5c430b218a89', 'false', 'false');
         } catch (err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -38,7 +38,7 @@ describe('search', function() {
 
     it('should throw an error with an invalid vertical', async function() {
         try {
-            const res = await search.search('business', '56f403a4-e2f3-44c5-bca5-5c430b218a89', 1, sid, uid, 'bing');
+            const res = await search.search('business', '56f403a4-e2f3-44c5-bca5-5c430b218a89', 1, sid, uid, 'bing', 'false', 'false');
         } catch (err) {
             err.name.should.be.exactly('Bad Request');
         }

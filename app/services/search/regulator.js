@@ -25,6 +25,20 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     let accumulatedResults = [];
     let response;
 
+    if (!['false', 'individual', 'shared'].includes(relevanceFeedback)) {
+        throw {
+            name: 'Bad Request',
+            message: 'Invalid relevanceFeedback'
+        };
+    }
+
+    if (!['false', 'unbookmarkedSoft', 'unbookmarkedOnly'].includes(distributionOfLabour)) {
+        throw {
+            name: 'Bad Request',
+            message: 'Invalid distributionOfLabour'
+        };
+    }
+
     // for loop to limit maximum number of repeated queries
     for (let i = 0; i < 10; i++) {
         if (relevanceFeedback === "individual") {

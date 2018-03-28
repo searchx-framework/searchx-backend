@@ -18,20 +18,28 @@ const bookmark = require('../../services/features/bookmark');
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
-    const bookmarkedUrls = bookmarks.map(bookmark => bookmark.url);
+    const userBookmarks = await bookmark.getUserBookmarks(sessionId, userId);
+    const bookmarkUrls = bookmarks.map(bookmark => bookmark.url);
+    const userBookmarkUrls = userBookmarks.map(bookmark => bookmark.url);
 
     let accumulatedResults = [];
     let response;
 
     // for loop to limit maximum number of repeated queries
     for (let i = 0; i < 10; i++) {
-        response = await provider.fetch(query, vertical, pageNumber + i, providerName);
+        if (relevanceFeedback === "individual") {
+            response = await provider.fetch(query, vertical, pageNumber + i, providerName, userBookmarkUrls);
+        } else if (relevanceFeedback === "shared") {
+            response = await provider.fetch(query, vertical, pageNumber + i, providerName, bookmarkUrls);
+        } else {
+            response = await provider.fetch(query, vertical, pageNumber + i, providerName, []);
+        }
         let filteredResults = response.results;
         if (distributionOfLabour === "unbookmarkedOnly") {
-            filteredResults = filteredResults.filter(resultsFilter(bookmarkedUrls));
+            filteredResults = filteredResults.filter(resultsFilter(bookmarkUrls));
         }
         accumulatedResults = accumulatedResults.concat(filteredResults);
-        if (accumulatedResults.filter(resultsFilter(bookmarkedUrls)).length >= count) {
+        if (accumulatedResults.filter(resultsFilter(bookmarkUrls)).length >= count) {
             break
         }
     }
@@ -42,7 +50,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         // return count unbookmarked results
         // (total number of results returned is count + the number of judged results in the list)
         accumulatedResults = accumulatedResults.slice(0, count +
-            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkedUrls)).length));
+            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkUrls)).length));
     }
     response.results = accumulatedResults;
     return response

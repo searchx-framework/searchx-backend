@@ -4,9 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/.bin/nf start -f Procfile -e Procfile.env",
+    "start": "./node_modules/.bin/nf start -e Procfile.env",
     "test": "./node_modules/.bin/mocha --timeout 15000 --exit",
-    "coverage": "istanbul cover _mocha -- -R spec"
+    "coverage": "./node_modules/.bin/istanbul cover _mocha -- -R spec"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
@@ -25,10 +25,6 @@
     "mongoose": "^5.0.7",
     "node-bing-api": "^3.2.2",
     "node-jquery-param": "0.0.2",
-    "passport": "^0.4.0",
-    "passport-http": "^0.3.0",
-    "passport-http-bearer": "^1.0.1",
-    "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "puppeteer": "^1.1.1",
     "randomcolor": "^0.5.3",
@@ -37,7 +33,6 @@
     "socket.io": "^2.0.4",
     "speakingurl": "^14.0.1",
     "stopwords": "0.0.9",
-    "swig": "^1.4.2",
     "underscore": "^1.8.3",
     "url": "^0.11.0",
     "when": "^3.7.8"

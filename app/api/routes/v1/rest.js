@@ -11,13 +11,6 @@ module.exports = function(router) {
        next();
     });
 
-    router.get('/', function(req, res) {
-        res.status(418).json({
-            error: false,
-            message: 'The API is up and running.'
-        });
-    });
-
     // Search
     router.get('/search/:vertical', SearchCtrl.search);
 

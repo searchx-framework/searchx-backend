@@ -8,7 +8,6 @@ const Utils = require('../../utils');
 
 exports.addSearchResultsToCache = async function(query, vertical, page, date, data, provider){
     if (arguments.length !== 6) {
-        console.log('Could not create a new cache - Arguments.');
         throw {
             name: 'Bad Request',
             message: 'Missing required arguments.'
@@ -16,7 +15,6 @@ exports.addSearchResultsToCache = async function(query, vertical, page, date, da
     }
 
     if (!Utils.isAString(query) || !Utils.isAString(vertical) || !Utils.isPosInteger(page) || !Utils.isObject(date) || !Utils.isObject(data) || !Utils.isAString(provider)) {
-        console.log('Could not create a new cache - types.');
         throw {
             name: 'Bad Request',
             message: 'Invalid arguments.'

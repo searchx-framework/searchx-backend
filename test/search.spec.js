@@ -8,7 +8,7 @@ require('../app/config/initializers/mongoose')(config.db);
 const should = require('should');
 const search = require('../app/services/search');
 
-describe('search', function() {
+describe('search (requires corresponding backend to be running)', function() {
     const uid = '123';
     const sid = '123';
 

@@ -41,9 +41,18 @@ exports.fetch = function (query, vertical, pageNumber) {
  * @params {body} result body received from the api call
  */
 function formatResults(vertical, body) {
-    if (!body && !(body.value || body.webPages.value)) {
-        throw new Error('No results from search api.');
+    if (!body) {
+        throw new Error('No response from bing api.');
     }
+
+    if (!("value" in body || "webPages" in body)) {
+        return {
+            results: [],
+            matches: 0
+        };
+    }
+
+    ////
 
     if (vertical === 'web') {
         body = body.webPages

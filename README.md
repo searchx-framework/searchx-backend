@@ -101,25 +101,7 @@ module.exports = {
 ```
 
 # Modifications
-SearchX can be extended to support new providers for search results, and to define tasks. Tasks define extra functionality that can be used in the frontend for user studies, for example placing users in groups according to predefined criteria, giving them search instructions, and asking them questions on what they found.
-
-## Search providers
-Two search provider services are included: Bing and Elasticsearch. These services can be found in `app/services/search/providers/`, and can serve as example of how to implement new search providers. New search providers can be implemented by adding a service in to the same folder, and adding it to the provider mapping in `app/services/search/provider.js`. The service must implement the `fetch(query, vertical, pageNumber)` function, which must return a promise resolving to the following data structure if retrieving the search result is successful:
-
-```
-{ matches: <number of matches>,
-  results: [
-    {
-      name: <name of the result>,
-      url: <full url>,
-      displayUrl: <url formatted for display>,
-      snippet: <part of text to display on search engine results page>
-    },
-    ...
-]}
-```
-
-The set of possible verticals and number of results per page can be defined as desired by the provider implementation.
+SearchX can be extended to define tasks, and to support new providers for search results. Tasks define extra functionality that can be used in the frontend for user studies, for example placing users in groups according to predefined criteria, giving them search instructions, and asking them questions on what they found.
 
 ## Tasks
 Two example tasks have been added in `app/services/session/tasks/`:
@@ -137,6 +119,69 @@ The puzzles for the asynchronous example are defined in `app/services/session/ta
 
 ### Creating a custom task
 To define a new task in the backend, you can add a new service inside `app/services/session/tasks/`  and then change `app/services/session/index.js` to serve the task description from the new service.
+
+## Search providers
+Two search provider services are included: Bing and Elasticsearch. These services can be found in `app/services/search/providers/`, and can serve as example of how to implement new search providers. New search providers can be implemented by adding a service in to the same folder, and adding it to the provider mapping in `app/services/search/provider.js`. The set of possible verticals and number of results per page can be defined as desired by the provider implementation. The provider service must implement the `fetch(query, vertical, pageNumber)` function, which must return a promise that resolves to an object containing the results if retrieving the search results is successful.
+
+The object containing the results needs to have the following fields:
+```
+{ matches: <number of matches>,
+  results: [
+    <result>,
+    ...
+]}
+```
+
+The data structure of <result> depends on the result type, which is defined by the component that will be used to display the result in the frontend. See the [searchx-frontend documentation](https://github.com/felipemoraes/searchx-frontend#search-providers) for an explanation of how to add custom result types.
+
+The included result types are (fields preceded by `<OPTIONAL>` are optional):
+
+### Web
+```
+{
+  name: <name of the result>,
+  url: <full url>,
+  displayUrl: <url formatted for display>,
+  snippet: <part of text to display on search engine results page>
+}
+```
+### Images
+```
+{
+  name: <name of the image>,
+  url: <full url>,
+  thumbnailUrl: <url of the thumbnail to display for this image>
+}
+```
+
+### Videos
+```
+{
+  name: <name of the video>,
+  thumbnailUrl: <url of the thumbnail to display for this result>,
+  publisher: [
+    {name: <name of the first publisher of this video}
+    ...
+  ],
+  viewCount: <number of times this video has been viewed (integer)>,
+  <OPTIONAL> creator: {name: <name of the creator of this video>},
+}
+```
+
+### News
+```
+{
+  name: <name of the news article>,
+  url: <full url>,
+  datePublished: <date the article has been published (in format compatible with Date() constructor)>,
+  description: <description of the article to display on search engine results page>,
+  provider: [
+    {name: <name of the first news provider that published this story>}
+    ...
+  ],
+  <OPTIONAL> image: {thumbnail: {contentUrl: <url of the thumbnail to display for this result>}}
+}
+```
 
 # License
 

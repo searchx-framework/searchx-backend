@@ -70,6 +70,15 @@ exports.getBookmarks = async function(sessionId) {
         .sort({date: 1});
 };
 
+exports.getUserBookmarks = async function(sessionId, userId) {
+    return await Bookmark
+        .find(
+            {sessionId: sessionId, userId: userId, deleted: false},
+            {url:1, title: 1, date: 1, userId: 1, starred: 1, _id: 0}
+        )
+        .sort({date: 1});
+};
+
 exports.getBookmark = async function(sessionId, url) {
     const query = {
         sessionId: sessionId,

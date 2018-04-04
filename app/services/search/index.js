@@ -1,6 +1,6 @@
 'use strict';
 
-const provider = require('./provider');
+const regulator = require('./regulator');
 const cache = require('./cache');
 const bookmark = require('../features/bookmark');
 const annotation = require('../features/annotation');
@@ -9,27 +9,22 @@ const view = require('../features/view');
 
 
 /*
- * Fetches and processes search results from the search api
+ * Fetches search results from the regulator and processes them to include metadata
  *
  * @params {query} the search query
+ * @params (vertical) type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
- * @params {vertical} type of search results (web, images, etc)
- * @params {sessionId} session id of user
+ * @params {sessionId} session id of the user
+ * @params {userId} id of the user
+ * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
+ * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false,
+ *         unbookmarkedSoft, unbookmarkedOnly)
  */
-exports.search = async function(query, vertical, pageNumber, sessionId, userId, providerName) {
-    let data = await cache.getSearchResultsFromCache(query, vertical, pageNumber, providerName);
-    if (!data) {
-        const date = new Date();
-        data = await provider.fetch(query, vertical, pageNumber, providerName);
-        data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
-
-        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data, providerName)
-            .catch(err => {
-                console.log(err);
-            });
-    } else {
-        data = data.data;
-    }
+exports.search = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+    const date = new Date();
+    let data = await regulator.fetch(...arguments);
+    data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
 
     data.results = await addMetadata(data.results, sessionId, userId);
     return data;

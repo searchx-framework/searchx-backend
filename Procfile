@@ -1,2 +1,2 @@
-web: ./node_modules/.bin/forever -m 5 --killSignal=SIGTERM server.js
-worker: ./node_modules/.bin/forever -m 5 --killSignal=SIGTERM worker.js
+api: ./node_modules/.bin/forever --minUptime 1000 --spinSleepTime 1000 -m 5 --killSignal=SIGTERM server.js
+worker: ./node_modules/.bin/forever --minUptime 1000 --spinSleepTime 1000 -m 5 --killSignal=SIGTERM worker.js

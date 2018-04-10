@@ -2,11 +2,13 @@
 
 const bing = require('./providers/bing');
 const elasticsearch = require('./providers/elasticsearch');
+const indri = require('./providers/indri');
 
 // mapping of providerName to search provider module
 const providers = {
-    bing: bing,
-    elasticsearch: elasticsearch
+    'bing': bing,
+    'elasticsearch': elasticsearch,
+    'indri': indri
 };
 
 /*
@@ -16,8 +18,9 @@ const providers = {
  * @params {vertical} type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
  * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback (if supported by provider)
  */
-exports.fetch = function (query, vertical, pageNumber, providerName) {
+exports.fetch = function (query, vertical, pageNumber, providerName, relevanceFeedbackDocuments) {
     if (!(providerName in providers)) {
         return Promise.reject({
             name: 'Bad Request',
@@ -26,5 +29,5 @@ exports.fetch = function (query, vertical, pageNumber, providerName) {
     }
     let provider = providers[providerName];
 
-    return provider.fetch(query, vertical, pageNumber);
+    return provider.fetch(query, vertical, pageNumber, relevanceFeedbackDocuments);
 };

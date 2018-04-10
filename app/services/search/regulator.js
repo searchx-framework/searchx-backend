@@ -49,6 +49,9 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             response = await provider.fetch(query, vertical, pageNumber + i, providerName, []);
         }
         let filteredResults = response.results;
+        if (filteredResults.length === 0) {
+            break
+        }
         if (distributionOfLabour === "unbookmarkedOnly") {
             filteredResults = filteredResults.filter(resultsFilter(bookmarkUrls));
         }

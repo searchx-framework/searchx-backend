@@ -6,7 +6,13 @@ const searcher = new indri.Searcher({
     "rules" : "method:dirichlet,mu:1000",
     "fbTerms": 10,
     "fbMu": 1500,
-    "includeFields": { "title": "title", "docno": "docno"},
+    "includeFields": {
+        "title": "title",
+        "docno": "docno",
+        "date": "date",
+        "source": "source",
+        "text": "text"
+    },
     "includeDocument" : true,
     "resultsPerPage": 10
 });

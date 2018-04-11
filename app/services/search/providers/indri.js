@@ -6,7 +6,7 @@ const searcher = new indri.Searcher({
     "rules" : "method:dirichlet,mu:1000",
     "fbTerms": 10,
     "fbMu": 1500,
-    "includeFields": { "title": "headline", "docno": "docno"},
+    "includeFields": { "headline": "title", "docno": "docno"},
     "includeDocument" : true,
     "resultsPerPage": 10
 });
@@ -36,7 +36,7 @@ exports.fetch = function (query, vertical, pageNumber, relevanceFeedbackDocument
             if (error) return reject(error);
             resolve(formatResults(results));
         };
-
+        relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
         searcher.search(query, pageNumber, relevanceFeedbackDocuments, callback);
     });
 };

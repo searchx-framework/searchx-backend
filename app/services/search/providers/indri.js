@@ -2,7 +2,7 @@
 
 const indri = require('../../../../lib/node-indri/node-indri');
 const searcher = new indri.Searcher({
-    "index": "./lib/node-indri/etc/poems_index",
+    "index": "../data/Aquaint-Index",
     "rules" : "method:dirichlet,mu:1000",
     "fbTerms": 10,
     "fbMu": 1500,
@@ -50,6 +50,14 @@ exports.fetch = function (query, vertical, pageNumber, relevanceFeedbackDocument
 
 function formatResults(results) {
     return {
-        results: results
+        results: results.map(result => ({
+            id: result.docid,
+            collectionId: result.fields.docno,
+            name: result.fields.title,
+            date: result.fields.date,
+            source: result.fields.source,
+            snippet: result.snippet,
+            text: result.fields.text
+        }))
     };
 }

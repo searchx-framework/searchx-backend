@@ -39,7 +39,7 @@ exports.search = async function (query, vertical, pageNumber, sessionId, userId,
  */
 async function addMetadata(results, sessionId, userId) {
     const promises = results.map(async (result) => {
-        const id = result.docid ? result.docid : result.url;
+        const id = result.id ? result.id : result.url;
         result.metadata = {
             bookmark: await bookmark.getBookmark(sessionId, id),
             annotations: (await annotation.getAnnotations(sessionId, id)).length,

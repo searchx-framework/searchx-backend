@@ -4,7 +4,8 @@ const provider = require('./provider');
 const bookmark = require('../../services/features/bookmark');
 
 /*
- * Fetches search results from the provider and applies algorithmic mediation
+ * Fetches search results from the provider, applies algorithmic mediation and ensures that all required fields
+ * are included in results.
  *
  * @params {query} the search query
  * @params (vertical) type of search results (web, images, etc)
@@ -69,10 +70,31 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         accumulatedResults = accumulatedResults.slice(0, count +
             (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkUrls)).length));
     }
+    accumulatedResults = addMissingFields(accumulatedResults);
     response.results = accumulatedResults;
     return response
 };
 
 function resultsFilter(bookmarkedUrls) {
     return result => !bookmarkedUrls.includes(result.url)
+}
+
+/**
+ * Add required fields when missing
+ * @param results the set of results to add missing fields to
+ * @returns set of results with missing fields added
+ */
+function addMissingFields(results) {
+    return results.map(result => {
+        if (!result.name.replace(/\s/g,'')) {
+            result.name = "Untitled";
+        }
+        if (result.id && !result.text.replace(/\s/g,'')) {
+            result.text = "No text available"
+        }
+        if (!result.snippet.replace(/\s/g,'')) {
+            result.snippet = "No text available"
+        }
+        return result;
+    });
 }

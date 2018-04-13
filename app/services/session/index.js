@@ -2,6 +2,7 @@
 
 const exampleGroupSync = require('./tasks/exampleGroupSync');
 const exampleGroupAsync = require('./tasks/exampleGroupAsync');
+const algorithmicMediationPilot = require('./tasks/algorithmicMediationPilot');
 const helper = require('./groupHelper');
 
 function task(taskId) {
@@ -10,6 +11,8 @@ function task(taskId) {
             return exampleGroupSync;
         case "example-group-async":
             return exampleGroupAsync;
+        case "algorithmic-mediation-pilot":
+            return algorithmicMediationPilot;
         default:
             throw {
                 name: "Bad Request",

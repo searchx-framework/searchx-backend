@@ -9,9 +9,9 @@ const BingApi = require('node-bing-api')({
 /*
  * Fetches data from bing
  *
- * @params {params} the search parameters
+ * @params {query} the search query string
  * @params {vertical} type of search results (web, images, etc)
- * @params {callback} the callback function that is executed once the request returns
+ * @params {pageNumber} the number of the page of results to show (1-based indexing)
  */
 exports.fetch = function (query, vertical, pageNumber) {
     return new Promise(function (resolve, reject) {

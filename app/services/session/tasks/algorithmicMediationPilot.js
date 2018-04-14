@@ -2,9 +2,11 @@
 
 const TASK_ID = "algorithmic-mediation-pilot";
 
+const _ = require('underscore');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
 const helper = require('../groupHelper');
+const utils = require("../../../utils");
 
 const topics = require('./data/pilot-topics.json');
 Object.keys(topics).forEach((index) => {
@@ -53,13 +55,9 @@ exports.getUserTask = async function(userId, params) {
     group.markModified('taskData');
     await group.save();
 
-    await setGroupTopic(userId);
+    group = await setGroupTopic(userId, group);
 
     return group;
-};
-
-exports.handleSyncSubmit = async function(userId) {
-    return await setGroupTopic(userId);
 };
 
 exports.handleSyncLeave = async function(userId) {
@@ -76,19 +74,18 @@ exports.handleSyncLeave = async function(userId) {
     await group.save();
 };
 
-async function setGroupTopic(userId) {
-    const group = await helper.getGroupByUserId(userId, TASK_ID);
+async function setGroupTopic(userId, group) {
     if (group === null) {
         return null;
     }
 
     const membersComplete = group.members.length >= group.taskData.size;
     if (!membersComplete) {
-        return null;
+        return group;
     }
 
-    // Todo: add topic assignment
-    group.taskData.topic = topics[0];
+    // assign random topic
+    group.taskData.topic = _.sample(topics);
     group.markModified("members");
     group.markModified("taskData");
     await group.save();

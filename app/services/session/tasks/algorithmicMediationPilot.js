@@ -74,7 +74,15 @@ exports.handleSyncLeave = async function(userId) {
     await group.save();
 };
 
+exports.handleSyncSubmit = async function(userId) {
+    return await setGroupTopic(userId);
+};
+
 async function setGroupTopic(userId, group) {
+    if (!group) {
+        group = await helper.getGroupByUserId(userId, TASK_ID);
+    }
+
     if (group === null) {
         return null;
     }
@@ -89,6 +97,7 @@ async function setGroupTopic(userId, group) {
     group.markModified("members");
     group.markModified("taskData");
     await group.save();
+
 
     return group;
 }

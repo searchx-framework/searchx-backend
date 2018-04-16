@@ -17,13 +17,13 @@ describe('regulator', function () {
     const sid = '123';
 
     const relevanceFeedbackTests = [
-        {relevanceFeedback: 'false', expected: 0},
+        {relevanceFeedback: false, expected: 0},
         {relevanceFeedback: 'individual', expected: 1},
         {relevanceFeedback: 'shared', expected: 2}
     ];
 
     const distributionOfLabourTests = [
-        {distributionOfLabour: 'false', expected: 10},
+        {distributionOfLabour: false, expected: 10},
         {distributionOfLabour: 'unbookmarkedSoft', expected: 12},
         {distributionOfLabour: 'unbookmarkedOnly', expected: 10}
     ];
@@ -51,7 +51,7 @@ describe('regulator', function () {
 
     // relevanceFeedbackTests.forEach(function (test) {
     //     it('should send correct number of documents to provider for relevanceFeedback ' + test.relevanceFeedback, async function () {
-    //         const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', test.relevanceFeedback, 'false');
+    //         const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', test.relevanceFeedback, false);
     //         res.should.have.property('results');
     //         res.results.length.should.be.exactly(test.expected);
     //     });
@@ -59,7 +59,7 @@ describe('regulator', function () {
 
     distributionOfLabourTests.forEach(function (test) {
         it('should return the correct number of documents for distributionOfLabour ' + test.distributionOfLabour, async function () {
-            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', 'false', test.distributionOfLabour);
+            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', false, test.distributionOfLabour);
             res.should.have.property('results');
             res.results.length.should.be.exactly(test.expected);
         });
@@ -67,7 +67,7 @@ describe('regulator', function () {
 
     it('should throw an error with an invalid relevanceFeedback', async function () {
         try {
-            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', 'f6735f6f-3e1e-4f83-8e52-a1ce0eeed432', 'false');
+            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', 'f6735f6f-3e1e-4f83-8e52-a1ce0eeed432', false);
         } catch (err) {
             err.name.should.be.exactly('Bad Request');
         }
@@ -75,7 +75,7 @@ describe('regulator', function () {
 
     it('should throw an error with an invalid distributionOfLabour', async function () {
         try {
-            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', 'false', 'f6735f6f-3e1e-4f83-8e52-a1ce0eeed432');
+            const res = await regulator.fetch('business', 'web', 1, sid, uid1, 'bing', false, 'f6735f6f-3e1e-4f83-8e52-a1ce0eeed432');
         } catch (err) {
             err.name.should.be.exactly('Bad Request');
         }

@@ -12,8 +12,14 @@ exports.search = function(req, res) {
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
     const providerName = req.query.providerName || config.defaultProvider;
-    const relevanceFeedback = req.query.relevanceFeedback || 'shared';
-    const distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
+    let relevanceFeedback = req.query.relevanceFeedback || 'shared';
+    if (relevanceFeedback === 'false') {
+        relevanceFeedback = false;
+    }
+    let distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
+    if (distributionOfLabour === 'false') {
+        distributionOfLabour = true;
+    }
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {

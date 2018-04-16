@@ -20,20 +20,20 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
     const userBookmarks = await bookmark.getUserBookmarks(sessionId, userId);
-    const bookmarkUrls = bookmarks.map(bookmark => bookmark.url);
-    const userBookmarkUrls = userBookmarks.map(bookmark => bookmark.url);
+    const bookmarkIds = bookmarks.map(bookmark => bookmark.url);
+    const userBookmarkIds = userBookmarks.map(bookmark => bookmark.url);
 
     let accumulatedResults = [];
     let response;
 
-    if (!['false', 'individual', 'shared'].includes(relevanceFeedback)) {
+    if (![false, 'individual', 'shared'].includes(relevanceFeedback)) {
         throw {
             name: 'Bad Request',
             message: 'Invalid relevanceFeedback'
         };
     }
 
-    if (!['false', 'unbookmarkedSoft', 'unbookmarkedOnly'].includes(distributionOfLabour)) {
+    if (![false, 'unbookmarkedSoft', 'unbookmarkedOnly'].includes(distributionOfLabour)) {
         throw {
             name: 'Bad Request',
             message: 'Invalid distributionOfLabour'
@@ -43,9 +43,9 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     // for loop to limit maximum number of repeated queries
     for (let i = 0; i < 10; i++) {
         if (relevanceFeedback === "individual") {
-            response = await provider.fetch(query, vertical, pageNumber + i, providerName, userBookmarkUrls);
+            response = await provider.fetch(query, vertical, pageNumber + i, providerName, userBookmarkIds);
         } else if (relevanceFeedback === "shared") {
-            response = await provider.fetch(query, vertical, pageNumber + i, providerName, bookmarkUrls);
+            response = await provider.fetch(query, vertical, pageNumber + i, providerName, bookmarkIds);
         } else {
             response = await provider.fetch(query, vertical, pageNumber + i, providerName, []);
         }
@@ -54,29 +54,35 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             break
         }
         if (distributionOfLabour === "unbookmarkedOnly") {
-            filteredResults = filteredResults.filter(resultsFilter(bookmarkUrls));
+            filteredResults = filteredResults.filter(resultsFilter(bookmarkIds));
         }
         accumulatedResults = accumulatedResults.concat(filteredResults);
-        if (accumulatedResults.filter(resultsFilter(bookmarkUrls)).length >= count) {
+        if (accumulatedResults.filter(resultsFilter(bookmarkIds)).length >= count) {
             break
         }
     }
 
-    if (distributionOfLabour === "false") {
+    if (distributionOfLabour === false) {
         accumulatedResults = accumulatedResults.slice(0, count);
     } else {
         // return count unbookmarked results
         // (total number of results returned is count + the number of judged results in the list)
         accumulatedResults = accumulatedResults.slice(0, count +
-            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkUrls)).length));
+            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkIds)).length));
     }
     accumulatedResults = addMissingFields(accumulatedResults);
     response.results = accumulatedResults;
     return response
 };
 
-function resultsFilter(bookmarkedUrls) {
-    return result => !bookmarkedUrls.includes(result.url)
+function resultsFilter(bookmarkedIds) {
+    return result => {
+        if (result.id) {
+            return !bookmarkedIds.includes(result.id)
+        } else {
+            return !bookmarkedIds.includes(result.url)
+        }
+    }
 }
 
 /**

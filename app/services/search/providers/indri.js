@@ -51,7 +51,7 @@ exports.fetch = function (query, vertical, pageNumber, relevanceFeedbackDocument
 function formatResults(results) {
     return {
         results: results.map(result => ({
-            id: result.docid,
+            id: result.docid + "",
             collectionId: result.fields.docno,
             name: result.fields.title,
             date: result.fields.date,

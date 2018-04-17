@@ -3,9 +3,6 @@
 // Default to development environment if not set
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Load the config
-const config = require('./app/config/config');
-
 // Load dependencies
 const express      = require('express');
 const bodyParser   = require('body-parser');
@@ -15,12 +12,12 @@ const router       = express.Router();
 const io           = require('socket.io').listen(http);
 
 // Run initializers
-require('./app/config/initializers/mongoose')(config.db);
-require('./app/api/routes/v1/rest')(router);
-require('./app/api/routes/v1/socket')(io);
+require('../app/config/initializers/mongoose')(process.env.DB);
+require('../app/api/routes/v1/rest')(router);
+require('../app/api/routes/v1/socket')(io);
 
 // Setup server
-app.set('port', (process.env.PORT || config.port));
+app.set('port', (process.env.PORT));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(function(req, res, next) {

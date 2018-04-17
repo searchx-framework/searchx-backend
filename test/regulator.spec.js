@@ -3,7 +3,7 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const config = require('../app/config/config');
-require('../app/config/initializers/mongoose')(config.db);
+require('../app/config/initializers/mongoose')(config.testDb);
 
 const should = require('should');
 const mongoose = require('mongoose');
@@ -11,7 +11,7 @@ const Bookmark = mongoose.model('Bookmark');
 const regulator = require('../app/services/search/regulator');
 const bookmark = require("../app/services/features/bookmark");
 
-describe('regulator', function () {
+describe('regulator (requires a working search provider)', function () {
     const uid1 = '123';
     const uid2 = '124';
     const sid = '123';

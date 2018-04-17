@@ -1,11 +1,10 @@
 'use strict';
 
 // Init
-const config = require('./app/config/config');
-require('./app/config/initializers/mongoose')(config.db);
+require('../app/config/initializers/mongoose')(process.env.DB);
 
 // Create Job Queue
-const queue  = require('./app/config/initializers/kue');
+const queue  = require('../app/config/initializers/kue');
 
 // Handle termination
 process.once('SIGTERM', function(){
@@ -23,5 +22,5 @@ process.once('SIGTERM', function(){
 // Define workers
 console.log('Starting Workers');
 
-const workers = require('./app/api/worker');
+const workers = require('../app/api/worker');
 queue.process('scrap_page', 3, workers.processScrapPage);

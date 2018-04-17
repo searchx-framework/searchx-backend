@@ -12,7 +12,7 @@ const bookmark = require('../../services/features/bookmark');
  * @params {pageNumber} result pagination number
  * @params {sessionId} session id of the user
  * @params {userId} id of the user
- * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {providerName} the name of the search provider to use (indri by default)
  * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
  * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly)
  */
@@ -71,8 +71,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkIds)).length));
     }
     accumulatedResults = addMissingFields(accumulatedResults);
-    response.results = accumulatedResults;
-    return response
+    return accumulatedResults;
 };
 
 function resultsFilter(bookmarkedIds) {

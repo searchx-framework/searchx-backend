@@ -17,17 +17,32 @@ const providers = {
  * @params {query} the search query
  * @params {vertical} type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
- * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {providerName} the name of the search provider to use (indri by default)
  * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback (if supported by provider)
  */
 exports.fetch = function (query, vertical, pageNumber, providerName, relevanceFeedbackDocuments) {
-    if (!(providerName in providers)) {
+    if (invalidProvider(providerName)) return invalidProvider(providerName);
+    return providers[providerName].fetch(query, vertical, pageNumber, relevanceFeedbackDocuments);
+};
+
+/*
+ * Get document by id from search provider
+ *
+ * @params {id} the id of the document to return
+ * @params {providerName} the name of the search provider to use (indri by default)
+ */
+exports.getById = function (id, providerName) {
+    if (invalidProvider(providerName)) return invalidProvider(providerName);
+    return providers[providerName].getById(id);
+};
+
+function invalidProvider(providerName) {
+    if (providerName in providers) {
+        return false;
+    } else {
         return Promise.reject({
             name: 'Bad Request',
             message: 'Provider does not exist'
         });
     }
-    let provider = providers[providerName];
-
-    return provider.fetch(query, vertical, pageNumber, relevanceFeedbackDocuments);
-};
+}

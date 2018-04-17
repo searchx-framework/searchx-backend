@@ -13,6 +13,7 @@ module.exports = function(router) {
 
     // Search
     router.get('/search/:vertical', SearchCtrl.search);
+    router.get('/search/:vertical/getById/:id', SearchCtrl.getById);
 
     // User
     router.get('/users/:userId/task/:task', SessionCtrl.getUserTask);

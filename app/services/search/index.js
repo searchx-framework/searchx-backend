@@ -1,5 +1,6 @@
 'use strict';
 
+const provider = require("./provider");
 const regulator = require('./regulator');
 const cache = require('./cache');
 const bookmark = require('../features/bookmark');
@@ -16,18 +17,32 @@ const view = require('../features/view');
  * @params {pageNumber} result pagination number
  * @params {sessionId} session id of the user
  * @params {userId} id of the user
- * @params {providerName} the name of the search provider to use (bing by default)
+ * @params {providerName} the name of the search provider to use (indri by default)
  * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
  * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false,
  *         unbookmarkedSoft, unbookmarkedOnly)
  */
 exports.search = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     const date = new Date();
-    let data = await regulator.fetch(...arguments);
-    data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
+    const data = {
+        results: await regulator.fetch(...arguments),
+        id: query + '_' + pageNumber + '_' + vertical + '_' + date.getTime(),
+    };
 
     data.results = await addMetadata(data.results, sessionId, userId);
     return data;
+};
+
+/*
+ * Get document by id from search provider
+ *
+ * @params {id} the id of the document to return
+ * @params {providerName} the name of the search provider to use (indri by default)
+ */
+exports.getById = async function(id, providerName) {
+    return {
+        result: await provider.getById(id, providerName)
+    }
 };
 
 

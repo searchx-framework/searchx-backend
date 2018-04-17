@@ -26,19 +26,30 @@ exports.search = function(req, res) {
             scrap.scrapPage(data.results);
             res.status(200).json(data);
         })
-        .catch((err) => {
-            console.log(err);
-
-            if (err.name === 'Bad Request') {
-                res.status(400).json({
-                    error: true,
-                    message: err.message
-                });
-            } else {
-                res.status(503).json({
-                    error: true,
-                    message: 'The request resulted in a backend time out or backend error. The team is investigating the issue. We are sorry for the inconvenience.'
-                });
-            }
-        });
+        .catch(err => handleError(err));
 };
+
+exports.getById = function (req, res) {
+    const docId = req.params.id;
+    const providerName = req.query.providerName || config.defaultProvider;
+
+    search.getById(docId, providerName)
+        .then(data => res.status(200).json(data))
+        .catch(err => handleError(err));
+};
+
+function handleError(err) {
+    console.log(err);
+
+    if (err.name === 'Bad Request') {
+        res.status(400).json({
+            error: true,
+            message: err.message
+        });
+    } else {
+        res.status(503).json({
+            error: true,
+            message: 'The request resulted in a backend time out or backend error. The team is investigating the issue. We are sorry for the inconvenience.'
+        });
+    }
+}

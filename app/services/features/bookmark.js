@@ -2,12 +2,15 @@
 
 const mongoose = require('mongoose');
 const Bookmark = mongoose.model('Bookmark');
+const Exclude = mongoose.model('Exclude');
 
 ////
 
-exports.addBookmark = async function(sessionId, data) {
+exports.addBookmark = async function(sessionId, data, isExclude) {
+    const Type = isExclude ? Exclude : Bookmark;
+
     data.sessionId = sessionId;
-    const doc = await Bookmark.findOne({
+    const doc = await Type.findOne({
         url: data.url,
         sessionId: data.sessionId
     });
@@ -17,7 +20,7 @@ exports.addBookmark = async function(sessionId, data) {
         data.created = now;
         data.date = now;
 
-        const B = new Bookmark(data);
+        const B = new Type(data);
         B.save();
         return;
     }
@@ -30,8 +33,10 @@ exports.addBookmark = async function(sessionId, data) {
     }
 };
 
-exports.removeBookmark = async function(sessionId, url) {
-    const doc = await Bookmark.findOne({
+exports.removeBookmark = async function(sessionId, url, isExclude) {
+    const Type = isExclude ? Exclude : Bookmark;
+
+    const doc = await Type.findOne({
         url: url,
         sessionId: sessionId
     });
@@ -61,8 +66,10 @@ exports.starBookmark = async function(sessionId, url) {
 
 ////
 
-exports.getBookmarks = async function(sessionId) {
-    return await Bookmark
+exports.getBookmarks = async function(sessionId, isExclude) {
+    const Type = isExclude ? Exclude : Bookmark;
+
+    return await Type
         .find(
             {sessionId: sessionId, deleted: false},
             {url:1, title: 1, date: 1, userId: 1, starred: 1, _id: 0}
@@ -79,14 +86,16 @@ exports.getUserBookmarks = async function(sessionId, userId) {
         .sort({date: 1});
 };
 
-exports.getBookmark = async function(sessionId, url) {
+exports.getBookmark = async function(sessionId, url, isExclude) {
+    const Type = isExclude ? Exclude : Bookmark;
+
     const query = {
         sessionId: sessionId,
         url: url,
         deleted: false
     };
 
-    const docs = await Bookmark.find(query, {date: 1, userId: 1, starred: 1, _id: 0});
+    const docs = await Type.find(query, {date: 1, userId: 1, starred: 1, _id: 0});
     if (docs.length !== 0) {
         return docs[0];
     }

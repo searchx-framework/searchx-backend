@@ -60,6 +60,32 @@ exports.removeBookmark = function(req,res) {
     );
 };
 
+exports.getExcludes = function(req, res) {
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        bookmark.getBookmarks(sessionId, true),
+        'Could not get excludes.'
+    );
+};
+
+exports.addExclude = function(req, res) {
+    const data = req.body;
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        bookmark.addBookmark(sessionId, data, true),
+        'Could not create a new exclude.'
+    );
+};
+
+exports.removeExclude = function(req,res) {
+    const url = req.body.url;
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        bookmark.removeBookmark(sessionId, url, true),
+        'Could not delete exclude.'
+    );
+};
+
 exports.starBookmark = function(req, res) {
     const url = req.body.url;
     const sessionId = req.params.sessionId;

@@ -57,11 +57,11 @@ async function addMetadata(results, sessionId, userId) {
         const id = result.id ? result.id : result.url;
         result.metadata = {
             bookmark: await bookmark.getBookmark(sessionId, id),
+            exclude: await bookmark.getBookmark(sessionId, id, true),
             annotations: (await annotation.getAnnotations(sessionId, id)).length,
             rating: (await rating.getRating(sessionId, id, userId)).total,
             views: await view.getViews(sessionId, result.url),
         };
-
         return result;
     });
 

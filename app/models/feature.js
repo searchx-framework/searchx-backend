@@ -21,7 +21,7 @@ const QueryHistorySchema = new Schema({
     },
 });
 
-const BookmarkSchema = new Schema({
+const bookmarkExcludeFields = {
     sessionId: {
         type: String
     },
@@ -32,7 +32,6 @@ const BookmarkSchema = new Schema({
         type: Date,
         required: true
     },
-
     url: {
         type: String,
         required: true
@@ -45,16 +44,20 @@ const BookmarkSchema = new Schema({
         type: Date,
         required: true
     },
-
-    starred: {
-        type: Boolean,
-        default: false
-    },
     deleted: {
         type: Boolean,
         default: false
-    },
-});
+    }
+};
+
+const ExcludeSchema = new Schema(bookmarkExcludeFields);
+
+bookmarkExcludeFields.starred = {
+    type: Boolean,
+    default: false
+};
+
+const BookmarkSchema = new Schema(bookmarkExcludeFields);
 
 const AnnotationSchema = new Schema({
     sessionId: {
@@ -125,6 +128,7 @@ const ViewSchema = new Schema({
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
+    Exclude: mongoose.model('Exclude', ExcludeSchema),
     Annotation: mongoose.model('Annotation', AnnotationSchema),
     Rating: mongoose.model('Rating', RatingSchema),
     View: mongoose.model('View', ViewSchema),

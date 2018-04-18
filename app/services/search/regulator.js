@@ -3,6 +3,10 @@
 const provider = require('./provider');
 const bookmark = require('../../services/features/bookmark');
 
+function getId(result) {
+    return result.id ? result.id : result.url;
+}
+
 /*
  * Fetches search results from the provider, applies algorithmic mediation and ensures that all required fields
  * are included in results.
@@ -68,21 +72,30 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     if (distributionOfLabour === false) {
         accumulatedResults = accumulatedResults.slice(0, count);
     } else {
-        // return count uncollapsible results
-        // (total number of results returned is count + the number of bookmarked or excluded results in the list)
-        accumulatedResults = accumulatedResults.slice(0, count +
-            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(collapsibleIds)).length));
+        // total number of results returned is such that there are always <count> uncollapsible results included)
+
+        let unCollapsibleResults = 0;
+        let i;
+        for (i = 0; i < accumulatedResults.length; i++) {
+            if (!collapsibleIds.includes(getId(accumulatedResults[i]))) {
+                unCollapsibleResults++;
+            }
+            if (unCollapsibleResults >= count) {
+                break
+            }
+        }
+        accumulatedResults = accumulatedResults.slice(0, i + 1);
     }
     accumulatedResults = addMissingFields(accumulatedResults);
     return accumulatedResults;
 };
 
-function resultsFilter(bookmarkedIds) {
+function resultsFilter(collapsibleIds) {
     return result => {
         if (result.id) {
-            return !bookmarkedIds.includes(result.id)
+            return !collapsibleIds.includes(result.id)
         } else {
-            return !bookmarkedIds.includes(result.url)
+            return !collapsibleIds.includes(result.url)
         }
     }
 }

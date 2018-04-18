@@ -19,8 +19,11 @@ const bookmark = require('../../services/features/bookmark');
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
+    const excludes = await bookmark.getBookmarks(sessionId, true);
     const userBookmarks = await bookmark.getUserBookmarks(sessionId, userId);
     const bookmarkIds = bookmarks.map(bookmark => bookmark.url);
+    const excludeIds = excludes.map(exclude => exclude.url);
+    const collapsibleIds = bookmarkIds.concat(excludeIds);
     const userBookmarkIds = userBookmarks.map(bookmark => bookmark.url);
 
     let accumulatedResults = [];
@@ -57,7 +60,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             filteredResults = filteredResults.filter(resultsFilter(bookmarkIds));
         }
         accumulatedResults = accumulatedResults.concat(filteredResults);
-        if (accumulatedResults.filter(resultsFilter(bookmarkIds)).length >= count) {
+        if (accumulatedResults.filter(resultsFilter(collapsibleIds)).length >= count) {
             break
         }
     }
@@ -65,10 +68,10 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     if (distributionOfLabour === false) {
         accumulatedResults = accumulatedResults.slice(0, count);
     } else {
-        // return count unbookmarked results
-        // (total number of results returned is count + the number of judged results in the list)
+        // return count uncollapsible results
+        // (total number of results returned is count + the number of bookmarked or excluded results in the list)
         accumulatedResults = accumulatedResults.slice(0, count +
-            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(bookmarkIds)).length));
+            (accumulatedResults.length - accumulatedResults.filter(resultsFilter(collapsibleIds)).length));
     }
     accumulatedResults = addMissingFields(accumulatedResults);
     return accumulatedResults;

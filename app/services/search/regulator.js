@@ -29,6 +29,14 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     const excludeIds = excludes.map(exclude => exclude.url);
     const collapsibleIds = bookmarkIds.concat(excludeIds);
     const userBookmarkIds = userBookmarks.map(bookmark => bookmark.url);
+    const bookmarkIdMap = {};
+    bookmarkIds.forEach(id => {
+        bookmarkIdMap[id] = true;
+    });
+    const collapsibleIdMap = {};
+    collapsibleIds.forEach(id => {
+        collapsibleIdMap[id] = true;
+    });
 
     let accumulatedResults = [];
     let response;
@@ -61,10 +69,10 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             break
         }
         if (distributionOfLabour === "unbookmarkedOnly") {
-            filteredResults = filteredResults.filter(resultsFilter(bookmarkIds));
+            filteredResults = filteredResults.filter(resultsFilter(bookmarkIdMap));
         }
         accumulatedResults = accumulatedResults.concat(filteredResults);
-        if (accumulatedResults.filter(resultsFilter(collapsibleIds)).length >= count) {
+        if (accumulatedResults.filter(resultsFilter(collapsibleIdMap)).length >= count) {
             break
         }
     }
@@ -90,12 +98,12 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     return accumulatedResults;
 };
 
-function resultsFilter(collapsibleIds) {
+function resultsFilter(collapsibleIdMap) {
     return result => {
         if (result.id) {
-            return !collapsibleIds.includes(result.id)
+            return !(result.id in collapsibleIdMap)
         } else {
-            return !collapsibleIds.includes(result.url)
+            return !(result.url in collapsibleIdMap)
         }
     }
 }

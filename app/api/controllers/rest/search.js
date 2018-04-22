@@ -18,7 +18,7 @@ exports.search = function(req, res) {
     }
     let distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
     if (distributionOfLabour === 'false') {
-        distributionOfLabour = true;
+        distributionOfLabour = false;
     }
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)

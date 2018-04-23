@@ -2,6 +2,7 @@
 
 const provider = require('./provider');
 const bookmark = require('../../services/features/bookmark');
+const viewedResults = require('./viewedResults');
 
 function getId(result) {
     return result.id ? result.id : result.url;
@@ -38,7 +39,6 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         collapsibleIdMap[id] = true;
     });
 
-    let accumulatedResults = [];
     let response;
 
     if (![false, 'individual', 'shared'].includes(relevanceFeedback)) {
@@ -53,6 +53,25 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
             name: 'Bad Request',
             message: 'Invalid distributionOfLabour'
         };
+    }
+
+    // Find all results on previous pages that the user has not viewed yet, they will be promoted to the current page
+    // to make sure that the user does not miss any results that have recently been promoted by relevance feedback.
+    const viewedResultIds = await viewedResults.getViewedResultIds(query, vertical, providerName, sessionId, userId);
+    const viewedResultsIdMap = {};
+    let accumulatedResults = [];
+    if (viewedResultIds) {
+        viewedResultIds.forEach(resultId => {
+            viewedResultsIdMap[resultId] = true;
+        });
+        for (let i = 1; i < pageNumber; i++) {
+            const response = await provider.fetch(query, vertical, i, providerName, []);
+            const pageResults = response.results;
+            if (pageResults) {
+                accumulatedResults = accumulatedResults.concat(pageResults);
+            }
+        }
+        accumulatedResults = accumulatedResults.filter(result => !viewedResultsIdMap[result.id]);
     }
 
     // for loop to limit maximum number of repeated queries
@@ -95,6 +114,13 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         accumulatedResults = accumulatedResults.slice(0, i + 1);
     }
     accumulatedResults = addMissingFields(accumulatedResults);
+    const resultIds = accumulatedResults.map(result => getId(result));
+
+    await viewedResults.addViewedResultIds(query, vertical, providerName, sessionId, userId, resultIds)
+        .catch(err => {
+            console.log(err);
+        });
+
     return accumulatedResults;
 };
 

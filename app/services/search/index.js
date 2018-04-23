@@ -2,7 +2,6 @@
 
 const provider = require("./provider");
 const regulator = require('./regulator');
-const cache = require('./cache');
 const bookmark = require('../features/bookmark');
 const annotation = require('../features/annotation');
 const rating = require('../features/rating');

@@ -33,7 +33,7 @@ exports.addViewedResultIds = async function(query, vertical, provider, sessionId
 
     if (viewedResults) {
         viewedResults.resultIds = _.union(viewedResults.resultIds, resultIds);
-        viewedResults.save();
+        await viewedResults.save();
     } else {
         const V = new ViewedResults({
             query: query,
@@ -96,7 +96,7 @@ exports.setLastPosition = async function(query, vertical, provider, pageNumber, 
     if (pagePosition) {
         pagePosition.lastPosition = lastPosition;
         pagePosition.pageNumber = pageNumber;
-        pagePosition.save();
+        await pagePosition.save();
     } else {
         const P = new PagePosition({
             query: query,

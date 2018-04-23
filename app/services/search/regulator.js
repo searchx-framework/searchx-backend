@@ -85,9 +85,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     let i = 0;
     if (uncollapsibleResultsOnPreviousPages > 0) {
         const previousPagePosition = await viewedResults.getLastPosition(query, vertical, providerName, sessionId, userId);
-        console.log(previousPagePosition);
         if (previousPagePosition && previousPagePosition.pageNumber === pageNumber - 1) {
-            console.log(previousPagePosition.lastPosition);
             i = previousPagePosition.lastPosition + 1;
         } else {
             let uncollapsibleResults = 0;
@@ -109,28 +107,46 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     // Find all results on previous pages that the user has not viewed yet, they will be promoted to the current page
     // to make sure that the user does not miss any results that have recently been promoted by relevance feedback.
     const viewedResultIds = await viewedResults.getViewedResultIds(query, vertical, providerName, sessionId, userId);
-    const viewedResultsIdMap = {};
+    const viewedResultIdsMap = {};
     let results = [];
     if (viewedResultIds) {
         viewedResultIds.forEach(resultId => {
-            viewedResultsIdMap[resultId] = true;
+            viewedResultIdsMap[resultId] = true;
         });
 
-        results = resultsOnPreviousPages.filter(result => !viewedResultsIdMap[result.id]);
+        results = resultsOnPreviousPages.filter(result => !viewedResultIdsMap[getId(result)]);
     }
 
     let uncollapsibleResults = results.filter(resultsFilter(collapsibleIdMap)).length;
-    let j;
-    for (j = i; j < allResults.length; j++) {
-        const result = allResults[j];
-        results.push(result);
-        if (!collapsibleIdMap[getId(result)]) {
-            uncollapsibleResults++;
+    let j = i;
+    if (uncollapsibleResults < count) {
+        for (j = i; j < allResults.length; j++) {
+            const result = allResults[j];
+            results.push(result);
+            if (!collapsibleIdMap[getId(result)]) {
+                uncollapsibleResults++;
+            }
+            if (uncollapsibleResults >= count) {
+                break;
+            }
         }
-        if (uncollapsibleResults >= count) {
-            break;
+    } else if (uncollapsibleResults > count) {
+        uncollapsibleResults = 0;
+        const newResults = [];
+        for (let l = 0; l < results.length; l++) {
+            const result = results[l];
+            newResults.push(result);
+            if (!collapsibleIdMap[getId(result)]) {
+                uncollapsibleResults++;
+            }
+            if (uncollapsibleResults >= count) {
+                break;
+            }
         }
+        j = i + newResults.length;
+        results = newResults;
     }
+
     if (distributionOfLabour === "unbookmarkedOnly") {
         results = results.filter(resultsFilter(bookmarkIdMap));
     }

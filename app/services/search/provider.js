@@ -20,9 +20,9 @@ const providers = {
  * @params {providerName} the name of the search provider to use (indri by default)
  * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback (if supported by provider)
  */
-exports.fetch = function (query, vertical, pageNumber, providerName, relevanceFeedbackDocuments) {
+exports.fetch = function (query, vertical, pageNumber, providerName, resultsPerPage, relevanceFeedbackDocuments) {
     if (invalidProvider(providerName)) return invalidProvider(providerName);
-    return providers[providerName].fetch(query, vertical, pageNumber, relevanceFeedbackDocuments);
+    return providers[providerName].fetch(query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments);
 };
 
 /*

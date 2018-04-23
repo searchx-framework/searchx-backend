@@ -14,8 +14,7 @@ const searcher = new indri.Searcher({
         "source": "source",
         "text": "text"
     },
-    "includeDocument" : true,
-    "resultsPerPage": 10
+    "includeDocument" : true
 });
 
 const reader = new indri.Reader(index_path);
@@ -32,7 +31,7 @@ const verticals = [
  * @params {pageNumber} the number of the page of results to show (1-based indexing)
  * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback
  */
-exports.fetch = function (query, vertical, pageNumber, relevanceFeedbackDocuments) {
+exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     if (!verticals.includes(vertical)) {
         throw {
             name: 'Bad Request',
@@ -46,7 +45,7 @@ exports.fetch = function (query, vertical, pageNumber, relevanceFeedbackDocument
             resolve(formatResults(results));
         };
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
-        searcher.search(query, pageNumber, relevanceFeedbackDocuments, callback);
+        searcher.search(query, 1, resultsPerPage, relevanceFeedbackDocuments, callback);
     });
 };
 

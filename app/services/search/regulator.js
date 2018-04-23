@@ -39,8 +39,6 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         collapsibleIdMap[id] = true;
     });
 
-    let response;
-
     if (![false, 'individual', 'shared'].includes(relevanceFeedback)) {
         throw {
             name: 'Bad Request',
@@ -55,73 +53,86 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         };
     }
 
+    let response;
+
+    if (!distributionOfLabour && !relevanceFeedback) {
+        response = await provider.fetch(query, vertical, pageNumber, providerName);
+        return response.results;
+    }
+
+    const numberOfResults = count * pageNumber + collapsibleIds.length;
+    if (relevanceFeedback === "individual") {
+        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, userBookmarkIds);
+    } else if (relevanceFeedback === "shared") {
+        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, bookmarkIds);
+    } else {
+        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, []);
+    }
+
+    const allResults = response.results;
+
+    if (!distributionOfLabour) {
+        const start = (pageNumber - 1) * count;
+        return allResults.slice(start, start + count);
+    }
+
+    // Count number of uncollapsible results to determine where to start current page.
+    // Each previous page has exactly <count> uncollapsed results.
+    const uncollapsibleResultsOnPreviousPages = (pageNumber - 1) * count;
+    let resultsOnPreviousPages;
+    let i = 0;
+    if (uncollapsibleResultsOnPreviousPages > 0) {
+        let uncollapsibleResults = 0;
+        for (i = 0; i < allResults.length; i++) {
+            if (!collapsibleIdMap[getId(allResults[i])]) {
+                uncollapsibleResults++;
+            }
+            if (uncollapsibleResults >= uncollapsibleResultsOnPreviousPages) {
+                break;
+            }
+        }
+        i++;
+        resultsOnPreviousPages = allResults.slice(0, i);
+    } else {
+        resultsOnPreviousPages = [];
+    }
+
     // Find all results on previous pages that the user has not viewed yet, they will be promoted to the current page
     // to make sure that the user does not miss any results that have recently been promoted by relevance feedback.
     const viewedResultIds = await viewedResults.getViewedResultIds(query, vertical, providerName, sessionId, userId);
     const viewedResultsIdMap = {};
-    let accumulatedResults = [];
+    let results = [];
     if (viewedResultIds) {
         viewedResultIds.forEach(resultId => {
             viewedResultsIdMap[resultId] = true;
         });
-        for (let i = 1; i < pageNumber; i++) {
-            const response = await provider.fetch(query, vertical, i, providerName, []);
-            const pageResults = response.results;
-            if (pageResults) {
-                accumulatedResults = accumulatedResults.concat(pageResults);
-            }
-        }
-        accumulatedResults = accumulatedResults.filter(result => !viewedResultsIdMap[result.id]);
+
+        results = resultsOnPreviousPages.filter(result => !viewedResultsIdMap[result.id]);
     }
 
-    // for loop to limit maximum number of repeated queries
-    for (let i = 0; i < 10; i++) {
-        if (relevanceFeedback === "individual") {
-            response = await provider.fetch(query, vertical, pageNumber + i, providerName, userBookmarkIds);
-        } else if (relevanceFeedback === "shared") {
-            response = await provider.fetch(query, vertical, pageNumber + i, providerName, bookmarkIds);
-        } else {
-            response = await provider.fetch(query, vertical, pageNumber + i, providerName, []);
+    let uncollapsibleResults = results.filter(resultsFilter(collapsibleIdMap)).length;
+    for (let j = i; j < allResults.length; j++) {
+        const result = allResults[j];
+        results.push(result);
+        if (!collapsibleIdMap[getId(result)]) {
+            uncollapsibleResults++;
         }
-        let filteredResults = response.results;
-        if (filteredResults.length === 0) {
-            break
-        }
-        if (distributionOfLabour === "unbookmarkedOnly") {
-            filteredResults = filteredResults.filter(resultsFilter(bookmarkIdMap));
-        }
-        accumulatedResults = accumulatedResults.concat(filteredResults);
-        if (accumulatedResults.filter(resultsFilter(collapsibleIdMap)).length >= count) {
-            break
+        if (uncollapsibleResults >= count) {
+            break;
         }
     }
-
-    if (distributionOfLabour === false) {
-        accumulatedResults = accumulatedResults.slice(0, count);
-    } else {
-        // total number of results returned is such that there are always <count> uncollapsible results included)
-
-        let unCollapsibleResults = 0;
-        let i;
-        for (i = 0; i < accumulatedResults.length; i++) {
-            if (!collapsibleIds.includes(getId(accumulatedResults[i]))) {
-                unCollapsibleResults++;
-            }
-            if (unCollapsibleResults >= count) {
-                break
-            }
-        }
-        accumulatedResults = accumulatedResults.slice(0, i + 1);
+    if (distributionOfLabour === "unbookmarkedOnly") {
+        results = results.filter(resultsFilter(bookmarkIdMap));
     }
-    accumulatedResults = addMissingFields(accumulatedResults);
-    const resultIds = accumulatedResults.map(result => getId(result));
+    results = addMissingFields(results);
+    const resultIds = results.map(result => getId(result));
 
     await viewedResults.addViewedResultIds(query, vertical, providerName, sessionId, userId, resultIds)
         .catch(err => {
             console.log(err);
         });
 
-    return accumulatedResults;
+    return results;
 };
 
 function resultsFilter(collapsibleIdMap) {

@@ -76,22 +76,31 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         return allResults.slice(start, start + count);
     }
 
+
+
     // Count number of uncollapsible results to determine where to start current page.
     // Each previous page has exactly <count> uncollapsed results.
     const uncollapsibleResultsOnPreviousPages = (pageNumber - 1) * count;
     let resultsOnPreviousPages;
     let i = 0;
     if (uncollapsibleResultsOnPreviousPages > 0) {
-        let uncollapsibleResults = 0;
-        for (i = 0; i < allResults.length; i++) {
-            if (!collapsibleIdMap[getId(allResults[i])]) {
-                uncollapsibleResults++;
+        const previousPagePosition = await viewedResults.getLastPosition(query, vertical, providerName, sessionId, userId);
+        console.log(previousPagePosition);
+        if (previousPagePosition && previousPagePosition.pageNumber === pageNumber - 1) {
+            console.log(previousPagePosition.lastPosition);
+            i = previousPagePosition.lastPosition + 1;
+        } else {
+            let uncollapsibleResults = 0;
+            for (i = 0; i < allResults.length; i++) {
+                if (!collapsibleIdMap[getId(allResults[i])]) {
+                    uncollapsibleResults++;
+                }
+                if (uncollapsibleResults >= uncollapsibleResultsOnPreviousPages) {
+                    break;
+                }
             }
-            if (uncollapsibleResults >= uncollapsibleResultsOnPreviousPages) {
-                break;
-            }
+            i++;
         }
-        i++;
         resultsOnPreviousPages = allResults.slice(0, i);
     } else {
         resultsOnPreviousPages = [];
@@ -111,7 +120,8 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     }
 
     let uncollapsibleResults = results.filter(resultsFilter(collapsibleIdMap)).length;
-    for (let j = i; j < allResults.length; j++) {
+    let j;
+    for (j = i; j < allResults.length; j++) {
         const result = allResults[j];
         results.push(result);
         if (!collapsibleIdMap[getId(result)]) {
@@ -131,6 +141,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         .catch(err => {
             console.log(err);
         });
+    await viewedResults.setLastPosition(query, vertical, providerName, pageNumber, sessionId, userId, j);
 
     return results;
 };

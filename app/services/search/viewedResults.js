@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const ViewedResults = mongoose.model('ViewedResults');
+const PagePosition = mongoose.model('PagePosition');
 const Utils = require('../../utils');
 const _  = require('underscore');
 
@@ -42,7 +43,7 @@ exports.addViewedResultIds = async function(query, vertical, provider, sessionId
             userId: userId,
             resultIds: resultIds
         });
-        V.save();
+        await V.save();
     }
 };
 
@@ -70,5 +71,42 @@ exports.getViewedResultIds = async function(query, vertical, provider, sessionId
         return viewedResults.resultIds;
     } else {
         return [];
+    }
+};
+
+exports.getLastPosition = async function(query, vertical, provider, sessionId, userId) {
+    return await PagePosition.findOne({
+        query: query,
+        vertical: vertical,
+        provider: provider,
+        sessionId: sessionId,
+        userId: userId
+    });
+};
+
+exports.setLastPosition = async function(query, vertical, provider, pageNumber, sessionId, userId, lastPosition) {
+    const pagePosition = await PagePosition.findOne({
+        query: query,
+        vertical: vertical,
+        provider: provider,
+        sessionId: sessionId,
+        userId: userId
+    });
+
+    if (pagePosition) {
+        pagePosition.lastPosition = lastPosition;
+        pagePosition.pageNumber = pageNumber;
+        pagePosition.save();
+    } else {
+        const P = new PagePosition({
+            query: query,
+            vertical: vertical,
+            provider: provider,
+            pageNumber: pageNumber,
+            sessionId: sessionId,
+            userId: userId,
+            lastPosition: lastPosition,
+        });
+        await P.save();
     }
 };

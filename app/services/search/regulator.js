@@ -56,8 +56,8 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     let response;
 
     if (!distributionOfLabour && !relevanceFeedback) {
-        response = await provider.fetch(query, vertical, pageNumber, providerName);
-        return response.results;
+        response = await provider.fetch(query, vertical, pageNumber, providerName, count, []);
+        return addMissingFields(response.results);
     }
 
     const numberOfResults = count * pageNumber + collapsibleIds.length;

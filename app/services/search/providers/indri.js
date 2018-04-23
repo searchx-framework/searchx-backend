@@ -45,7 +45,7 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
             resolve(formatResults(results));
         };
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
-        searcher.search(query, 1, resultsPerPage, relevanceFeedbackDocuments, callback);
+        searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
     });
 };
 

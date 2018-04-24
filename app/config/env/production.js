@@ -1,5 +1,10 @@
 'use strict';
 
 module.exports = {
-    port: 443,
+    port: 4443,
+    url: 'http://localhost',
+    db: 'mongodb://localhost/searchx',
+    redis: 'redis://localhost:6379',
+    bingAccessKey: '2dc977d4fe444173be6155559264e442', /* fe.moraesg@outlook.com */
+    defaultProvider: 'bing',
 };

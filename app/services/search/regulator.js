@@ -180,7 +180,7 @@ function resultsFilter(collapsibleIdMap) {
 function addMissingFields(results) {
     return results.map(result => {
         if (!result.name.replace(/\s/g,'')) {
-            result.name = "Untitled";
+            result.name = result.text.slice(0, 80) + "...";
         }
         if (result.id && !result.text.replace(/\s/g,'')) {
             result.text = "No text available"

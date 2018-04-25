@@ -9,7 +9,7 @@ module.exports = function(io) {
 
         // Register
         socket.on('register', async (data) => {
-            console.log(data.userId + ' has connected ' + "(" + socket.id + ")");
+            console.log('user connected: ' + data.userId);
             socket.sessionId = data.sessionId;
             socket.join(data.sessionId);
         });
@@ -22,6 +22,9 @@ module.exports = function(io) {
 
         // Pretest
         socket.on('pushSyncSubmit', (data) => SessionCtrl.handleSyncSubmit(socket, gio, data));
-        socket.on('pushSyncLeave', (data) => SessionCtrl.handleSyncLeave(socket, gio, data));
+        socket.on('pushSyncLeave', (data) => {
+            console.log('user left: ' + data.userId);
+            return SessionCtrl.handleSyncLeave(socket, gio, data)
+        });
     });
 };

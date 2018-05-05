@@ -74,6 +74,22 @@ exports.handleSyncLeave = async function(userId) {
     await group.save();
 };
 
+exports.handleSyncTimeout = async function(userId) {
+    let group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group === null || 'topic' in group.taskData) {
+        return;
+    }
+
+    group.taskData.size = group.members.length;
+    group.taskData.nMembers = group.members.length;
+
+    group.markModified('members');
+    group.markModified('taskData');
+    await group.save();
+    group = await setGroupTopic(userId, group);
+    return group;
+};
+
 exports.handleSyncSubmit = async function(userId) {
     return await helper.getGroupByUserId(userId, TASK_ID);
 };

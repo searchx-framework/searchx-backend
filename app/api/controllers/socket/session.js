@@ -12,3 +12,10 @@ exports.handleSyncSubmit = async function(socket, io, data) {
 exports.handleSyncLeave = async function(socket, io, data) {
     await session.handleSyncLeave(data.userId, data.taskId);
 };
+
+exports.handleSyncTimeout = async function(socket, io, data) {
+    const res = await session.handleSyncTimeout(data.userId, data.taskId);
+    if (res !== null) {
+        io.to(socket.sessionId).emit('syncData', res);
+    }
+};

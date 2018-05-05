@@ -41,3 +41,7 @@ exports.handleSyncSubmit = async function(userId, taskId, data) {
 exports.handleSyncLeave = async function(userId, taskId) {
     return task(taskId).handleSyncLeave(userId);
 };
+
+exports.handleSyncTimeout = async function (userId, taskId) {
+    return task(taskId).handleSyncTimeout(userId);
+};

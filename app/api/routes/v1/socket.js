@@ -26,5 +26,9 @@ module.exports = function(io) {
             console.log('user left: ' + data.userId);
             return SessionCtrl.handleSyncLeave(socket, gio, data)
         });
+        socket.on('pushSyncTimeout', (data) => {
+            console.log('user timed out: ' + data.userId);
+            return SessionCtrl.handleSyncTimeout(socket, gio, data);
+        })
     });
 };

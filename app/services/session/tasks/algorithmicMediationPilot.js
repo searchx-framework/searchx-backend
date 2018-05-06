@@ -109,11 +109,11 @@ async function setGroupTopic(userId, group) {
     }
 
     // assign random topic
-    group.taskData.topic = _.sample(topics);
+    group.taskData.topics = _.shuffle(topics);
     group.markModified("members");
     group.markModified("taskData");
     await group.save();
-    console.log("group formed: {size: " + group.taskData.size + ", topic: " + group.taskData.topic.id + ", members: [" + group.members.map(member => member.userId) + "]}");
+    console.log("group formed: {size: " + group.taskData.size + ", members: [" + group.members.map(member => member.userId) + "]}");
 
     return group;
 }

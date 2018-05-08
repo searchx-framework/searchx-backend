@@ -5,7 +5,7 @@ const session = require('../../../services/session');
 exports.handleSyncSubmit = async function(socket, io, data) {
     const res = await session.handleSyncSubmit(data.userId, data.taskId, data.data);
     if (res !== null) {
-        io.to(socket.sessionId).emit('syncData', res);
+        io.to(data.groupId).emit('syncData', res);
     }
 };
 
@@ -16,6 +16,7 @@ exports.handleSyncLeave = async function(socket, io, data) {
 exports.handleSyncTimeout = async function(socket, io, data) {
     const res = await session.handleSyncTimeout(data.userId, data.taskId);
     if (res !== null) {
-        io.to(socket.sessionId).emit('syncData', res);
+        console.log("groupId = " + data.groupId);
+        io.to(data.groupId).emit('syncData', res);
     }
 };

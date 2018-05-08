@@ -10,8 +10,22 @@ module.exports = function(io) {
         // Register
         socket.on('register', async (data) => {
             console.log('user connected: ' + data.userId);
-            socket.sessionId = data.sessionId;
-            socket.join(data.sessionId);
+        });
+
+        // Join Group
+        socket.on('joinGroup', async (data) => {
+            try {
+                console.log('user completed registration: ' + data.userId);
+                socket.join(data.groupId);
+                if (data.groupComplete) {
+                    // TODO: separate join group and handle sync submit
+                    data.data = {};
+                    const res = await SessionCtrl.handleSyncSubmit(socket, gio, data);
+                    io.to(data.groupId).emit('syncData', res);
+                }
+            } catch(e) {
+                console.log(e);
+            }
         });
 
         // Feature
@@ -22,13 +36,15 @@ module.exports = function(io) {
 
         // Pretest
         socket.on('pushSyncSubmit', (data) => SessionCtrl.handleSyncSubmit(socket, gio, data));
-        socket.on('pushSyncLeave', (data) => {
+
+        // Task exceptions
+        socket.on('pushSyncLeave', async (data) => {
             console.log('user left: ' + data.userId);
-            return SessionCtrl.handleSyncLeave(socket, gio, data)
+            return await SessionCtrl.handleSyncLeave(socket, gio, data)
         });
-        socket.on('pushSyncTimeout', (data) => {
+        socket.on('pushSyncTimeout', async (data) => {
             console.log('user timed out: ' + data.userId);
-            return SessionCtrl.handleSyncTimeout(socket, gio, data);
+            return await SessionCtrl.handleSyncTimeout(socket, gio, data);
         })
     });
 };

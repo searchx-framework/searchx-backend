@@ -16,7 +16,6 @@ exports.handleSyncLeave = async function(socket, io, data) {
 exports.handleSyncTimeout = async function(socket, io, data) {
     const res = await session.handleSyncTimeout(data.userId, data.taskId);
     if (res !== null) {
-        console.log("groupId = " + data.groupId);
         io.to(data.groupId).emit('syncData', res);
     }
 };

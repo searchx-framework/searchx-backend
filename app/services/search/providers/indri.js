@@ -4,9 +4,9 @@ const index_path = "../data/Aquaint-Index";
 const indri = require('../../../../lib/node-indri/node-indri');
 const searcher = new indri.Searcher({
     "index": index_path,
-    "rules" : "method:dirichlet,mu:1000",
+    "rules": "rules", // method:dirichlet,mu:2500
     "fbTerms": 10,
-    "fbMu": 1500,
+    "fbMu": 0,
     "includeFields": {
         "title": "title",
         "docno": "docno",

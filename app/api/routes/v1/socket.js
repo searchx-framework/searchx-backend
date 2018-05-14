@@ -14,17 +14,21 @@ module.exports = function(io) {
 
         // Join Group
         socket.on('joinGroup', async (data) => {
-            try {
-                console.log('user completed registration: ' + data.userId);
-                socket.join(data.groupId);
-                if (data.groupComplete) {
-                    // TODO: separate join group and handle sync submit
-                    data.data = {};
-                    const res = await SessionCtrl.handleSyncSubmit(socket, gio, data);
-                    io.to(data.groupId).emit('syncData', res);
+            if (data.groupId) {
+                try {
+                    console.log('user completed registration: ' + data.userId);
+                    socket.join(data.groupId);
+                    if (data.groupComplete) {
+                        // TODO: separate join group and handle sync submit
+                        data.data = {};
+                        const res = await SessionCtrl.handleSyncSubmit(socket, gio, data);
+                        io.to(data.groupId).emit('syncData', res);
+                    }
+                } catch(e) {
+                    console.log(e);
                 }
-            } catch(e) {
-                console.log(e);
+            } else {
+                console.log('joinGroup event without groupId occurred: ' + data)
             }
         });
 
@@ -43,8 +47,12 @@ module.exports = function(io) {
             return await SessionCtrl.handleSyncLeave(socket, gio, data)
         });
         socket.on('pushSyncTimeout', async (data) => {
-            console.log('user timed out: ' + data.userId);
-            return await SessionCtrl.handleSyncTimeout(socket, gio, data);
+            if (data.groupId) {
+                console.log('user timed out: ' + data.userId);
+                return await SessionCtrl.handleSyncTimeout(socket, gio, data);
+            } else {
+                console.log('pushSyncTimeout event without groupId occurred: ' + data)
+            }
         })
     });
 };

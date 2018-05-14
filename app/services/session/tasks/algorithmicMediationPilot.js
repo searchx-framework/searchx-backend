@@ -55,7 +55,7 @@ exports.getUserTask = async function(userId, params) {
     group.markModified('taskData');
     await group.save();
 
-    group = await setGroupTopic(userId, group);
+    group = await setGroupTopic(group);
 
     return group;
 };
@@ -75,30 +75,37 @@ exports.handleSyncLeave = async function(userId) {
 };
 
 exports.handleSyncTimeout = async function(userId) {
-    let group = await helper.getGroupByUserId(userId, TASK_ID);
-    if (group === null || 'topic' in group.taskData) {
-        return;
+    let oldGroup = await helper.getGroupByUserId(userId, TASK_ID);
+    if (oldGroup === null || 'topic' in oldGroup.taskData) {
+        return null;
+    }
+    let newGroup = undefined;
+    const initialSize = oldGroup.members.length;
+    if (initialSize === 3 || initialSize === 5) {
+        oldGroup.members = oldGroup.members.filter(x => x.userId !== userId);
+        await _updateGroupSize(oldGroup);
+        newGroup = await exports.getUserTask(userId, {groupSize: 1});
+    } else {
+        await _updateGroupSize(oldGroup);
     }
 
+    oldGroup = await setGroupTopic(oldGroup);
+    return {oldGroup: oldGroup, newGroup: newGroup};
+};
+
+async function _updateGroupSize(group) {
     group.taskData.size = group.members.length;
     group.taskData.nMembers = group.members.length;
-
     group.markModified('members');
     group.markModified('taskData');
     await group.save();
-    group = await setGroupTopic(userId, group);
-    return group;
-};
+}
 
 exports.handleSyncSubmit = async function(userId) {
     return await helper.getGroupByUserId(userId, TASK_ID);
 };
 
-async function setGroupTopic(userId, group) {
-    if (!group) {
-        group = await helper.getGroupByUserId(userId, TASK_ID);
-    }
-
+async function setGroupTopic(group) {
     if (group === null) {
         return null;
     }

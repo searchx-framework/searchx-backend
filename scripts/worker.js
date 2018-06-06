@@ -1,5 +1,12 @@
 'use strict';
 
+// Check ENV variables
+const requiredEnv = ['DB'];
+const unsetEnv = requiredEnv.filter((env) => !(env in process.env));
+if (unsetEnv.length > 0) {
+    throw new Error("Required ENV variables are not set: [" + unsetEnv.join(', ') + "]");
+}
+
 // Init
 require('../app/config/initializers/mongoose')(process.env.DB);
 

@@ -19,7 +19,7 @@ which node
 
 - Install [MongoDB](https://www.mongodb.com/):
 
-Execute the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition)
+    Execute the four steps of the [MongoDB installation instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition)
 ```
 // Check if MongoDB is running
 mongo
@@ -44,15 +44,21 @@ redis-cli
 
 - Install [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 
-Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html)
+    Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html)
 
-- Set up Server
+- Set up and run server
 ```
 // Clone the repository
-git clone https://github.com/felipemoraes/searchx-api.git
+git clone https://github.com/felipemoraes/searchx-backend.git
+
+// Change directory to repository
+cd searchx-backend
 
 // Install dependencies
 npm install
+
+// Copy example configuration
+cp .env.example .env
 
 // Start the development server
 npm run start
@@ -84,19 +90,18 @@ npm test
 ## Configuration
 SearchX requires a Bing API key to use the Bing web search provider. If you do not have a Bing key, you can use SearchX with your own dataset using the Elasticsearch provider.
 
-```
-// For development, inside app/config/env/development.js set:
--  MongoDB and redis address
--  Bing API Access Key
--  API port and address
+Production configuration keys can be set in the `.env` file, example values can be found in `.example.env`. These keys are the node environment `NODE_ENV` (production or development), the `PORT` the server will run on, the database url `DB`, and the `REDIS` url.
 
+Further development configuration can be found inside `app/config/config.js`:
+```
 module.exports = {
-    port: 4443,
-    url: 'http://localhost',
-    client: 'http://localhost:3000',
-    db: 'mongodb://localhost/searchx',
-    redis: 'redis://localhost:6379',
-    bingAccessKey: 'XXXXXX'
+    outDir: './out',
+    testDb: 'mongodb://localhost/searchx-test',
+    testUrl: 'http://localhost',
+    cacheFreshness: 3600,
+    scrapFreshness: 60 * 60 * 24,
+    bingAccessKey: '2dc977d4fe444173be6155559264e442', /* fe.moraesg@outlook.com */
+    defaultProvider: 'bing',
 };
 ```
 

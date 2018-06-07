@@ -1,7 +1,12 @@
 'use strict';
 
-// Default to development environment if not set
+// Check ENV variables
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const requiredEnv = ['PORT', 'DB', 'REDIS'];
+const unsetEnv = requiredEnv.filter((env) => !(env in process.env));
+if (unsetEnv.length > 0) {
+    throw new Error("Required ENV variables are not set: [" + unsetEnv.join(', ') + "]");
+}
 
 // Load dependencies
 const express      = require('express');

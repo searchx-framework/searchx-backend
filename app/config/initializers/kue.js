@@ -2,8 +2,7 @@
 
 const kue    = require('kue');
 const url    = require('url');
-const config = require('../config');
-const redisUrl = url.parse(config.redis);
+const redisUrl = url.parse(process.env.REDIS);
 
 let queue = null;
 if(redisUrl.auth){

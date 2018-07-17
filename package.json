@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/.bin/nf start -e Procfile.env",
+    "start": "./node_modules/.bin/nf start",
     "test": "./node_modules/.bin/mocha --timeout 15000 --exit",
     "coverage": "./node_modules/.bin/istanbul cover _mocha -- -R spec"
   },

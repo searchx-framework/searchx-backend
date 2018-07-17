@@ -3,7 +3,7 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const config   = require('../app/config/config');
-require('../app/config/initializers/mongoose')(config.db);
+require('../app/config/initializers/mongoose')(config.testDb);
 
 const should = require('should');
 const search = require('../app/services/search');

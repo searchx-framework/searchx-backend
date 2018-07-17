@@ -1,14 +1,19 @@
 'use strict';
 
-// Default to development environment if not set
+// Default NODE_ENV to development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+// Load newrelic application monitoring in production
 if (process.env.NODE_ENV === 'production') {
     require('newrelic');
 }
 
-// Load the config
-const config = require('./app/config/config');
+// Check ENV variables
+const requiredEnv = ['PORT', 'DB', 'REDIS'];
+const unsetEnv = requiredEnv.filter((env) => !(env in process.env));
+if (unsetEnv.length > 0) {
+    throw new Error("Required ENV variables are not set: [" + unsetEnv.join(', ') + "]");
+}
 
 // Load dependencies
 const express      = require('express');
@@ -19,12 +24,12 @@ const router       = express.Router();
 const io           = require('socket.io').listen(http);
 
 // Run initializers
-require('./app/config/initializers/mongoose')(config.db);
-require('./app/api/routes/v1/rest')(router);
-require('./app/api/routes/v1/socket')(io);
+require('../app/config/initializers/mongoose')(process.env.DB);
+require('../app/api/routes/v1/rest')(router);
+require('../app/api/routes/v1/socket')(io);
 
 // Setup server
-app.set('port', (process.env.PORT || config.port));
+app.set('port', (process.env.PORT));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(function(req, res, next) {

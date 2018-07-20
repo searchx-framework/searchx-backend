@@ -10,6 +10,10 @@ module.exports = function(io) {
         // Register
         socket.on('register', async (data) => {
             console.log('user connected: ' + data.userId);
+            if (data.groupId) {
+                socket.sessionId = data.groupId;
+                socket.join(data.groupId);
+            }
         });
 
         // Join Group
@@ -17,6 +21,9 @@ module.exports = function(io) {
             if (data.groupId) {
                 try {
                     console.log('user completed registration: ' + data.userId);
+                    if (socket.sessionId) {
+                        socket.leave(socket.sessionId);
+                    }
                     socket.join(data.groupId);
                     if (data.groupComplete) {
                         // TODO: separate join group and handle sync submit

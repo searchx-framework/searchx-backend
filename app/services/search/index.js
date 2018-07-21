@@ -57,8 +57,8 @@ async function addMetadata(results, sessionId, userId) {
         result.metadata = {
             bookmark: await bookmark.getBookmark(sessionId, id),
             exclude: await bookmark.getBookmark(sessionId, id, true),
-            annotations: (await annotation.getAnnotations(sessionId, id)).length,
-            rating: (await rating.getRating(sessionId, id, userId)).total,
+            annotations: (await annotation.getAnnotations(sessionId, id)),
+            rating: (await rating.getRating(sessionId, id, userId)),
             views: await view.getViews(sessionId, result.url),
         };
         return result;

@@ -188,6 +188,19 @@ The included result types are (fields preceded by `<OPTIONAL>` are optional):
 }
 ```
 
+# Citation
+--------
+
+If you use SearchX to produce results for your scientific publication, please refer to our [SIGIR 2018](http://fmoraes.nl/documents/moraes2018sigir.pdf) paper.
+
+    @inproceedings{putra2018searchx,
+      title={SearchX: Empowering Collaborative Search Research.},
+      author={Putra, Sindunuraga Rikarno and Moraes, Felipe and Hauff, Claudia},
+      booktitle={SIGIR},
+      pages={1265--1268},
+      year={2018}
+    }
+
 # License
 
 [MIT](https://opensource.org/licenses/MIT) License

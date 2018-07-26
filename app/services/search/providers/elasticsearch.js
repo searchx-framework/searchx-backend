@@ -16,7 +16,10 @@ const verticals = {
 /*
  * Fetches data from elasticsearch and returns the formatted result
  */
-exports.fetch = function (query, vertical, pageNumber, resultsPerPage) {
+exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
+    if (Array.isArray(relevanceFeedbackDocuments) && relevanceFeedbackDocuments.length > 0) {
+        return Promise.reject({name: 'Bad Request', message: 'The Elasticsearch search provider does not support relevance feedback, but got relevance feedback documents.'})
+    }
     if (vertical in verticals) {
         const dataset = verticals[vertical];
         return esClient.search({

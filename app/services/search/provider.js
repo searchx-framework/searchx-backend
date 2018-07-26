@@ -14,13 +14,14 @@ const providers = {
 /*
  * Fetches data from search provider and returns the formatted result
  *
+ * @params {providerName} the name of the search provider to use (indri by default)
  * @params {query} the search query
  * @params {vertical} type of search results (web, images, etc)
  * @params {pageNumber} result pagination number
- * @params {providerName} the name of the search provider to use (indri by default)
+ * @params {resultsPerPage} the number of results to use per page
  * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback (if supported by provider)
  */
-exports.fetch = function (query, vertical, pageNumber, providerName, resultsPerPage, relevanceFeedbackDocuments) {
+exports.fetch = function (providerName, query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     if (invalidProvider(providerName)) return invalidProvider(providerName);
     return providers[providerName].fetch(query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments);
 };

@@ -64,30 +64,27 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     let response;
 
     if (!distributionOfLabour && !relevanceFeedback) {
-        response = await provider.fetch(query, vertical, pageNumber, providerName, count, []);
+        response = await provider.fetch(providerName, query, vertical, pageNumber, count, []);
         response.results = addMissingFields(response.results);
         return response;
     }
 
-    const numberOfResults = count * pageNumber + collapsibleIds.length;
+    let relevanceFeedbackIds = [];
     if (relevanceFeedback === "individual") {
-        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, userBookmarkIds);
+        relevanceFeedbackIds = userBookmarkIds;
     } else if (relevanceFeedback === "shared") {
-        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, bookmarkIds);
-    } else {
-        response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, []);
+        relevanceFeedbackIds = bookmarkIds;
     }
+
+    if (!distributionOfLabour) {
+        return provider.fetch(providerName, query, vertical, pageNumber, count, relevanceFeedbackIds);
+    }
+
+    const numberOfResults = count * pageNumber + collapsibleIds.length;
+    response = await provider.fetch(providerName, query, vertical, 1, numberOfResults, relevanceFeedbackIds);
 
     const matches = response.matches;
     const allResults = response.results;
-
-    if (!distributionOfLabour) {
-        const start = (pageNumber - 1) * count;
-        return {
-            results: allResults.slice(start, start + count),
-            matches: matches
-        };
-    }
 
     // Count number of uncollapsible results to determine where to start current page.
     // Each previous page has exactly <count> uncollapsed results.

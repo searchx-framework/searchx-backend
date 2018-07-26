@@ -13,13 +13,7 @@ exports.search = function(req, res) {
     const pageNumber = parseInt(req.query.page) || 1;
     const providerName = req.query.providerName || config.defaultProvider;
     let relevanceFeedback = req.query.relevanceFeedback || 'shared';
-    if (relevanceFeedback === 'false') {
-        relevanceFeedback = false;
-    }
     let distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
-    if (distributionOfLabour === 'false') {
-        distributionOfLabour = false;
-    }
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {

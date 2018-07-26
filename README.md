@@ -72,7 +72,11 @@ curl http://localhost:4443/v1
 
 ## Running tests
 ```
-// Perform all the steps above and run:
+// Load the test dataset into elasticsearch
+./node_modules/elasticdump/bin/elasticdump --input=test/data/test_index_mapping.json --output=http://localhost:9200/cranfield --type=mapping
+./node_modules/elasticdump/bin/elasticdump --input=test/data/test_index.json --output=http://localhost:9200/cranfield --type=data
+
+// Run tests
 npm test
 ```
 

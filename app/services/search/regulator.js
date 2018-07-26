@@ -22,6 +22,14 @@ function getId(result) {
  * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly)
  */
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+    // Convert falsy string to false boolean for cleaner if statements below
+    if (relevanceFeedback === 'false') {
+        relevanceFeedback = false;
+    }
+    if (distributionOfLabour === 'false') {
+        distributionOfLabour = false;
+    }
+
     const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
     const excludes = await bookmark.getBookmarks(sessionId, true);
@@ -179,8 +187,11 @@ function resultsFilter(collapsibleIdMap) {
  */
 function addMissingFields(results) {
     return results.map(result => {
-        if (!result.name.replace(/\s/g,'')) {
+        if (!result.name.replace(/\s/g,'') && result.text) {
             result.name = result.text.slice(0, 80) + "...";
+        }
+        if (!result.name.replace(/\s/g,'')) {
+            result.name = "No name available"
         }
         if (result.id && !result.text.replace(/\s/g,'')) {
             result.text = "No text available"

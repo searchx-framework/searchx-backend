@@ -4,7 +4,8 @@ const cheerio = require('cheerio');
 
 exports.index = 'clueweb-diskb-00-v2';
 exports.queryField = 'parsed-content';
-exports.formatSource = function (source) {
+exports.formatSource = function (hit) {
+    const source = hit._source;
     // strip extra whitespace and limit snippet length
     // todo: pre-process the data in elasticsearch so whitespace stripping is not needed
     const $ = cheerio.load(source['raw-content'], {
@@ -19,6 +20,7 @@ exports.formatSource = function (source) {
     const title = source.title ? source.title.replace(/\s+/g, " ") : "";
 
     return {
+        id: hit._id,
         name: title,
         url: source['target-uri'],
         displayUrl: source['target-uri'],

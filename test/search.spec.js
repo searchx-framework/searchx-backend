@@ -13,7 +13,7 @@ describe('search (requires corresponding backend to be running)', function() {
     const sid = '123';
 
     const tests = [
-        {provider: 'elasticsearch', verticals: ['web'], expected: 10}
+        {provider: 'elasticsearch', verticals: ['text'], expected: 10}
     ];
 
     // only execute bing tests if access key is set

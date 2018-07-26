@@ -1,10 +1,12 @@
 {"_index":"cranfield","_type":"document","_id":"ViMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"WCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"WSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"XCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"YSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"ZiMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"aCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"bSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"biMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
-{"_index":"cranfield","_type":"document","_id":"cyMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business"}}
+{"_index":"cranfield","_type":"document","_id":"WCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 1"}}
+{"_index":"cranfield","_type":"document","_id":"WSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 2 test"}}
+{"_index":"cranfield","_type":"document","_id":"XCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 3 test"}}
+{"_index":"cranfield","_type":"document","_id":"YSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 4 test"}}
+{"_index":"cranfield","_type":"document","_id":"ZiMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 5 test"}}
+{"_index":"cranfield","_type":"document","_id":"aCMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 6 test"}}
+{"_index":"cranfield","_type":"document","_id":"bSMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 7 test"}}
+{"_index":"cranfield","_type":"document","_id":"biMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 8 test"}}
+{"_index":"cranfield","_type":"document","_id":"cyMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 9 test"}}
+{"_index":"cranfield","_type":"document","_id":"aiMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 10 test"}}
+{"_index":"cranfield","_type":"document","_id":"ayMZ92EBU0zMMLnalHhD","_score":1,"_source":{"title":"","author":"","source":"","content":"business 11 test"}}

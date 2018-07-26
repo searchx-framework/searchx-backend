@@ -65,7 +65,8 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
 
     if (!distributionOfLabour && !relevanceFeedback) {
         response = await provider.fetch(query, vertical, pageNumber, providerName, count, []);
-        return addMissingFields(response.results);
+        response.results = addMissingFields(response.results);
+        return response;
     }
 
     const numberOfResults = count * pageNumber + collapsibleIds.length;
@@ -77,14 +78,16 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         response = await provider.fetch(query, vertical, 1, providerName, numberOfResults, []);
     }
 
+    const matches = response.matches;
     const allResults = response.results;
 
     if (!distributionOfLabour) {
         const start = (pageNumber - 1) * count;
-        return allResults.slice(start, start + count);
+        return {
+            results: allResults.slice(start, start + count),
+            matches: matches
+        };
     }
-
-
 
     // Count number of uncollapsible results to determine where to start current page.
     // Each previous page has exactly <count> uncollapsed results.
@@ -167,7 +170,10 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         });
     await viewedResults.setLastPosition(query, vertical, providerName, pageNumber, sessionId, userId, j);
 
-    return results;
+    return {
+        results: results,
+        matches: matches
+    };
 };
 
 function resultsFilter(collapsibleIdMap) {
@@ -187,16 +193,17 @@ function resultsFilter(collapsibleIdMap) {
  */
 function addMissingFields(results) {
     return results.map(result => {
+        // use document text to set name if it is available
         if (!result.name.replace(/\s/g,'') && result.text) {
             result.name = result.text.slice(0, 80) + "...";
         }
         if (!result.name.replace(/\s/g,'')) {
             result.name = "No name available"
         }
-        if (result.id && !result.text.replace(/\s/g,'')) {
+        if (result.id && result.text && !result.text.replace(/\s/g,'')) {
             result.text = "No text available"
         }
-        if (!result.snippet.replace(/\s/g,'')) {
+        if (result.snippet && !result.snippet.replace(/\s/g,'')) {
             result.snippet = "No text available"
         }
         return result;

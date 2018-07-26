@@ -10,21 +10,20 @@ const cranfield = require('./es-datasets/cranfield');
 
 // mapping of vertical to module for elasticsearch dataset
 const verticals = {
-    web: cranfield
+    text: cranfield
 };
 
 /*
  * Fetches data from elasticsearch and returns the formatted result
  */
-exports.fetch = function (query, vertical, pageNumber) {
+exports.fetch = function (query, vertical, pageNumber, resultsPerPage) {
     if (vertical in verticals) {
         const dataset = verticals[vertical];
-        const size = 10;
         return esClient.search({
             index: dataset.index,
             type: 'document',
-            from: (pageNumber - 1) * size,
-            size: size,
+            from: (pageNumber - 1) * resultsPerPage,
+            size: resultsPerPage,
             body: {
                 query: {
                     match: {
@@ -51,13 +50,12 @@ function formatResults(vertical) {
         let results = [];
 
         result.hits.hits.forEach(function (hit) {
-            const source = hit._source;
-            results.push(dataset.formatSource(source));
+            results.push(dataset.formatHit(hit));
         });
 
         return {
             results: results,
             matches: result.hits.total
-        }
+        };
     }
 }

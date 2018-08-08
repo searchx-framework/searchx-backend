@@ -20,7 +20,7 @@ const searcher = new indri.Searcher({
 const reader = new indri.Reader(index_path);
 
 const verticals = [
-    'text'
+    'AQUAINT'
 ];
 
 /*

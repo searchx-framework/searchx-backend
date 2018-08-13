@@ -1,23 +1,32 @@
 'use strict';
 
 const index_path = "../data/Aquaint-Index";
-const indri = require('../../../../lib/node-indri/node-indri');
-const searcher = new indri.Searcher({
-    "index": index_path,
-    "rules": "rules", // method:dirichlet,mu:2500
-    "fbTerms": 10,
-    "fbMu": 0,
-    "includeFields": {
-        "title": "title",
-        "docno": "docno",
-        "date": "date",
-        "source": "source",
-        "text": "text"
-    },
-    "includeDocument" : true
-});
+let indri_searcher, indri_reader;
+try {
+    const indri = require('../../../../lib/node-indri/node-indri');
+    indri_searcher = new indri.Searcher({
+        "index": index_path,
+        "rules": "rules", // method:dirichlet,mu:2500
+        "fbTerms": 10,
+        "fbMu": 0,
+        "includeFields": {
+            "title": "title",
+            "docno": "docno",
+            "date": "date",
+            "source": "source",
+            "text": "text"
+        },
+        "includeDocument" : true
+    });
 
-const reader = new indri.Reader(index_path);
+    indri_reader = new indri.Reader(index_path);
+} catch (e) {
+    if (e instanceof Error && e.code === "MODULE_NOT_FOUND") {
+        console.error("Node-indri was not found, please install it if you wish to use the indri provider. See the documentation for instructions.");
+    } else {
+        console.error(e);
+    }
+}
 
 const verticals = [
     'AQUAINT'
@@ -45,7 +54,7 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
             resolve(formatResults(results));
         };
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
-        searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
+        indri_searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
     });
 };
 
@@ -60,7 +69,7 @@ exports.getById = function (id) {
             if (error) return reject(error);
             resolve(formatResult(result));
         };
-        reader.getDocument(parseInt(id), callback);
+        indri_reader.getDocument(parseInt(id), callback);
     });
 };
 

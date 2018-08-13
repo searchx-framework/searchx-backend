@@ -18,15 +18,16 @@ const viewedResults = require('./viewedResults');
  * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly)
  */
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
-    // Convert falsy string to false boolean for cleaner if statements below
+    // Convert falsy string to false boolean for cleaner if statements below.
     if (relevanceFeedback === 'false') {
         relevanceFeedback = false;
     }
     if (distributionOfLabour === 'false') {
         distributionOfLabour = false;
     }
+    checkStringValues(relevanceFeedback, distributionOfLabour);
 
-    const count = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
+    const resultPerPageCount = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
     const excludes = await bookmark.getBookmarks(sessionId, true);
     const userBookmarks = await bookmark.getUserBookmarks(sessionId, userId);
@@ -43,62 +44,49 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
         collapsibleIdMap[id] = true;
     });
 
-    if (![false, 'individual', 'shared'].includes(relevanceFeedback)) {
-        throw {
-            name: 'Bad Request',
-            message: 'Invalid relevanceFeedback'
-        };
-    }
-
-    if (![false, 'unbookmarkedSoft', 'unbookmarkedOnly'].includes(distributionOfLabour)) {
-        throw {
-            name: 'Bad Request',
-            message: 'Invalid distributionOfLabour'
-        };
-    }
-
-    if (!distributionOfLabour && !relevanceFeedback) {
-        const response = await provider.fetch(providerName, query, vertical, pageNumber, count, []);
-        response.results = addMissingFields(response.results);
-        return response;
-    }
-
     let relevanceFeedbackIds = [];
     if (relevanceFeedback === "individual") {
         relevanceFeedbackIds = userBookmarkIds;
     } else if (relevanceFeedback === "shared") {
         relevanceFeedbackIds = bookmarkIds;
+    } else {
+        relevanceFeedbackIds = [];
     }
 
     if (!distributionOfLabour) {
-        const response = provider.fetch(providerName, query, vertical, pageNumber, count, relevanceFeedbackIds);
+        const response = await provider.fetch(providerName, query, vertical, pageNumber, resultPerPageCount, relevanceFeedbackIds);
         response.results = addMissingFields(response.results);
         return response;
     }
 
-    const numberOfResults = count * pageNumber + collapsibleIds.length;
-    const response = await provider.fetch(providerName, query, vertical, 1, numberOfResults, relevanceFeedbackIds);
+    // Fetch as many results as may be needed.
+    // Due to the collapsing of results we need to fetch extra results from the provider. Also, because we check
+    // whether previous pages contain results the user has not yet seen, we also need to fetch the results for all
+    // lower page numbers.
+    const resultCount = resultPerPageCount * pageNumber + collapsibleIds.length;
+    const response = await provider.fetch(providerName, query, vertical, 1, resultCount, relevanceFeedbackIds);
     const matches = response.matches;
     const allResults = response.results;
 
+    // Get the list of results for the current page.
     const previousPagePosition = await viewedResults.getLastPosition(query, vertical, providerName, sessionId, userId);
-    let startPosition = getStartPosition(pageNumber, count, previousPagePosition, allResults, collapsibleIdMap);
+    const startPosition = getStartPosition(pageNumber, resultPerPageCount, previousPagePosition, allResults, collapsibleIdMap);
     const resultsOnPreviousPages = allResults.slice(0, startPosition);
     const viewedResultIds = await viewedResults.getViewedResultIds(query, vertical, providerName, sessionId, userId);
-    let promotedResults = getPromotedResults(viewedResultIds, resultsOnPreviousPages);
-
-    let {results, j} = getPageOfResults(promotedResults, count, collapsibleIdMap, startPosition, allResults);
-    const lastPosition = j + startPosition;
+    const promotedResults = getPromotedResults(viewedResultIds, resultsOnPreviousPages);
+    let {results, unpromotedResultCount} = getPageOfResults(promotedResults, resultPerPageCount, collapsibleIdMap, startPosition, allResults);
     if (distributionOfLabour === "unbookmarkedOnly") {
         results = results.filter(resultsFilter(bookmarkIdMap));
     }
     results = addMissingFields(results);
-    const resultIds = results.map(result => getId(result));
 
+    // Add viewedResultIds and lastPosition entries in the database for this page of results.
+    const resultIds = results.map(result => getId(result));
     await viewedResults.addViewedResultIds(query, vertical, providerName, sessionId, userId, resultIds)
         .catch(err => {
             console.log(err);
         });
+    const lastPosition = unpromotedResultCount + startPosition;
     await viewedResults.setLastPosition(query, vertical, providerName, pageNumber, sessionId, userId, lastPosition);
 
     return {
@@ -174,11 +162,11 @@ function getPromotedResults(viewedResultIds, resultsOnPreviousPages) {
  *        results per page).
  * @param startPosition - The position in the list of all results at which the non-promoted results for this page start.
  * @param allResults - The list of all results returned for the user's query.
- * @returns {{results: Array, j: *}} - The list of results for this page and the number of non-promoted results on the page.
+ * @returns {{results: Array, unpromotedResultCount: *}} - The list of results for this page and the number of
+ *          unpromoted results on the page.
  */
 function getPageOfResults(promotedResults, count, collapsibleIdMap, startPosition, allResults) {
     let results = [];
-    let j;
     let uncollapsibleResults = 0;
     for (let l = 0; l < promotedResults.length && !(uncollapsibleResults >= count); l++) {
         const result = promotedResults[l];
@@ -187,14 +175,16 @@ function getPageOfResults(promotedResults, count, collapsibleIdMap, startPositio
             uncollapsibleResults++;
         }
     }
-    for (j = 0; j < allResults.length && !(uncollapsibleResults >= count); j++) {
-        const result = allResults[j + startPosition];
+    let unpromotedResultCount = 0;
+    for (let j = startPosition; j < allResults.length && !(uncollapsibleResults >= count); j++) {
+        const result = allResults[j];
         results.push(result);
+        unpromotedResultCount++;
         if (!collapsibleIdMap[getId(result)]) {
             uncollapsibleResults++;
         }
     }
-    return {results, j};
+    return {results, unpromotedResultCount};
 }
 
 /**
@@ -239,4 +229,23 @@ function resultsFilter(collapsibleIdMap) {
  */
 function getId(result) {
     return result.id ? result.id : result.url;
+}
+
+/**
+ * Check whether relevanceFeedback and distributionOfLabour have valid values.
+ */
+function checkStringValues(relevanceFeedback, distributionOfLabour) {
+    if (![false, 'individual', 'shared'].includes(relevanceFeedback)) {
+        throw {
+            name: 'Bad Request',
+            message: 'Invalid relevanceFeedback'
+        };
+    }
+
+    if (![false, 'unbookmarkedSoft', 'unbookmarkedOnly'].includes(distributionOfLabour)) {
+        throw {
+            name: 'Bad Request',
+            message: 'Invalid distributionOfLabour'
+        };
+    }
 }

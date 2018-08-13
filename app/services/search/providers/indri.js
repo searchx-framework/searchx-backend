@@ -32,13 +32,12 @@ const verticals = [
     'AQUAINT'
 ];
 
-/*
- * Fetches data from indri
- *
- * @params {query} the search query string
- * @params {vertical} type of search results (web, images, etc)
- * @params {pageNumber} the number of the page of results to show (1-based indexing)
- * @params {relevanceFeedbackDocuments} the set of documents to use for relevance feedback
+/**
+ * Fetch data from indri.
+ * @param query - The search query string.
+ * @param vertical - Type of search results (web, images, etc).
+ * @param pageNumber} - The number of the page of results to show (1-based indexing).
+ * @param relevanceFeedbackDocuments - The set of documents to use for relevance feedback.
  */
 exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     if (!verticals.includes(vertical)) {
@@ -58,10 +57,9 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
     });
 };
 
-/*
- * Get document by id from search provider
- *
- * @params {id} the id of the document to return
+/**
+ * Get document by id from search provider.
+ * @param id - The id of the document to return.
  */
 exports.getById = function (id) {
     return new Promise(function (resolve, reject) {

@@ -13,8 +13,8 @@ const verticals = {
     text: cranfield
 };
 
-/*
- * Fetches data from elasticsearch and returns the formatted result
+/**
+ * Fetch data from elasticsearch and return formatted results.
  */
 exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     if (Array.isArray(relevanceFeedbackDocuments) && relevanceFeedbackDocuments.length > 0) {
@@ -41,8 +41,8 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
     });
 };
 
-/*
- * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical
+/**
+ * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical.
  */
 function formatResults(vertical) {
     return function (result) {

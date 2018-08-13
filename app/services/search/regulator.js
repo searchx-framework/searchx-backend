@@ -4,18 +4,17 @@ const provider = require('./provider');
 const bookmark = require('../../services/features/bookmark');
 const viewedResults = require('./viewedResults');
 
-/*
- * Fetches search results from the provider, applies algorithmic mediation and ensures that all required fields
- * are included in results.
- *
- * @params {query} the search query
- * @params (vertical) type of search results (web, images, etc)
- * @params {pageNumber} result pagination number
- * @params {sessionId} session id of the user
- * @params {userId} id of the user
- * @params {providerName} the name of the search provider to use (indri by default)
- * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
- * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly)
+/**
+ * Fetch search results from the provider, apply algorithmic mediation and ensure that all required fields are included
+ * in results.
+ * @param query - The search query.
+ * @param vertical - Type of search results (web, images, etc).
+ * @param pageNumber - Result pagination number.
+ * @param sessionId - The session id of the user.
+ * @param userId - The id of the user.
+ * @param providerName - The name of the search provider to use (indri by default).
+ * @param relevanceFeedback - String indicating what type of relevance feedback to use (false, individual, shared).
+ * @param distributionOfLabour - String indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly).
  */
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     // Convert falsy string to false boolean for cleaner if statements below.

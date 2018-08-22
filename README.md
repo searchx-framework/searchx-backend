@@ -74,6 +74,7 @@ These instructions are for Ubuntu Linux. The steps can be adapted for all major 
     ```
 
 ## Search Providers
+You can install the supported search providers as follows.
 
 ### Elasticsearch
 Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html).
@@ -86,6 +87,19 @@ Execute the [Elasticsearch installation instructions](https://www.elastic.co/gui
 SearchX requires a [Bing API key](https://azure.microsoft.com/en-us/services/cognitive-services/bing-web-search-api/) to use the Bing web search provider.
 
 Once you have a Bing API key, you can paste it into `app/config/config.js` under `bingAccessKey`. Be careful not to check the key into version control, since this may lead to abuse if the key leaks.
+
+# API Specification 
+```
+// Search
+[address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]&provider=[provider]
+- address: address set in the configuration file
+- vertical: search vertical to use, as specified by search provider, eg. (web, images, videos, news) for bing
+- query: query string
+- page: page number
+- provider: the search provider to use (elasticsearch, indri, bing)
+- relevanceFeedback [optional, false by default]: whether to use relevance feedback (false, individual, shared)
+- distributionOfLabour [optional, false by default]: whether to use distribution of labour (false, unbookmarkedSoft, unbookmarkedOnly)
+```
 
 # Configuration
 The main production configuration keys can be set in the `.env` file, example values can be found in `.example.env`. These keys are the node environment `NODE_ENV` (production or development), the `PORT` the server will run on, the database url `DB`, and the `REDIS` url.
@@ -113,19 +127,6 @@ The tests require that the [Elasticsearch search provider](#elasticsearch) is in
 
 // Run tests
 npm test
-```
-
-# API Specification 
-```
-// Search
-[address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]&provider=[provider]
-- address: address set in the configuration file
-- vertical: search vertical to use, as specified by search provider, eg. (web, images, videos, news) for bing
-- query: query string
-- page: page number
-- provider: the search provider to use (elasticsearch, indri, bing)
-- relevanceFeedback [optional, false by default]: whether to use relevance feedback (false, individual, shared)
-- distributionOfLabour [optional, false by default]: whether to use distribution of labour (false, unbookmarkedSoft, unbookmarkedOnly)
 ```
 
 # Modifications
@@ -221,6 +222,16 @@ The included result types are (fields preceded by `<OPTIONAL>` are optional):
   text: <full document text>
 ```
 
+# Citation
+If you use SearchX to produce results for your scientific publication, please refer to our [SIGIR 2018](http://fmoraes.nl/documents/moraes2018sigir.pdf) paper.
+```
+@inproceedings{putra2018searchx,
+  title={SearchX: Empowering Collaborative Search Research.},
+  author={Putra, Sindunuraga Rikarno and Moraes, Felipe and Hauff, Claudia},
+  booktitle={SIGIR},
+  pages={1265--1268},
+  year={2018}
+}
+```
 # License
-
 [MIT](https://opensource.org/licenses/MIT) License

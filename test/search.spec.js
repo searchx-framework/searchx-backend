@@ -17,7 +17,7 @@ describe('search (requires corresponding backend to be running)', function() {
     ];
 
     // only execute bing tests if access key is set
-    if (config.bingAccessKey) {
+    if (process.env.BING_ACCESS_KEY) {
         tests.push([
             {provider: 'bing', verticals: ['web', 'news'], expected: 10},
             {provider: 'bing', verticals: ['images', 'videos'], expected: 12}

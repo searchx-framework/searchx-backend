@@ -1,8 +1,7 @@
 'use strict';
 
-const config = require('../../../config/config');
 const BingApi = require('node-bing-api')({
-    accKey: config.bingAccessKey,
+    accKey: process.env.BING_ACCESS_KEY,
     rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"
 });
 

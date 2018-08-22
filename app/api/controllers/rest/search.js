@@ -11,7 +11,7 @@ exports.search = function(req, res) {
     const query = req.query.query || '';
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
-    const providerName = req.query.providerName || config.defaultProvider;
+    const providerName = req.query.providerName || process.env.DEFAULT_SEARCH_PROVIDER;
     let relevanceFeedback = req.query.relevanceFeedback || 'shared';
     let distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
 
@@ -26,7 +26,7 @@ exports.search = function(req, res) {
 
 exports.getById = function (req, res) {
     const docId = req.params.id;
-    const providerName = req.query.providerName || config.defaultProvider;
+    const providerName = req.query.providerName || process.env.DEFAULT_SEARCH_PROVIDER;
 
     search.getById(docId, providerName)
         .then(data => res.status(200).json(data))

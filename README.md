@@ -74,7 +74,7 @@ These instructions are for Ubuntu Linux. The steps can be adapted for all major 
     ```
 
 ## Search Providers
-You can install the supported search providers as follows.
+You can install the supported search providers as follows. See the [configuration section](#configuration) for how to configure which search provider is used by default.
 
 ### Elasticsearch
 Execute the [Elasticsearch installation instructions](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/deb.html).
@@ -86,7 +86,7 @@ Execute the [Elasticsearch installation instructions](https://www.elastic.co/gui
 ### Bing
 SearchX requires a [Bing API key](https://azure.microsoft.com/en-us/services/cognitive-services/bing-web-search-api/) to use the Bing web search provider.
 
-Once you have a Bing API key, you can paste it into `app/config/config.js` under `bingAccessKey`. Be careful not to check the key into version control, since this may lead to abuse if the key leaks.
+Once you have a Bing API key, you can paste it into your `.env` file under the key `BING_ACCESS_KEY`. Be careful not to check the key into version control, since this may lead to abuse if the key leaks.
 
 # API Specification 
 ```
@@ -96,13 +96,19 @@ Once you have a Bing API key, you can paste it into `app/config/config.js` under
 - vertical: search vertical to use, as specified by search provider, eg. (web, images, videos, news) for bing
 - query: query string
 - page: page number
-- provider: the search provider to use (elasticsearch, indri, bing)
+- provider [optional]: the search provider to use (elasticsearch, indri, bing)
 - relevanceFeedback [optional, false by default]: whether to use relevance feedback (false, individual, shared)
 - distributionOfLabour [optional, false by default]: whether to use distribution of labour (false, unbookmarkedSoft, unbookmarkedOnly)
 ```
 
 # Configuration
-The main production configuration keys can be set in the `.env` file, example values can be found in `.example.env`. These keys are the node environment `NODE_ENV` (production or development), the `PORT` the server will run on, the database url `DB`, and the `REDIS` url.
+The main production configuration keys can be set in the `.env` file, example values can be found in `.example.env`. These keys are:
+- `NODE_ENV`: the node environment (production or development)
+- `PORT`: the port server will run on
+- `DB`: the database url
+- `REDIS`: the redis server url
+- `DEFAULT_SEARCH_PROVIDER`: the search provider that is used by default if the provider url parameter of the API is not set
+- `BING_ACCESS_KEY` (optional): the API access key for when the Bing search provider is used
 
 Further development configuration can be found inside `app/config/config.js`:
 ```
@@ -112,8 +118,7 @@ module.exports = {
     testUrl: 'http://localhost',
     cacheFreshness: 3600,
     scrapFreshness: 60 * 60 * 24,
-    bingAccessKey: '<paste your bing access key here>',
-    defaultProvider: 'bing',
+    defaultProvider: 'elasticsearch',
 };
 ```
 

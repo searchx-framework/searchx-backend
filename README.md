@@ -81,7 +81,7 @@ Execute the [Elasticsearch installation instructions](https://www.elastic.co/gui
 
 ### Indri
 1. Execute the [node-indri installation instructions](https://github.com/felipemoraes/node-indri#setup).
-2. Copy the built node-indri module from `./build/Release/node-indri` inside your node-indri folder to `./lib/node-indri` inside your searchx-backend folder (you need to create the lib and node-indri folders first).
+2. Copy the built node-indri module from `build/Release/node-indri` inside your node-indri folder to `lib/node-indri` inside your searchx-backend folder (you need to create the lib and node-indri folders first).
 
 ### Bing
 SearchX requires a [Bing API key](https://azure.microsoft.com/en-us/services/cognitive-services/bing-web-search-api/) to use the Bing web search provider.
@@ -161,7 +161,7 @@ The object containing the results needs to have the following fields:
 ]}
 ```
 
-The data structure of <result> depends on the result type, which is defined by the component that will be used to display the result in the frontend. See the [searchx-frontend documentation](https://github.com/felipemoraes/searchx-frontend#search-providers) for an explanation of how to add custom result types.
+The data structure of the `<result>` depends on the result type, which is defined by the component that will be used to display the result in the frontend. See the [searchx-frontend documentation](https://github.com/felipemoraes/searchx-frontend#search-providers) for an explanation of how to add custom result types.
 
 The included result types are (fields preceded by `<OPTIONAL>` are optional):
 

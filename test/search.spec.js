@@ -13,10 +13,16 @@ describe('search (requires corresponding backend to be running)', function() {
     const sid = '123';
 
     const tests = [
-        {provider: 'bing', verticals: ['web', 'news'], expected: 10},
-        {provider: 'bing', verticals: ['images', 'videos'], expected: 12},
-        {provider: 'elasticsearch', verticals: ['web'], expected: 10}
+        {provider: 'elasticsearch', verticals: ['text'], expected: 10}
     ];
+
+    // only execute bing tests if access key is set
+    if (process.env.BING_ACCESS_KEY) {
+        tests.push([
+            {provider: 'bing', verticals: ['web', 'news'], expected: 10},
+            {provider: 'bing', verticals: ['images', 'videos'], expected: 12}
+        ]);
+    }
 
     tests.forEach(function (test) {
         test.verticals.forEach(function (vertical) {

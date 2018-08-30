@@ -1,7 +1,14 @@
 'use strict';
 
-// Check ENV variables
+// Default NODE_ENV to development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Load newrelic application monitoring in production
+if (process.env.NODE_ENV === 'production') {
+    require('newrelic');
+}
+
+// Check ENV variables
 const requiredEnv = ['PORT', 'DB', 'REDIS'];
 const unsetEnv = requiredEnv.filter((env) => !(env in process.env));
 if (unsetEnv.length > 0) {

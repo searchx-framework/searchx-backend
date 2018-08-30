@@ -10,21 +10,23 @@ const cranfield = require('./es-datasets/cranfield');
 
 // mapping of vertical to module for elasticsearch dataset
 const verticals = {
-    web: cranfield
+    text: cranfield
 };
 
-/*
- * Fetches data from elasticsearch and returns the formatted result
+/**
+ * Fetch data from elasticsearch and return formatted results.
  */
-exports.fetch = function (query, vertical, pageNumber) {
+exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
+    if (Array.isArray(relevanceFeedbackDocuments) && relevanceFeedbackDocuments.length > 0) {
+        return Promise.reject({name: 'Bad Request', message: 'The Elasticsearch search provider does not support relevance feedback, but got relevance feedback documents.'})
+    }
     if (vertical in verticals) {
         const dataset = verticals[vertical];
-        const size = 10;
         return esClient.search({
             index: dataset.index,
             type: 'document',
-            from: (pageNumber - 1) * size,
-            size: size,
+            from: (pageNumber - 1) * resultsPerPage,
+            size: resultsPerPage,
             body: {
                 query: {
                     match: {
@@ -39,8 +41,8 @@ exports.fetch = function (query, vertical, pageNumber) {
     });
 };
 
-/*
- * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical
+/**
+ * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical.
  */
 function formatResults(vertical) {
     return function (result) {
@@ -51,13 +53,12 @@ function formatResults(vertical) {
         let results = [];
 
         result.hits.hits.forEach(function (hit) {
-            const source = hit._source;
-            results.push(dataset.formatSource(source));
+            results.push(dataset.formatHit(hit));
         });
 
         return {
             results: results,
             matches: result.hits.total
-        }
+        };
     }
 }

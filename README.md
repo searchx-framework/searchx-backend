@@ -92,11 +92,13 @@ Once you have a Bing API key, you can paste it into your `.env` file under the k
 ```
 // Search
 [address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]&provider=[provider]
-- address: address set in the configuration file
+- address: address set in the configuration file (testUrl:PORT)
 - vertical: search vertical to use, as specified by search provider, eg. (web, images, videos, news) for bing
+- userId: the identifier for the user that is issuing this API call
+- sessionId: the identifier for the session that the this API call belongs to
 - query: query string
 - page: page number
-- provider [optional]: the search provider to use (elasticsearch, indri, bing)
+- providerName [optional]: the search provider to use (elasticsearch, indri, bing), defaults to DEFAULT_SEARCH_PROVIDER if unset
 - relevanceFeedback [optional, false by default]: whether to use relevance feedback (false, individual, shared)
 - distributionOfLabour [optional, false by default]: whether to use distribution of labour (false, unbookmarkedSoft, unbookmarkedOnly)
 ```
@@ -117,8 +119,7 @@ module.exports = {
     testDb: 'mongodb://localhost/searchx-test',
     testUrl: 'http://localhost',
     cacheFreshness: 3600,
-    scrapFreshness: 60 * 60 * 24,
-    defaultProvider: 'elasticsearch',
+    scrapFreshness: 60 * 60 * 24
 };
 ```
 

@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Check ENV variables
-const requiredEnv = ['PORT', 'DB', 'REDIS'];
+const requiredEnv = ['PORT', 'DB', 'REDIS', 'DEFAULT_SEARCH_PROVIDER'];
 const unsetEnv = requiredEnv.filter((env) => !(env in process.env));
 if (unsetEnv.length > 0) {
     throw new Error("Required ENV variables are not set: [" + unsetEnv.join(', ') + "]");

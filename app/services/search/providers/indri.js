@@ -1,6 +1,6 @@
 'use strict';
 
-const index_path = "../data/Aquaint-Index";
+const index_path = process.env.INDRI_INDEX;
 let indri_searcher, indri_reader;
 try {
     const indri = require('../../../../lib/node-indri/node-indri');

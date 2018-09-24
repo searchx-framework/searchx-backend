@@ -2,8 +2,10 @@
 
 const mongoose = require('mongoose');
 const Log = mongoose.model('Log');
+const sensemaking = require('./sensemaking');
 
 exports.insertLogs = async function(userId, queue) {
+    
     queue = queue
         .filter(event => {
             return typeof event === 'object' && event.userId === userId;
@@ -13,5 +15,7 @@ exports.insertLogs = async function(userId, queue) {
             return event;
         });
 
+    sensemaking.handleUserLogs(queue);
+    
     return Log.insertMany(queue);
 };

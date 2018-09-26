@@ -4,7 +4,11 @@ const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
 const CoverageSchema = new Schema({
-    id: {
+    userId: {
+        type: String,
+        required: true
+    },
+    sessionId: {
         type: String,
         required: true
     },

@@ -6,29 +6,35 @@ const Coverage = mongoose.model('Coverage');
 const queryMatching = require('./queryMatching');
 const indri = require('../../../lib/node-indri/node-indri');
 
+
+const querySuggestions = require('./querySuggestions');
+
 const indri_scorer = new indri.Scorer({
     "index": process.env.INDRI_INDEX,
     "rules": "method:dirichlet,mu:2500"
 })
 
+const topics = require("../session/tasks/data/scent-topics.json");
 
-const findAspects = async function (id) {
+const findAspects = async function (userId, sessionId) {
     const aspects = await Aspect.findOne({
-        id: id
+        userId: userId,
+        sessionId: sessionId
     });
     return aspects;
 }
 
-const insertAspects = async function(id, aspects) {
+const insertAspects = async function(userId, sessionId, aspects) {
     
-    let novelty = {}
-    let centroidvectors = {}
+    let novelty = new Map;
+    let centroidvectors = new Map;
     for (var i in aspects) {
-        novelty[aspects[i]] = 1.0;
-        centroidvectors[aspects[i]] = await queryMatching.computeCentroidWordVector(aspects[i].split(" "));
+        novelty.set(aspects[i], 1.0);
+        centroidvectors.set(aspects[i], await queryMatching.computeCentroidWordVector(aspects[i].split(" ")));
     }
     const data = {
-        id: id,
+        userId: userId,
+        sessionId: sessionId,
         aspects: aspects,
         novelty: novelty,
         documents: new Map,
@@ -36,10 +42,11 @@ const insertAspects = async function(id, aspects) {
     }
     const A = new Aspect(data);
     A.save();
+    return data;
 }
 
 
-const computeCoverage = async function(id, aspects) {
+const computeCoverage = async function(userId, sessionId, aspects) {
 
 
     const promisesAspects = aspects.map(async (aspect) => {
@@ -49,7 +56,7 @@ const computeCoverage = async function(id, aspects) {
                     resolve(results);
                 };
 
-                indri_scorer.score(aspect, [], 10, callback);
+                indri_scorer.score(aspect, [], 1000, callback);
         });
     });
 
@@ -63,7 +70,7 @@ const computeCoverage = async function(id, aspects) {
     }
 
     let docsIds = Array.from(docs.keys());
-    console.log(docsIds);
+    //console.log(docsIds);
     const promisesCoverage = aspects.map(async (aspect) => {
         return new Promise((resolve, reject) => {
                 const callback = function (error, results) {
@@ -81,7 +88,8 @@ const computeCoverage = async function(id, aspects) {
     for (i in aspects) {
         for (j in coveragesValues[i]) {
             coverages.push ( {
-                    id: id,
+                    userId: userId,
+                    sessionId, sessionId,
                     aspect: aspects[i],
                     coverage : coveragesValues[i][j].score,
                     docid: coveragesValues[i][j].docid
@@ -110,15 +118,27 @@ const normalise = function(docs) {
 
 
 
-exports.singleInformationScent = async function(userId, suggestions) {
+exports.singleInformationScent = async function(userId, sessionId, suggestions) {
 
-    let userAspects = await findAspects(userId);
-
+    let userAspects = await findAspects(userId, sessionId);
+    let centroidvectors, novelty;
     if (userAspects === null) {
-        insertAspects(userId, suggestions);
-        computeCoverage(userId, suggestions);
-        return suggestions.map((suggestion) => { return [suggestion, 1.0]});
+        if (process.env.INFOSCENT_ASPECTS_ORIGIN === "groundtruth") {
+            let topicId = sessionId.split("-")[0]
+            let aspects = topics[topicId]["aspects"];
+            userAspects =  await insertAspects(userId, sessionId, aspects);
+            centroidvectors = userAspects.centroidvectors;
+            novelty = userAspects.novelty;
+            computeCoverage(userId, sessionId, aspects);
+        } else if (process.env.INFOSCENT_ASPECTS_ORIGIN === "bing") {
+            return [];
+        }
+    } else {
+        centroidvectors = userAspects.centroidvectors;
+        novelty = userAspects.novelty;
     }
+
+    
 
     let suggestionsCentroidVectors = suggestions.map( (suggestion) => {
         return queryMatching.computeCentroidWordVector(suggestion.split(" "));
@@ -126,7 +146,7 @@ exports.singleInformationScent = async function(userId, suggestions) {
 
     suggestionsCentroidVectors = await Promise.all(suggestionsCentroidVectors);
 
-    let infoScents = suggestionsCentroidVectors.map((v) => aspectInformationScent(v, userAspects.novelty, userAspects.centroidvectors))
+    let infoScents = suggestionsCentroidVectors.map((v) => aspectInformationScent(v, novelty, centroidvectors))
     let infoScentsSuggestion = []
     for (let i in infoScents) {
         infoScentsSuggestion.push([suggestions[i], infoScents[i]]);
@@ -138,8 +158,8 @@ exports.singleInformationScent = async function(userId, suggestions) {
 
 exports.collaborativeInformationScent = async function(userId, sessionId, suggestions) {
 
-    const singleUserInfoScent = await this.singleInformationScent(userId, suggestions);
-    const collaborativeUserInfoScent = await this.singleInformationScent(sessionId, suggestions);
+    const singleUserInfoScent = await this.singleInformationScent(userId, sessionId, suggestions);
+    const collaborativeUserInfoScent = await this.singleInformationScent(sessionId, sessionId, suggestions);
 
     let scents = []
     for (let i in suggestions) {
@@ -193,7 +213,8 @@ exports.handleUserLogs = async function(logs){
                     continue;
                 }
                 Coverage.find( {
-                    "id": sessionId,
+                    "userId": userId,
+                    "sessionId": sessionId,
                     "docid" : docid
     
                 } , function(error,response) {
@@ -209,6 +230,17 @@ exports.handleUserLogs = async function(logs){
                 )
             }
 
+        } else if (logs[i].event === "SEARCH_QUERY") {
+            let userId = logs[i].userId;
+            let sessionId = logs[i].sessionId;
+            let query = logs[i].meta.query;
+
+            let userAspects = await findAspects(userId);
+            if (userAspects === null) {
+                const suggestions = await querySuggestions.fetch(query);
+                insertAspects(userId, sessionId, suggestions);
+                computeCoverage(userId, sessionId, suggestions);
+            }
         }
     }
 }
@@ -217,7 +249,7 @@ const aspectInformationScent = function(suggestionCentroidVector, novelty, centr
 
     let selectedAspect = null;
     let selectedDistance = 2; 
-    for (const [key, value] of novelty.entries()) {
+    for (let [key, value] of novelty) {
         let distance = queryMatching.cosineSim(centroidvectors.get(key),suggestionCentroidVector);
         if (distance < selectedDistance) {
             selectedDistance = distance;
@@ -229,5 +261,5 @@ const aspectInformationScent = function(suggestionCentroidVector, novelty, centr
         return [ 1-selectedDistance, (1-selectedDistance)*novelty.get(selectedAspect) ];
     } 
 
-    return 1;
+    return 0;
 }

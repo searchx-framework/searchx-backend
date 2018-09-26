@@ -29,7 +29,7 @@ try {
 }
 
 const verticals = [
-    'AQUAINT'
+    'AQUAINT', 'CW12B'
 ];
 
 /**

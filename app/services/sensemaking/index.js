@@ -12,7 +12,7 @@ exports.informationScent = async function(query, sessionId, userId) {
         return wrapWithOneValues(suggestions);
     }
     if (process.env.INFOSCENT_TYPE == "single" ){ 
-        return informationScent.singleInformationScent(userId, suggestions);
+        return informationScent.singleInformationScent(userId, sessionId, suggestions);
     } else if (process.env.INFOSCENT_TYPE == "collaborative") {
         return informationScent.collaborativeInformationScent(userId, sessionId, suggestions);
     }

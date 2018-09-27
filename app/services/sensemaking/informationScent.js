@@ -32,12 +32,12 @@ const insertAspects = async function(userId, sessionId, aspects) {
         novelty.set(aspects[i], 1.0);
         centroidvectors.set(aspects[i], await queryMatching.computeCentroidWordVector(aspects[i].split(" ")));
     }
+
     const data = {
         userId: userId,
         sessionId: sessionId,
         aspects: aspects,
         novelty: novelty,
-        documents: new Map,
         centroidvectors: centroidvectors
     }
     const A = new Aspect(data);
@@ -55,8 +55,7 @@ const computeCoverage = async function(userId, sessionId, aspects) {
                     if (error) return reject(error);
                     resolve(results);
                 };
-
-                indri_scorer.score(aspect, [], 1000, callback);
+                indri_scorer.score(aspect, [], 100, callback);
         });
     });
 
@@ -70,7 +69,7 @@ const computeCoverage = async function(userId, sessionId, aspects) {
     }
 
     let docsIds = Array.from(docs.keys());
-    //console.log(docsIds);
+
     const promisesCoverage = aspects.map(async (aspect) => {
         return new Promise((resolve, reject) => {
                 const callback = function (error, results) {
@@ -89,7 +88,7 @@ const computeCoverage = async function(userId, sessionId, aspects) {
         for (j in coveragesValues[i]) {
             coverages.push ( {
                     userId: userId,
-                    sessionId, sessionId,
+                    sessionId: sessionId,
                     aspect: aspects[i],
                     coverage : coveragesValues[i][j].score,
                     docid: coveragesValues[i][j].docid
@@ -124,7 +123,13 @@ exports.singleInformationScent = async function(userId, sessionId, suggestions) 
     let centroidvectors, novelty;
     if (userAspects === null) {
         if (process.env.INFOSCENT_ASPECTS_ORIGIN === "groundtruth") {
-            let topicId = sessionId.split("-")[0]
+            let topicId;
+            if (sessionId.includes("-")) {
+                topicId = sessionId.split("-")[0];
+            } else {
+                topicId = "1";
+            }
+            
             let aspects = topics[topicId]["aspects"];
             userAspects =  await insertAspects(userId, sessionId, aspects);
             centroidvectors = userAspects.centroidvectors;
@@ -139,13 +144,13 @@ exports.singleInformationScent = async function(userId, sessionId, suggestions) 
     }
 
     
+    
 
     let suggestionsCentroidVectors = suggestions.map( (suggestion) => {
         return queryMatching.computeCentroidWordVector(suggestion.split(" "));
     });
 
     suggestionsCentroidVectors = await Promise.all(suggestionsCentroidVectors);
-
     let infoScents = suggestionsCentroidVectors.map((v) => aspectInformationScent(v, novelty, centroidvectors))
     let infoScentsSuggestion = []
     for (let i in infoScents) {
@@ -180,38 +185,39 @@ exports.handleUserLogs = async function(logs){
             let sessionId = logs[i].sessionId;
             let docid = logs[i].meta.url;
 
-            let userAspects = await findAspects(userId);
+            let userAspects = await findAspects(userId, sessionId);
+            
             if (userAspects === null) {
                 return;
             }
-            if (! userAspects.documents.has(docid)) {
-            
-                Coverage.find( {
-                    "id": sessionId,
-                    "docid" : docid
+        
+    
+            Coverage.find( {
+                "userId": userId,
+                "sessionId" : sessionId,
+                "docid" : docid
 
-                } , function(error,response) {
-                        if (!error) {
-                            for (let r in response) {
-                                let novelty = userAspects.novelty.get(response[r].aspect);
-                                userAspects.novelty.set(response[r].aspect, novelty*(1-response[r].coverage));
-                            }
-                            userAspects.documents.set(docid, 1);
-                            userAspects.save();
+            } , function(error,response) {
+                    if (!error) {
+                        for (let r in response) {
+                            let novelty = userAspects.novelty.get(response[r].aspect);
+                            userAspects.novelty.set(response[r].aspect, novelty*(1-response[r].coverage));
                         }
+                        userAspects.save();
                     }
-                );
-            }
+                }
+            );
+
+            
 
             if (process.env.INFOSCENT_TYPE === "collaborative") {
                 let sessionAspects = await findAspects(sessionId);
+                
                 if (sessionAspects === null) {
                     return;
                 }
 
-                if (sessionAspects.documents.has(docid)) {
-                    continue;
-                }
+
                 Coverage.find( {
                     "userId": userId,
                     "sessionId": sessionId,
@@ -223,7 +229,6 @@ exports.handleUserLogs = async function(logs){
                                 let novelty = sessionAspects.novelty.get(response[r].aspect);
                                 sessionAspects.novelty.set(response[r].aspect, novelty*(1-response[r].coverage));
                             }
-                            sessionAspects.documents.set(docid, 1);
                             sessionAspects.save();
                         }
                     }
@@ -240,6 +245,10 @@ exports.handleUserLogs = async function(logs){
                 const suggestions = await querySuggestions.fetch(query);
                 insertAspects(userId, sessionId, suggestions);
                 computeCoverage(userId, sessionId, suggestions);
+                if (process.env.INFOSCENT_TYPE === "collaborative") {
+                    insertAspects(sessionId, sessionId, suggestions);
+                    computeCoverage(sessionId, sessionId, suggestions);
+                }
             }
         }
     }

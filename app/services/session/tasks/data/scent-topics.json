@@ -4,7 +4,7 @@
       "description": "You are writing an article about healthy nutrition. Aspects pertaining to your article are: healthy meals, healthy snacks, healthy eating plan, healthy nutrition for pregnant women, healthy nutrition for infants, healthy eating initiatives in schools, government programs to support healthy nutrition, losing weight.",
       "aspects" : [
         "healthy meals",
-         "healthy snacks",
+        "healthy snacks",
         "healthy eating plan",
         "healthy nutrition for pregnant women",
         "healthy nutrition for infants",
@@ -17,13 +17,13 @@
       "title" : "us civil war",
       "description": "You are writing an article about the US civil war. Find relevant documents that talk about the following aspects: causes of the civil war, economic causes, battles in the civil war, consequences of the civil war, how greed affected the civil war, civil war effects today, what weapons were used during civil war, what rifles were used.",
       "aspects" : [
-        "United states civil war causes",
-        "United states civil war economic causes", 
-        "United states civil war battles",
-        "United states civil war effects today",
-        "United states civil war consequences ",
-        "United states civil war weapons used",
-        "United states civil war rifles used"
+        "united states civil war causes",
+        "united states civil war economic causes", 
+        "united states civil war battles",
+        "united states civil war effects today",
+        "united states civil war consequences ",
+        "united states civil war weapons used",
+        "united states civil war rifles used"
         
       ] 
     },
@@ -31,11 +31,11 @@
       "title" : "red bull",
       "description": "A friend has just advised you not to drink Red Bull. You are curious about what the side effects of Red Bull are? what are its health concerns? which of its ingredients are problematic? what countries have banned the use of Red Bull? You also want to find information about US laws proposing a ban on drinks like Red Bull.",
       "aspects" : [
-        "side effects of drinking Red Bull",
-        "health concerns of drinking Red Bull",  
-        "Red Bull problematic ingredients",
-        "countries have banned Red Bull",
-        "US laws against energetic drinks"
+        "side effects of drinking red bull",
+        "health concerns of drinking bed bull",  
+        "red bull problematic ingredients",
+        "countries have banned red bull",
+        "united states laws against energetic drinks"
       ] 
     }
 

@@ -20,10 +20,6 @@ const AspectSchema = new Schema({
         type: Map,
         require: true
     },
-    documents : {
-        type: Map,
-        required: true
-    },
     centroidvectors : {
         type: Map
     }

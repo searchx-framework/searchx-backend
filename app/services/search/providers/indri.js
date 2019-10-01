@@ -1,6 +1,6 @@
 'use strict';
 
-const index_path = "../data/Aquaint-Index";
+const index_path = "/data2/index-clueweb12-catB";
 let indri_searcher, indri_reader;
 try {
     const indri = require('../../../../lib/node-indri/node-indri');

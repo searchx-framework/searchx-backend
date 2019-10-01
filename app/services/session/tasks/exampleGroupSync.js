@@ -180,3 +180,22 @@ exports.handleSyncLeave = async function(userId) {
     group.markModified('taskData');
     await group.save();
 };
+
+
+exports.postUserTask = async function(userId, data) {
+    //let group = await helper.getGroupByUserId(userId, TASK_ID);
+    //if (group !== null) {
+      //  return group;
+    //}
+
+    //const groupSize = parseInt(params.groupSize);
+    //const topicsSize = parseInt(params.topicsSize);
+    //group = await getAvailableGroup(groupSize, topicsSize);
+    //group.members.push(helper.initializeMember(userId, {}));
+    //group.taskData.nMembers = group.members.length;
+
+    await savePretestResults(userId, data);
+    return await setGroupTopic(userId);
+};
+
+

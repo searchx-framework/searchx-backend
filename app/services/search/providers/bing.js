@@ -1,3 +1,4 @@
+
 'use strict';
 
 const BingApi = require('node-bing-api')({

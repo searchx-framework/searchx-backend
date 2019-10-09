@@ -17,8 +17,10 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
             const data = formatResults(vertical, body);
             resolve(data);
         };
-
-        if ((resultsPerPage !== 12 && vertical === 'images') || resultsPerPage !== 10) {
+	console.log("pageNumber", pageNumber)
+	console.log("resultsPerPage", resultsPerPage)
+	console.log("vertical", vertical)
+        if ((resultsPerPage !== 12 && vertical === 'images') || (resultsPerPage !== 10 && vertical === 'web') || (resultsPerPage !== 12 && vertical === 'videos') || (resultsPerPage !== 10 && vertical === 'news')) {
             throw {name: 'Bad Request', message: 'Invalid number of results per page (Bing only supports a fixed number of results per page, and can therefore not support Distribution of Labour)'}
         }
         if (Array.isArray(relevanceFeedbackDocuments) && relevanceFeedbackDocuments.length > 0) {

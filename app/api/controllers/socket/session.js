@@ -4,7 +4,6 @@ const session = require('../../../services/session');
 
 exports.handleSyncSubmit = async function(socket, io, data) {
     const res = await session.handleSyncSubmit(data.userId, data.taskId, data.data);
-console.log("checking sync",res)    
 if (res !== null) {
         io.to(data.groupId).emit('syncData', res);
     }

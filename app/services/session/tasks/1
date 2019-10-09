@@ -18,8 +18,7 @@ Object.keys(topics).forEach((index) => {
 function sampleTopics(n) {
     let validTopics = underscore.omit(topics, '0');
     let samples = utils.sample(validTopics, n);
-    console.log("topicSize",n)	
-	console.log("sample", samples)
+
     samples[1] = topics[0];
     return samples;
 }
@@ -80,6 +79,7 @@ exports.getUserTask = async function(userId, params) {
 function getScoresFromResults(results) {
     function formatScores(scores) {
         return Object.keys(scores)
+            .filter((key) => key !== '0')
             .map(key => {
                 return {
                     topicId: key,
@@ -97,7 +97,7 @@ function getScoresFromResults(results) {
             scores[v[1]] += parseInt(results[result]);
         }
     });
-//    console.log("formatscores", formatScores(scores))
+    console.log("scores", scores)
     return formatScores(scores);
 }
 
@@ -145,20 +145,14 @@ async function setGroupTopic(userId) {
     });
 
     let minScore = Infinity;
-//    let minId = null;
-  //  console.log("totals", totals)
-	console.log("keys", Object.keys(totals))
-    let ids = Object.keys(totals);
-    const smallest = Math.min.apply(null, ids.map(x => totals[x]));
-    let result = ids.reduce((result, key) => { if (totals[key] === smallest){ result.push(key); } return result; }, []);
-    //Object.keys(totals).forEach(topicId => {
-        ///if (totals[topicId] < minScore) {
-          //  minScore = totals[topicId];
-        //  minId = topicId;
-      //  }
-    //});
-	console.log("minimum scored topics", result)
-    let minId = result[Math.floor(Math.random() * result.length)]
+    let minId = null;
+    Object.keys(totals).forEach(topicId => {
+        if (totals[topicId] < minScore) {
+            minScore = totals[topicId];
+            minId = topicId;
+        }
+    });
+
     group.taskData.topic = topics[minId.toString()];
     group.markModified("members");
     group.markModified("taskData");

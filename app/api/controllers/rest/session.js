@@ -5,7 +5,7 @@ const session = require('../../../services/session');
 const resolve = function(req, res, promise, errorMessage) {
     promise
         .then((data) => {
-		console.log("post data", data);
+	
             res.status(200).json({
                 error: false,
                 results: data

@@ -18,8 +18,8 @@ Object.keys(topics).forEach((index) => {
 function sampleTopics(n) {
     let validTopics = underscore.omit(topics, '0');
     let samples = utils.sample(validTopics, n);
-    console.log("topicSize",n)	
-	console.log("sample", samples)
+  //  console.log("topicSize",n)	
+//	console.log("sample", samples)
     samples[1] = topics[0];
     return samples;
 }
@@ -147,7 +147,7 @@ async function setGroupTopic(userId) {
     let minScore = Infinity;
 //    let minId = null;
   //  console.log("totals", totals)
-	console.log("keys", Object.keys(totals))
+//	console.log("keys", Object.keys(totals))
     let ids = Object.keys(totals);
     const smallest = Math.min.apply(null, ids.map(x => totals[x]));
     let result = ids.reduce((result, key) => { if (totals[key] === smallest){ result.push(key); } return result; }, []);
@@ -157,7 +157,7 @@ async function setGroupTopic(userId) {
         //  minId = topicId;
       //  }
     //});
-	console.log("minimum scored topics", result)
+//	console.log("minimum scored topics", result)
     let minId = result[Math.floor(Math.random() * result.length)]
     group.taskData.topic = topics[minId.toString()];
     group.markModified("members");

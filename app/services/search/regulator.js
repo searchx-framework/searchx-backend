@@ -18,13 +18,10 @@ const viewedResults = require('./viewedResults');
  */
 exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     // Convert falsy string to false boolean for cleaner if statements below.
-    if (relevanceFeedback === 'false') {
         relevanceFeedback = false;
-    }
-    if (distributionOfLabour === 'false') {
         distributionOfLabour = false;
-    }
-    checkStringValues(relevanceFeedback, distributionOfLabour);
+    
+    
 
     const resultPerPageCount = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
     const bookmarks = await bookmark.getBookmarks(sessionId);
@@ -63,7 +60,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     // whether previous pages contain results the user has not yet seen, we also need to fetch the results for all
     // lower page numbers.
     const resultCount = resultPerPageCount * pageNumber + collapsibleIds.length;
-    const response = await provider.fetch(providerName, query, vertical, 1, resultCount, relevanceFeedbackIds);
+    const response = await provider.fetch(providerName, query, vertical, pageNumber, resultPerPageCount, relevanceFeedbackIds);
     const matches = response.matches;
     const allResults = response.results;
 

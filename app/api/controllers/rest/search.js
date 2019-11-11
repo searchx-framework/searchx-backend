@@ -13,12 +13,12 @@ exports.search = function(req, res) {
     const pageNumber = parseInt(req.query.page) || 1;
     const providerName = req.query.providerName || process.env.DEFAULT_SEARCH_PROVIDER;
     let relevanceFeedback = req.query.relevanceFeedback || 'shared';
-    let distributionOfLabour = req.query.distributionOfLabour || 'unbookmarkedSoft';
+    let distributionOfLabour = req.query.distributionOfLabour || 'false';
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {
             // TODO: enable page scraping for providers that need it
-            // scrap.scrapPage(data.results);
+            scrap.scrapPage(data.results);
             res.status(200).json(data);
         })
         .catch(err => handleError(err));

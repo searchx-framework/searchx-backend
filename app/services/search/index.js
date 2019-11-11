@@ -25,6 +25,7 @@ exports.search = async function (query, vertical, pageNumber, sessionId, userId,
     const date = new Date();
     const data = await regulator.fetch(...arguments);
     data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
+// console.log("services index",data)
     data.results = await addMetadata(data.results, sessionId, userId);
     return data;
 };

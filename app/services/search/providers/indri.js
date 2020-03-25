@@ -1,6 +1,6 @@
 'use strict';
 
-const index_path = "/Users/felipemoraes/Developer/data/Aquaint-Index/";
+const index_path = process.env.INDRI_INDEX;
 let indri_searcher, indri_reader;
 try {
     const indri = require('../../../../lib/node-indri/node-indri');
@@ -29,7 +29,7 @@ try {
 }
 
 const verticals = [
-    'AQUAINT'
+    'AQUAINT', 'CW12B'
 ];
 
 /**

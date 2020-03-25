@@ -37,6 +37,9 @@ exports.getUserData = async function(userId, taskId) {
     return null;
 };
 
+exports.postUserTask = async function(userId, taskId, data) {
+    return task(taskId).postUserTask(userId, data);
+};
 exports.handleSyncSubmit = async function(userId, taskId, data) {
     return task(taskId).handleSyncSubmit(userId, data);
 };

@@ -18,7 +18,6 @@ Object.keys(topics).forEach((index) => {
 function sampleTopics(n) {
     let validTopics = underscore.omit(topics, '0');
     let samples = utils.sample(validTopics, n);
-
     samples[1] = topics[0];
     return samples;
 }
@@ -79,7 +78,6 @@ exports.getUserTask = async function(userId, params) {
 function getScoresFromResults(results) {
     function formatScores(scores) {
         return Object.keys(scores)
-            .filter((key) => key !== '0')
             .map(key => {
                 return {
                     topicId: key,
@@ -97,7 +95,6 @@ function getScoresFromResults(results) {
             scores[v[1]] += parseInt(results[result]);
         }
     });
-
     return formatScores(scores);
 }
 
@@ -146,13 +143,17 @@ async function setGroupTopic(userId) {
 
     let minScore = Infinity;
     let minId = null;
+    let ids = Object.keys(totals);
+    const smallest = Math.min.apply(null, ids.map(x => totals[x]));
+    let result = ids.reduce((result, key) => { if (totals[key] === smallest){ result.push(key); } return result; }, []);
     Object.keys(totals).forEach(topicId => {
         if (totals[topicId] < minScore) {
-            minScore = totals[topicId];
-            minId = topicId;
-        }
+           minScore = totals[topicId];
+         minId = topicId;
+       }
     });
 
+    let minId = result[Math.floor(Math.random() * result.length)]
     group.taskData.topic = topics[minId.toString()];
     group.markModified("members");
     group.markModified("taskData");
@@ -180,3 +181,22 @@ exports.handleSyncLeave = async function(userId) {
     group.markModified('taskData');
     await group.save();
 };
+
+
+exports.postUserTask = async function(userId, data) {
+    let group = await helper.getGroupByUserId(userId, TASK_ID);
+    if (group !== null) {
+       return group;
+    }
+
+    const groupSize = parseInt(params.groupSize);
+    const topicsSize = parseInt(params.topicsSize);
+    group = await getAvailableGroup(groupSize, topicsSize);
+    group.members.push(helper.initializeMember(userId, {}));
+    group.taskData.nMembers = group.members.length;
+
+    await savePretestResults(userId, data);
+    return await setGroupTopic(userId);
+};
+
+

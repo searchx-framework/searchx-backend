@@ -52,6 +52,7 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
             if (error) return reject(error);
             resolve(formatResults(results));
         };
+        query = escape(query);
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
         indri_searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
     });
@@ -87,4 +88,11 @@ function formatResult(result) {
         snippet: result.snippet,
         text: result.fields.text
     }
+}
+
+
+function escape(query) {
+    query = query.replace(/\(|\)|\'|\"|\`\$/g, '');
+    query = query.replace(/\.|\:|\t|\/|\&|\,|\-|\?|\+|\+|\;|\<|\>|\%|\@|\\|\*/g, ' ');
+    return query;
 }

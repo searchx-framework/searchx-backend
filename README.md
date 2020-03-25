@@ -92,11 +92,13 @@ Once you have a Bing API key, you can paste it into your `.env` file under the k
 ```
 // Search
 [address]/v1/search/[vertical]/?query=[query]&page=[pageNumber]&provider=[provider]
-- address: address set in the configuration file
+- address: address set in the configuration file (testUrl:PORT)
 - vertical: search vertical to use, as specified by search provider, eg. (web, images, videos, news) for bing
+- userId: the identifier for the user that is issuing this API call
+- sessionId: the identifier for the session that the this API call belongs to
 - query: query string
 - page: page number
-- provider [optional]: the search provider to use (elasticsearch, indri, bing)
+- providerName [optional]: the search provider to use (elasticsearch, indri, bing), defaults to DEFAULT_SEARCH_PROVIDER if unset
 - relevanceFeedback [optional, false by default]: whether to use relevance feedback (false, individual, shared)
 - distributionOfLabour [optional, false by default]: whether to use distribution of labour (false, unbookmarkedSoft, unbookmarkedOnly)
 ```
@@ -117,8 +119,7 @@ module.exports = {
     testDb: 'mongodb://localhost/searchx-test',
     testUrl: 'http://localhost',
     cacheFreshness: 3600,
-    scrapFreshness: 60 * 60 * 24,
-    defaultProvider: 'elasticsearch',
+    scrapFreshness: 60 * 60 * 24
 };
 ```
 
@@ -238,5 +239,42 @@ If you use SearchX to produce results for your scientific publication, please re
   year={2018}
 }
 ```
+
+
+### Publications
+
+    @article{moraes2019impact,
+      title={On the impact of group size on collaborative search effectiveness},
+      author={Moraes, Felipe and Grashoff, Kilian and Hauff, Claudia},
+      journal={Information Retrieval Journal},
+      pages={1--23},
+      year={2019},
+      publisher={Springer}
+    }
+    
+    
+    @inproceedings{moraes2019node,
+        title={node-indri: moving the Indri toolkit to the modern Web stack},
+        author={Moraes, Felipe and Hauff, Claudia},
+        booktitle={ECIR},
+        pages={241--245},
+        year={2019}
+    }
+
+    @inproceedings{moraes2018contrasting,
+      title={Contrasting Search as a Learning Activity with Instructor-designed Learning},
+      author={Moraes, Felipe and Putra, Sindunuraga Rikarno and Hauff, Claudia},
+      booktitle={CIKM},
+      pages={167--176},
+      year={2018}
+    }
+    
+    @inproceedings{putra2018development,
+        title={On the Development of a Collaborative Search System},
+        author={Putra, Sindunuraga Rikarno and Grashoff, Kilian and Moraes, Felipe and Hauff, Claudia},
+        booktitle={DESIRES},
+        pages={76--82},
+        year={2018}
+    }
 # License
 [MIT](https://opensource.org/licenses/MIT) License

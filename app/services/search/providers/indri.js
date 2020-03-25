@@ -1,6 +1,6 @@
 'use strict';
 
-const index_path = "data/Aquaint-Index/";
+const index_path = "/Users/felipemoraes/Developer/data/Aquaint-Index/";
 let indri_searcher, indri_reader;
 try {
     const indri = require('../../../../lib/node-indri/node-indri');
@@ -96,30 +96,3 @@ function escape(query) {
     query = query.replace(/\.|\:|\t|\/|\&|\,|\-|\?|\+|\+|\;|\<|\>|\%|\@|\\|\*/g, ' ');
     return query;
 }
-
-
-// def escape(input):
-//     return input.translate({
-//         ord('('): None,
-//         ord(')'): None,
-//         ord('\''): None,
-//         ord('\"'): None,
-//         ord('.'): ' ',
-//         ord(':'): ' ',
-//         ord('\t'): ' ',
-//         ord('/'): ' ',
-//         ord('&'): ' ',
-//         ord(','): ' ',
-//         ord('-'): ' ',
-//         ord('?'): ' ',
-//         ord('+'): ' ',
-//         ord(';'): ' ',
-//         ord('`'): None,
-//         ord('$'): None,
-//         ord('<'): ' ',
-//         ord('>'): ' ',
-//         ord('%'): ' ',
-//         ord('@'): ' ',
-//         ord('\\'): ' ',
-//         ord('*'): ' ',
-//     })

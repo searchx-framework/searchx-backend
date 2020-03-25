@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "./node_modules/.bin/nf start",
-    "start-dev" : "node_modules/.bin/nodemon --exec 'npm start -s'",
+    "start-dev": "node_modules/.bin/nodemon --exec 'npm start -s'",
     "test": "./node_modules/.bin/mocha --timeout 15000 --exit",
     "coverage": "./node_modules/.bin/nyc cover _mocha -- -R spec"
   },

@@ -1,6 +1,6 @@
 'use strict';
 
-const index_path = "/data2/index-clueweb12-catB";
+const index_path = "data/Aquaint-Index/";
 let indri_searcher, indri_reader;
 try {
     const indri = require('../../../../lib/node-indri/node-indri');
@@ -52,6 +52,7 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
             if (error) return reject(error);
             resolve(formatResults(results));
         };
+        query = escape(query);
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
         indri_searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
     });
@@ -88,3 +89,37 @@ function formatResult(result) {
         text: result.fields.text
     }
 }
+
+
+function escape(query) {
+    query = query.replace(/\(|\)|\'|\"|\`\$/g, '');
+    query = query.replace(/\.|\:|\t|\/|\&|\,|\-|\?|\+|\+|\;|\<|\>|\%|\@|\\|\*/g, ' ');
+    return query;
+}
+
+
+// def escape(input):
+//     return input.translate({
+//         ord('('): None,
+//         ord(')'): None,
+//         ord('\''): None,
+//         ord('\"'): None,
+//         ord('.'): ' ',
+//         ord(':'): ' ',
+//         ord('\t'): ' ',
+//         ord('/'): ' ',
+//         ord('&'): ' ',
+//         ord(','): ' ',
+//         ord('-'): ' ',
+//         ord('?'): ' ',
+//         ord('+'): ' ',
+//         ord(';'): ' ',
+//         ord('`'): None,
+//         ord('$'): None,
+//         ord('<'): ' ',
+//         ord('>'): ' ',
+//         ord('%'): ' ',
+//         ord('@'): ' ',
+//         ord('\\'): ' ',
+//         ord('*'): ' ',
+//     })

@@ -1,8 +1,6 @@
 'use strict';
 
-let request = require ('request');
-
-let subscriptionKey = process.env.BING_ACCESS_KEY;
+const request = require ('request');
 
 let host = 'https://api.cognitive.microsoft.com';
 let path = '/bing/v7.0/Suggestions';
@@ -18,7 +16,7 @@ exports.fetch = function(query){
         let request_params = {
             url : host + path + params,
             headers : {
-            'Ocp-Apim-Subscription-Key' : subscriptionKey,
+            'Ocp-Apim-Subscription-Key' : process.env.BING_ACCESS_KEY,
             }
         }
 

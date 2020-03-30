@@ -153,7 +153,7 @@ async function setGroupTopic(userId) {
        }
     });
 
-    let minId = result[Math.floor(Math.random() * result.length)]
+    
     group.taskData.topic = topics[minId.toString()];
     group.markModified("members");
     group.markModified("taskData");

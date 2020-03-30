@@ -19,6 +19,7 @@
     "foreman": "^3.0.1",
     "forever": "^2.0.0",
     "kue": "^0.11.6",
+    "mathjs": "^6.6.1",
     "mongoose": "^5.8.5",
     "newrelic": "^6.2.0",
     "node-bing-api": "^4.0.1",
@@ -27,6 +28,7 @@
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "socket.io": "^2.3.0",
+    "trie-search": "^1.2.11",
     "underscore": "^1.9.2"
   },
   "devDependencies": {

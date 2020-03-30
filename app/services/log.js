@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const Log = mongoose.model('Log');
-const sensemaking = require('./sensemaking');
 
 exports.insertLogs = async function(userId, queue) {
     
@@ -14,8 +13,6 @@ exports.insertLogs = async function(userId, queue) {
             if (!('date' in event)) event.date = new Date();
             return event;
         });
-
-    sensemaking.handleUserLogs(queue);
     
     return Log.insertMany(queue);
 };

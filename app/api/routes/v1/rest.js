@@ -4,7 +4,7 @@ const LogCtrl         = require('../../controllers/rest/log');
 const SearchCtrl      = require('../../controllers/rest/search');
 const FeatureCtrl     = require('../../controllers/rest/feature');
 const SessionCtrl     = require('../../controllers/rest/session');
-const SensemakingCtrl = require('../../controllers/rest/sensemaking');
+const SuggestionsCtrl = require('../../controllers/rest/suggestions');
 
 module.exports = function(router) {
     router.use(function(req, res, next) {
@@ -16,8 +16,8 @@ module.exports = function(router) {
     router.get('/search/:vertical', SearchCtrl.search);
     router.get('/search/:vertical/getById/:id', SearchCtrl.getById);
 
-    // Sensemaking
-    router.get('/sensemaking/scent', SensemakingCtrl.scent);
+    // Suggestions
+    router.get('/suggestions', SuggestionsCtrl.suggestions);
 
     // User
     router.get('/users/:userId/task/:task', SessionCtrl.getUserTask);

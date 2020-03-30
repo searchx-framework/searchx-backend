@@ -6,7 +6,8 @@ const bookmark = require('../features/bookmark');
 const annotation = require('../features/annotation');
 const rating = require('../features/rating');
 const view = require('../features/view');
-
+const cache = require('./cache');
+const config = require('../../config/config');
 
 /*
  * Fetches search results from the regulator and processes them to include metadata
@@ -25,8 +26,12 @@ exports.search = async function (query, vertical, pageNumber, sessionId, userId,
     const date = new Date();
     const data = await regulator.fetch(...arguments);
     data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();
-// console.log("services index",data)
     data.results = await addMetadata(data.results, sessionId, userId);
+    data.sessionId = sessionId;
+    data.userId = userId;
+    if (config.enableCache) {
+        cache.addSearchResultsToCache(query, vertical, pageNumber, date, data, providerName);
+    }
     return data;
 };
 

@@ -17,8 +17,9 @@ exports.search = function(req, res) {
 
     search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {
-            // TODO: enable page scraping for providers that need it
-            scrap.scrapPage(data.results);
+            if (config.enableScrap) {
+                scrap.scrapPage(data.results);
+            }
             res.status(200).json(data);
         })
         .catch(err => handleError(err));

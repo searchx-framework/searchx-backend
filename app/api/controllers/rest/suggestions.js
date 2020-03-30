@@ -1,16 +1,14 @@
 'use strict';
-const sensemaking = require('../../../services/sensemaking');
 
-exports.scent = function(req, res) {
+const suggestions = require('../../../services/suggestions');
+
+exports.suggestions = function(req, res) {
     const userId = req.query.userId || '';
     const sessionId = req.query.sessionId || '';
 
     const query = req.query.query || '';
-    const scentType = req.query.type || 'noscent';
 
-    const providerName = "indri";
-
-    sensemaking.informationScent(query, sessionId, userId, providerName, scentType)
+    suggestions.getQuerySuggestions(query, sessionId, userId)
     .then((data) => {
         res.status(200).json(data);
     })

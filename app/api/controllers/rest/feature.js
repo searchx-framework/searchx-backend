@@ -4,6 +4,7 @@ const queryhistory = require('../../../services/features/queryhistory');
 const bookmark = require('../../../services/features/bookmark');
 const annotation = require('../../../services/features/annotation');
 const rating = require('../../../services/features/rating');
+const chat = require('../../../services/features/chat')
 
 const resolve = function(req, res, promise, errorMessage) {
     promise
@@ -142,6 +143,26 @@ exports.submitRating = function(req, res) {
     const data = req.body;
     resolve(req, res,
         rating.submitRating(sessionId, data),
+        'Could not save rating data.'
+    );
+};
+
+
+//// CHAT
+
+exports.getChatMessageList = function(req, res) {
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        chat.getChatMessageList(sessionId),
+        'Could not get ratings.'
+    );
+};
+
+exports.addChatMessage = function(req, res) {
+    const sessionId = req.params.sessionId;
+    const data = req.body;
+    resolve(req, res,
+        chat.addChatMessage(sessionId, data),
         'Could not save rating data.'
     );
 };

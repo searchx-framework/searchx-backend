@@ -43,6 +43,7 @@ module.exports = function(io) {
         socket.on('pushSearchState', (data) => FeatureCtrl.broadcastSearchState(socket, gio, data));
         socket.on('pushViewState', (data) => FeatureCtrl.broadcastViewState(socket, gio, data));
         socket.on('pushBookmarkUpdate', (data) => FeatureCtrl.broadcastBookmarkUpdate(socket, gio, data));
+        socket.on('pushChatUpdate', (data) => FeatureCtrl.broadcastChatUpdate(socket, gio, data));
         socket.on('pushPageMetadataUpdate', (data) => FeatureCtrl.broadcastPageMetadataUpdate(socket, gio, data));
 
         // Pretest

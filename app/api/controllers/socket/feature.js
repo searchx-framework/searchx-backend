@@ -19,6 +19,10 @@ exports.broadcastBookmarkUpdate = async function(socket, io, data) {
     socket.broadcast.to(data.groupId).emit('bookmarkUpdate', data.searchState);
 };
 
+exports.broadcastChatUpdate = async function(socket, io, data) {
+    socket.broadcast.to(data.groupId).emit('chatUpdate', data);
+};
+
 exports.broadcastPageMetadataUpdate = async function(socket, io, data) {
     socket.broadcast.to(data.groupId).emit('pageMetadataUpdate', data);
 };

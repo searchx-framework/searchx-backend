@@ -49,12 +49,21 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
 
     return new Promise(function (resolve, reject) {
         const callback = function (error, results) {
-            if (error) return reject(error);
-            resolve(formatResults(results));
+            if (error) {
+                console.log(error)
+                return reject(error);
+            } else {
+                resolve(formatResults(results));
+            }
         };
         query = escape(query);
         relevanceFeedbackDocuments = relevanceFeedbackDocuments.map(string => parseInt(string));
-        indri_searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
+        try {
+            indri_searcher.search(query, pageNumber, resultsPerPage, relevanceFeedbackDocuments, callback);
+        } catch (err){
+            console.log(error);
+            reject(error);
+        }
     });
 };
 

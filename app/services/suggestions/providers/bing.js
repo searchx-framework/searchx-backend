@@ -22,6 +22,7 @@ exports.fetch = function(query){
 
         const callback = function (err, resp, body) {
             if (err) {
+                console.log(err);
                 reject(err);
             } else {
                 resolve(formatResults(JSON.parse(body)));

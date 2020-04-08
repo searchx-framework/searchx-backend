@@ -51,12 +51,3 @@ exports.getUserData = function(req, res) {
         'User not found.'
     );
 };
-
-
-exports.getUserGroup = function(req, res) {
-    const userId = req.params.userId;
-    resolve(req, res,
-        session.getUserGroup(userId),
-        'Could not get user group.'
-    );
-};

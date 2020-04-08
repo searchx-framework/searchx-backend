@@ -30,6 +30,7 @@ exports.getUserTask = function(req, res) {
     );
 };
 
+
 exports.postUserTask = function(req, res) {
     const userId = req.params.userId;
     const task = req.params.task;
@@ -48,5 +49,14 @@ exports.getUserData = function(req, res) {
     resolve(req, res,
         session.getUserData(userId, task),
         'User not found.'
+    );
+};
+
+
+exports.getUserGroup = function(req, res) {
+    const userId = req.params.userId;
+    resolve(req, res,
+        session.getUserGroup(userId),
+        'Could not get user group.'
     );
 };

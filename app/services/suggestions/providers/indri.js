@@ -1,16 +1,16 @@
 'use strict';
 
 const TrieSearch = require('trie-search');
-const fs = require('fs');
 
-let ts = new TrieSearch(null, {cache: true, min: 3});
+let ts = null;
 
-if (process.env.SUGGESTIONS_TYPE == "indri") {
-    const ngrams = require(process.env.INDRI_NGRAM_FILE);
-    ts.addFromObject(ngrams);
-}
 
 exports.fetch = function(query){
+    if (ts === null) {
+        const ngrams = require(process.env.INDRI_NGRAM_FILE);
+        ts = new TrieSearch(null, {cache: true, min: 3});
+        ts.addFromObject(ngrams);
+    }
 
     return new Promise ( (resolve, reject) => {
         let results = ts.get(query).filter((x) => x._key_.startsWith(query));

@@ -6,7 +6,6 @@ const SessionCtrl = require('../../controllers/socket/session');
 module.exports = function(io) {
     const gio = io.of('/session');
     gio.on('connection', (socket) => {
-
         // Register
         socket.on('register', async (data) => {
             console.log('user connected: ' + data.userId);
@@ -52,7 +51,12 @@ module.exports = function(io) {
         // Task exceptions
         socket.on('pushSyncLeave', async (data) => {
             console.log('user left: ' + data.userId);
+            socket.leave(data.groupId);
             return await SessionCtrl.handleSyncLeave(socket, gio, data)
+        });
+        socket.on('pushSyncLeaveGroup', async (data) => {
+            console.log('user left previour group: ' + data.userId);
+            socket.leave(data.groupId);
         });
         socket.on('pushSyncTimeout', async (data) => {
             if (data.groupId) {

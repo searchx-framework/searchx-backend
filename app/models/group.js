@@ -18,6 +18,10 @@ const GroupSchema = new Schema({
     },
     taskData: {
         type: Schema.Types.Mixed
+    },
+    status: {
+        type: String,
+        default: "forming"
     }
 }, {minimize: false});
 

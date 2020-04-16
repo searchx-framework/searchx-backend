@@ -8,7 +8,7 @@ const Group = mongoose.model('Group');
 const helper = require('../groupHelper');
 const utils = require("../../../utils");
 
-const topics = require('./data/pilot-topics.json');
+const topics = require('./data/robust-topics.json');
 Object.keys(topics).forEach((index) => {
     topics[index].id = index;
 });
@@ -56,6 +56,7 @@ exports.getUserTask = async function(userId, params) {
     await group.save();
 
     group = await setGroupTopic(group);
+    group.isCompleted = true;
     return group;
 };
 
@@ -79,17 +80,25 @@ exports.handleSyncTimeout = async function(userId) {
         return null;
     }
     let newGroup = undefined;
+    let newUser = undefined;
     const initialSize = oldGroup.members.length;
+    const oldSize = oldGroup.taskData.size;
     if (initialSize === 3 || initialSize === 5) {
-        oldGroup.members = oldGroup.members.filter(x => x.userId !== userId);
+        let sortedGroupMembers = oldGroup.members
+        .sort((a, b) => (a.joined > b.joined) ? 1 : -1);
+        newUser = sortedGroupMembers[initialSize-1].userId
+        oldGroup.members = sortedGroupMembers.slice(0, initialSize-1);
         await _updateGroupSize(oldGroup);
-        newGroup = await exports.getUserTask(userId, {groupSize: 1});
+        newGroup = await exports.getUserTask(newUser, {groupSize: oldSize});
     } else {
         await _updateGroupSize(oldGroup);
     }
 
     oldGroup = await setGroupTopic(oldGroup);
-    return {oldGroup: oldGroup, newGroup: newGroup};
+    oldGroup = JSON.parse(JSON.stringify(oldGroup));
+    oldGroup.newGroup = newGroup;
+    oldGroup.newUser = newUser;
+    return oldGroup;
 };
 
 async function _updateGroupSize(group) {
@@ -127,6 +136,8 @@ async function setGroupTopic(group) {
     for (let i = 0; i < group.members.length; i++) {
         group.members[i].role = roles[i];
     }
+    group.status = "formed";
+    group.markModified("status");
     group.markModified("members");
     group.markModified("taskData");
     await group.save();

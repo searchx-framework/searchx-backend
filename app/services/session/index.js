@@ -8,7 +8,9 @@ const roleBased = require('./tasks/roleBased');
 const helper = require('./groupHelper');
 
 function task(taskId) {
+    console.log(taskId)
     switch (taskId) {
+        
         case "example-group-sync":
             return exampleGroupSync;
         case "example-group-async":

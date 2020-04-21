@@ -125,6 +125,17 @@ const ViewSchema = new Schema({
     },
 });
 
+const PopularQuerySchema = new Schema({
+    _id : {
+        type: String,
+        required: true
+    },
+    count: {
+        type: Number,
+        required: true
+    }
+});
+
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
@@ -132,4 +143,5 @@ module.exports = {
     Annotation: mongoose.model('Annotation', AnnotationSchema),
     Rating: mongoose.model('Rating', RatingSchema),
     View: mongoose.model('View', ViewSchema),
+    PopularQuery : mongoose.model('PopularQuery', PopularQuerySchema)
 };

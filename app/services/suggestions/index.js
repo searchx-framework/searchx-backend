@@ -12,7 +12,7 @@ exports.getQuerySuggestions = async function(query, sessionId, userId) {
         case "bing":
             return await bing.fetch(query);
         case "indri":
-            return await indri.fetch(query);
+            return await indri.fetch(escape(query.toLowerCase()));
         default:
             throw {
                 name: "Bad Request",
@@ -20,3 +20,10 @@ exports.getQuerySuggestions = async function(query, sessionId, userId) {
             };
     }
 };
+
+
+function escape(query) {
+    query = query.replace(/\(|\)|\'|\"|\`\$/g, '');
+    query = query.replace(/\.|\:|\t|\/|\&|\,|\-|\?|\+|\+|\;|\<|\>|\%|\@|\\|\*/g, ' ');
+    return query;
+}

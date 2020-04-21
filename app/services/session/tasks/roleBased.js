@@ -5,6 +5,7 @@ const TASK_ID = "role-based";
 const _ = require('underscore');
 const mongoose = require('mongoose');
 const Group = mongoose.model('Group');
+const TopicOrder = mongoose.model('TopicOrder');
 const helper = require('../groupHelper');
 const utils = require("../../../utils");
 
@@ -130,9 +131,16 @@ async function setGroupTopic(group) {
     for (let step = 0; step < group.taskData.size/2; step++) {
         roles.push("prospector");
     }
+    if (group.taskData.size === 1) {
+        roles = [];
+        roles.push("single");
+    }
     roles = _.shuffle(roles);
-    // assign random topic
-    group.taskData.topics = _.shuffle(topics);
+    let order = await TopicOrder.findOne({groupSize: group.taskData.size }).sort({count: 1});
+    group.taskData.topics = order.topics;
+    order.count = order.count + 1;
+    order.markModified("count");
+    await order.save();
     for (let i = 0; i < group.members.length; i++) {
         group.members[i].role = roles[i];
     }

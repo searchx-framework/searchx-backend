@@ -25,4 +25,23 @@ const GroupSchema = new Schema({
     }
 }, {minimize: false});
 
-module.exports = mongoose.model('Group', GroupSchema);
+
+const TopicOrderSchema = new Schema({
+    topics: {
+        type: [Schema.Types.Mixed],
+        default: []
+    },
+    groupSize: {
+        type: Number,
+        required: true
+    },
+    count: {
+        type: Number
+    }
+}, {minimize: false});
+
+
+module.exports = {
+    Group:  mongoose.model('Group', GroupSchema),
+    TopicOrder : mongoose.model('TopicOrder', TopicOrderSchema)
+}

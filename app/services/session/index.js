@@ -3,6 +3,7 @@
 const exampleGroupSync = require('./tasks/exampleGroupSync');
 const exampleGroupAsync = require('./tasks/exampleGroupAsync');
 const trecCovidNoSearch = require('./tasks/trecCovidNoSearch');
+const trecCovidSearch = require('./tasks/trecCovidSearch');
 const algorithmicMediationPilot = require('./tasks/algorithmicMediationPilot');
 const roleBased = require('./tasks/roleBased');
 const helper = require('./groupHelper');
@@ -19,6 +20,8 @@ function task(taskId) {
             return algorithmicMediationPilot;
         case "trec-covid-no-search":
             return trecCovidNoSearch;
+        case "trec-covid-search":
+            return trecCovidSearch;
         case "role-based":
             return roleBased;
         default:

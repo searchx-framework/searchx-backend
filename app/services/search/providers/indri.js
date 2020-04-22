@@ -6,7 +6,7 @@ try {
     const indri = require('../../../../lib/node-indri/node-indri');
     indri_searcher = new indri.Searcher({
         "index": index_path,
-        "rules": "rules", // method:dirichlet,mu:2500
+        "rules": "method:dirichlet,mu:2500", // 0.2124
         "fbTerms": 10,
         "fbMu": 0,
         "includeFields": {

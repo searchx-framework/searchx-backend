@@ -3,12 +3,14 @@
 const bing = require('./providers/bing');
 const elasticsearch = require('./providers/elasticsearch');
 const indri = require('./providers/indri');
+const covidex = require('./providers/covidex');
 
 // mapping of providerName to search provider module
 const providers = {
     'bing': bing,
     'elasticsearch': elasticsearch,
-    'indri': indri
+    'indri': indri,
+    'covidex' : covidex
 };
 
 /*

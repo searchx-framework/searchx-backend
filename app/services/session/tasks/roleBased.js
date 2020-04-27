@@ -136,8 +136,8 @@ async function setGroupTopic(group) {
         roles.push("single");
     }
     roles = _.shuffle(roles);
-    let order = await TopicOrder.findOne({groupSize: group.taskData.size }).sort({count: 1});
-    group.taskData.topics = order.topics;
+    let orders = await TopicOrder.find({groupSize: group.taskData.size }).sort({count: 1});
+    group.taskData.topics = orders[0].topics;
     order.count = order.count + 1;
     order.markModified("count");
     await order.save();

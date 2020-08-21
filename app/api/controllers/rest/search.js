@@ -5,17 +5,18 @@ const scrap = require('../../../services/scrap');
 const config = require('../../../config/config');
 
 exports.search = function(req, res) {
-    const userId = req.query.userId || '';
-    const sessionId = req.query.sessionId || '';
+    const userId = req.body.userId || '';
+    const sessionId = req.body.sessionId || '';
 
     const query = req.query.query || '';
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
+    const filters = req.body.filters || [];
     const providerName = req.query.providerName || process.env.DEFAULT_SEARCH_PROVIDER;
     let relevanceFeedback = req.query.relevanceFeedback || 'shared';
     let distributionOfLabour = req.query.distributionOfLabour || 'false';
 
-    search.search(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
+    search.search(query, vertical, filters, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
         .then((data) => {
             if (config.enableScrap) {
                 scrap.scrapPage(data.results);

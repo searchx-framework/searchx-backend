@@ -123,13 +123,13 @@ async function setGroupTopic(group) {
     if (!membersComplete) {
         return group;
     }
-
+    console.log(group);
     let roles = [];
     for (let step = 0; step < group.taskData.size/2; step++) {
-        roles.push("miner");
+        roles.push("none");
     }
     for (let step = 0; step < group.taskData.size/2; step++) {
-        roles.push("prospector");
+        roles.push("none");
     }
     if (group.taskData.size === 1) {
         roles = [];
@@ -137,10 +137,11 @@ async function setGroupTopic(group) {
     }
     roles = _.shuffle(roles);
     let orders = await TopicOrder.find({groupSize: group.taskData.size }).sort({count: 1});
+    console.log()
     group.taskData.topics = orders[0].topics;
-    order.count = order.count + 1;
-    order.markModified("count");
-    await order.save();
+    orders[0].count = orders[0].count + 1;
+    orders[0].markModified("count");
+    await orders[0].save();
     for (let i = 0; i < group.members.length; i++) {
         group.members[i].role = roles[i];
     }

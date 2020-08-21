@@ -9,7 +9,7 @@ const BingApi = require('node-bing-api')({
 /**
  * Fetch data from bing and return formatted results.
  */
-exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
+exports.fetch = function (query, vertical, filters, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     return new Promise(function (resolve, reject) {
         const callback = function (err, res, body) {
             if (err) return reject(err);

@@ -22,7 +22,7 @@ const config = require('../../config/config');
  * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false,
  *         unbookmarkedSoft, unbookmarkedOnly)
  */
-exports.search = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+exports.search = async function (query, vertical, filters, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     const date = new Date();
     const data = await regulator.fetch(...arguments);
     data.id = query + '_' + pageNumber + '_' + vertical + '_' + date.getTime();

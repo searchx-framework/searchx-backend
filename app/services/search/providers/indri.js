@@ -7,8 +7,9 @@ try {
     indri_searcher = new indri.Searcher({
         "index": index_path,
         "rules": "method:dirichlet,mu:2500", // 0.2124
-        "fbTerms": 10,
+        "fbTerms": 5,
         "fbMu": 0,
+        "fbDocs" : 10,
         "includeFields": {
             "title": "title",
             "docno": "docno",
@@ -39,7 +40,7 @@ const verticals = [
  * @param pageNumber} - The number of the page of results to show (1-based indexing).
  * @param relevanceFeedbackDocuments - The set of documents to use for relevance feedback.
  */
-exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
+exports.fetch = function (query, vertical, filters, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
     if (!verticals.includes(vertical)) {
         throw {
             name: 'Bad Request',

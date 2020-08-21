@@ -16,14 +16,12 @@ const viewedResults = require('./viewedResults');
  * @param relevanceFeedback - String indicating what type of relevance feedback to use (false, individual, shared).
  * @param distributionOfLabour - String indicating what type of distribution of labour to use (false, unbookmarkedSoft, unbookmarkedOnly).
  */
-exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+exports.fetch = async function (query, vertical, filters, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
     // Convert falsy string to false boolean for cleaner if statements below.
         relevanceFeedback = false;
         distributionOfLabour = false;
-    
-    
 
-    const resultPerPageCount = (vertical === 'images' || vertical === 'videos') ? 12 : 10;
+    const resultPerPageCount = (vertical === 'web') ? 10 : 12;
     const bookmarks = await bookmark.getBookmarks(sessionId);
     const excludes = await bookmark.getBookmarks(sessionId, true);
     const userBookmarks = await bookmark.getUserBookmarks(sessionId, userId);
@@ -50,7 +48,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     }
 
     if (!distributionOfLabour) {
-        const response = await provider.fetch(providerName, query, vertical, pageNumber, resultPerPageCount, relevanceFeedbackIds);
+        const response = await provider.fetch(providerName, query, vertical, filters, pageNumber, resultPerPageCount, relevanceFeedbackIds);
         response.results = addMissingFields(response.results);
         return response;
     }
@@ -60,7 +58,7 @@ exports.fetch = async function (query, vertical, pageNumber, sessionId, userId, 
     // whether previous pages contain results the user has not yet seen, we also need to fetch the results for all
     // lower page numbers.
     const resultCount = resultPerPageCount * pageNumber + collapsibleIds.length;
-    const response = await provider.fetch(providerName, query, vertical, pageNumber, resultPerPageCount, relevanceFeedbackIds);
+    const response = await provider.fetch(providerName, query, vertical, filters, pageNumber, resultPerPageCount, relevanceFeedbackIds);
     const matches = response.matches;
     const allResults = response.results;
 

@@ -13,7 +13,7 @@ module.exports = function(router) {
     });
 
     // Search
-    router.get('/search/:vertical', SearchCtrl.search);
+    router.post('/search/:vertical', SearchCtrl.search);
     router.get('/search/:vertical/getById/:id', SearchCtrl.getById);
 
     // Suggestions

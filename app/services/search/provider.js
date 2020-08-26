@@ -39,6 +39,11 @@ exports.getById = function (id, providerName) {
     return providers[providerName].getById(id);
 };
 
+exports.fetchFacets = function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+    if (invalidProvider(providerName)) return invalidProvider(providerName);
+    return providers[providerName].fetchFacets(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour);
+};
+
 function invalidProvider(providerName) {
     if (providerName in providers) {
         return false;

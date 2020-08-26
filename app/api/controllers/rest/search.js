@@ -7,7 +7,6 @@ const config = require('../../../config/config');
 exports.search = function(req, res) {
     const userId = req.body.userId || '';
     const sessionId = req.body.sessionId || '';
-
     const query = req.query.query || '';
     const vertical = req.params.vertical;
     const pageNumber = parseInt(req.query.page) || 1;
@@ -21,6 +20,25 @@ exports.search = function(req, res) {
             if (config.enableScrap) {
                 scrap.scrapPage(data.results);
             }
+            res.status(200).json(data);
+        })
+        .catch(err => handleError(err));
+};
+
+
+exports.getFacets = function(req, res) {
+    const userId = req.body.userId || '';
+    const sessionId = req.body.sessionId || '';
+
+    const query = req.query.query || '';
+    const vertical = req.params.vertical;
+    const pageNumber = parseInt(req.query.page) || 1;
+    const providerName = req.query.providerName || process.env.DEFAULT_SEARCH_PROVIDER;
+    let relevanceFeedback = req.query.relevanceFeedback || 'shared';
+    let distributionOfLabour = req.query.distributionOfLabour || 'false';
+
+    search.fetchFacets(query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour)
+        .then((data) => {
             res.status(200).json(data);
         })
         .catch(err => handleError(err));

@@ -28,6 +28,9 @@ exports.formatHit = function (hit) {
 exports.formatAggregation = function (name, result) {
   let formatedAggregation = [];
   let aggregations = result[name];
+  if (aggregations.buckets.length === 0) {
+    return formatedAggregation;
+  }
   if (name === "Price Facet") {
     let bucketCount = 1;
     let sumDocCount = aggregations.buckets[0].doc_count;
@@ -64,7 +67,8 @@ exports.formatAggregation = function (name, result) {
   return formatedAggregation;
 }
 
-exports.getQuery = function (query, vertical, filters) {
+exports.getFacets = function (query) {
+
   let facets = {
     "Category Facet": {
       "terms": {
@@ -91,6 +95,56 @@ exports.getQuery = function (query, vertical, filters) {
       }
     }
   }
+
+  return { 
+    "size": 0,
+    "aggs": facets,
+    "query" : {
+        "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "fields": [
+                    "title^7",
+                    "description^2"
+                  ],
+                  "operator": "AND",
+                  "type": "best_fields",
+                  "query": query
+                }
+              }
+            ],
+        "should": [
+          {
+            "multi_match": {
+              "fields": [
+                "title^7",
+                "description^2"
+              ],
+              "operator": "OR",
+              "type": "best_fields",
+              "query": query
+            }
+          },
+          {
+            "multi_match": {
+              "fields": [
+                "title^7",
+                "description^2"
+              ],
+              "operator": "OR",
+              "type": "best_fields",
+              "query": query
+            }
+          }
+        ]
+      }
+    }
+  }
+
+}
+
+exports.getQuery = function (query, vertical, filters) {
 
   let filtered_query = []
   if ("price" in filters) {
@@ -140,9 +194,7 @@ exports.getQuery = function (query, vertical, filters) {
     })
   }
   return {
-    "aggs": facets,
     "query": {
-
       "function_score": {
         "query" : {
                     "bool": {

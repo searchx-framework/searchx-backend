@@ -49,6 +49,27 @@ exports.getById = async function(id, providerName) {
 
 
 /*
+ * Fetches search facets from the regulator and processes them to include metadata
+ *
+ * @params {query} the search query
+ * @params (vertical) type of search results (web, images, etc)
+ * @params {pageNumber} result pagination number
+ * @params {sessionId} session id of the user
+ * @params {userId} id of the user
+ * @params {providerName} the name of the search provider to use (indri by default)
+ * @params {relevanceFeedback} string indicating what type of relevance feedback to use (false, individual, shared)
+ * @params {distributionOfLabour} string indicating what type of distribution of labour to use (false,
+ *         unbookmarkedSoft, unbookmarkedOnly)
+ */
+exports.fetchFacets = async function (query, vertical, pageNumber, sessionId, userId, providerName, relevanceFeedback, distributionOfLabour) {
+    const data = await provider.fetchFacets(...arguments);
+    data.sessionId = sessionId;
+    data.userId = userId;
+    return data;
+};
+
+
+/*
  * Add metadata to search results
  *
  * @params {results} formatted query results from api

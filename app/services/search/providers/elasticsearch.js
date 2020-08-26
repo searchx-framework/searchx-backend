@@ -26,7 +26,7 @@ exports.fetch = function (query, vertical, filters, pageNumber, resultsPerPage, 
     }
     if (amazonCategories.includes(vertical)) {
         const dataset = verticals['shopping'];
-
+        
         return esClient.search({
             index: dataset.index,
             from: (pageNumber - 1) * resultsPerPage,
@@ -49,6 +49,36 @@ exports.fetch = function (query, vertical, filters, pageNumber, resultsPerPage, 
         message: 'Invalid vertical'
     });
 };
+
+/**
+ * Fetch data from elasticsearch and return formatted results.
+ */
+exports.fetchFacets = function (query, vertical, pageNumber, resultsPerPage, relevanceFeedbackDocuments) {
+    if (Array.isArray(relevanceFeedbackDocuments) && relevanceFeedbackDocuments.length > 0) {
+        return Promise.reject({name: 'Bad Request', message: 'The Elasticsearch search provider does not support relevance feedback, but got relevance feedback documents.'})
+    }
+    if (amazonCategories.includes(vertical)) {
+        const dataset = verticals['shopping'];
+        
+        return esClient.search({
+            index: dataset.index,
+            body: dataset.getFacets(query)
+            
+        }).then(formatAggregation('shopping'));
+    }
+    else if (vertical in verticals) {
+        const dataset = verticals[vertical];
+        return esClient.search({
+            index: dataset.index,
+            body: dataset.getFacets(query)
+            
+        }).then(formatResults(vertical));
+    } else return Promise.reject({
+        name: 'Bad Request',
+        message: 'Invalid vertical'
+    });
+};
+
 
 /**
  * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical.
@@ -77,6 +107,29 @@ function formatResults(vertical) {
         };
     }
 }
+
+/**
+ * Format the results returned by elasticsearch, using the dataset corresponding to the requested vertical.
+ */
+function formatAggregation(vertical) {
+    return function (result) {
+        const dataset = verticals[vertical];
+        if (!result.hits || result.hits.length === 0) {
+            throw new Error('No results from search api.');
+        }
+        let facets = [];
+        if (result.aggregations) {
+            facets = Object.keys(result.aggregations).map((key, index) => [key, dataset.formatAggregation(key, result.aggregations)]);
+            facets = facets.filter((data) => data[1].length > 0);
+            facets = facets.reduce((map, obj) => { map[obj[0]] = obj[1]; return map}, {})
+        }
+
+        return {
+            facets: facets,
+        };
+    }
+}
+
 
 
 exports.getById = function (id) {

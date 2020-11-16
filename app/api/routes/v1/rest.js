@@ -26,6 +26,9 @@ module.exports = function(router) {
     router.post('/users/:userId/logs', LogCtrl.insertLogs);
     router.post('/users/:userId/task/:task/topic', SessionCtrl.postUserTask);
 
+    // Group
+    router.post('/groups/task/:task', SessionCtrl.addGroup);
+
     // Feature
     router.get('/session/:sessionId/query', FeatureCtrl.getQueryHistory);
     router.get('/session/:sessionId/bookmark', FeatureCtrl.getBookmarks);

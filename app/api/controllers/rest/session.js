@@ -51,3 +51,12 @@ exports.getUserData = function(req, res) {
         'User not found.'
     );
 };
+
+exports.addGroup = function(req, res) {
+    const groupData = req.body;
+    const task = req.params.task;
+    resolve(req, res,
+        session.addGroup(task, groupData),
+        'Could not creat group.'
+    );
+};

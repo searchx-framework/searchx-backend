@@ -19,7 +19,6 @@ exports.getGroupByUserId = async function(userId, taskId) {
             }
         }
     };
-
     const group = await Group.find(query, {}, {sort: {created: -1}});
     if (group.length > 0) {
         const groupId = group[0]._id;

@@ -6,10 +6,10 @@ const trecCovidNoSearch = require('./tasks/trecCovidNoSearch');
 const trecCovidSearch = require('./tasks/trecCovidSearch');
 const algorithmicMediationPilot = require('./tasks/algorithmicMediationPilot');
 const roleBased = require('./tasks/roleBased');
+const ecommTask = require('./tasks/ecommTask');
 const helper = require('./groupHelper');
 
 function task(taskId) {
-    console.log(taskId)
     switch (taskId) {
         
         case "example-group-sync":
@@ -24,6 +24,8 @@ function task(taskId) {
             return trecCovidSearch;
         case "role-based":
             return roleBased;
+        case "ecomm":
+            return ecommTask;
         default:
             throw {
                 name: "Bad Request",
@@ -48,6 +50,11 @@ exports.getUserData = async function(userId, taskId) {
 exports.postUserTask = async function(userId, taskId, data) {
     return task(taskId).postUserTask(userId, data);
 };
+
+exports.addGroup = async function(taskId,groupData) {
+    return task(taskId).addGroup(groupData);
+};
+
 exports.handleSyncSubmit = async function(userId, taskId, data) {
     return task(taskId).handleSyncSubmit(userId, data);
 };

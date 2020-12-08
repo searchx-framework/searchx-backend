@@ -67,8 +67,14 @@ exports.formatAggregation = function (name, result) {
   return formatedAggregation;
 }
 
-exports.getFacets = function (query) {
-
+exports.getFacets = function (query, vertical) {
+  let filtered_query = []
+  if (vertical !== "All") {
+    let categories = vertical.replace("and", "&");
+    filtered_query.push({
+      "term" : {"categories.keyword" : categories}
+    })
+  }
   let facets = {
     "Category Facet": {
       "terms": {
@@ -90,7 +96,7 @@ exports.getFacets = function (query) {
     },
     "Rating Facet" : {
       "histogram": {
-        "field": "rating", 
+        "field": "avgRating", 
         "interval": 1
       }
     }
@@ -100,37 +106,17 @@ exports.getFacets = function (query) {
     "size": 0,
     "aggs": facets,
     "query" : {
-        "bool": {
-            "must": [
-              {
-                "multi_match": {
-                  "fields": [
-                    "title^7",
-                    "description^2"
-                  ],
-                  "operator": "AND",
-                  "type": "best_fields",
-                  "query": query
-                }
-              }
-            ],
+      "bool": {
+        filter : filtered_query,
         "should": [
           {
             "multi_match": {
               "fields": [
-                "title^7",
-                "description^2"
-              ],
-              "operator": "OR",
-              "type": "best_fields",
-              "query": query
-            }
-          },
-          {
-            "multi_match": {
-              "fields": [
-                "title^7",
-                "description^2"
+                "title^5",
+                "description^3",
+                "reviews",
+                "categories",
+                "brand"
               ],
               "operator": "OR",
               "type": "best_fields",
@@ -144,8 +130,7 @@ exports.getFacets = function (query) {
 
 }
 
-exports.getQuery = function (query, vertical, filters) {
-
+const getFilterQuery = function(vertical, filters){
   let filtered_query = []
   if ("price" in filters) {
     let prices = filters["price"].split("-")
@@ -166,9 +151,11 @@ exports.getQuery = function (query, vertical, filters) {
     }
   }
   if ("brand" in filters) {
-    filtered_query.push({
-      "terms" : {"brand.keyword" : filters.brand}
-    })
+    if (filters.brand.length > 0){
+      filtered_query.push({
+        "terms" : {"brand.keyword" : filters.brand}
+      })
+    }
   }
 
   if ('rating' in filters) {
@@ -178,77 +165,67 @@ exports.getQuery = function (query, vertical, filters) {
     }
     }})
   }
-  let categories = []
   if ("categories" in filters) {
     let categories = filters.categories
-    if (vertical !== "All") {
-      categories.push(vertical);
-    }
     filtered_query.push({
       "term" : {"categories.keyword" : categories}
     })
   } else if (vertical !== "All") {
-    categories.push(vertical);
+    let categories = vertical.replace("and", "&");
     filtered_query.push({
       "term" : {"categories.keyword" : categories}
     })
   }
+  return filtered_query;
+}
+
+exports.getQuery = function (query, vertical, filters) {
+
+  let filtered_query = getFilterQuery(vertical, filters)
   return {
-    "query": {
-      "function_score": {
         "query" : {
-                    "bool": {
-                      "must": [
-                        {
-                          "multi_match": {
-                            "fields": [
-                              "title^7",
-                              "description^2"
-                            ],
-                            "operator": "AND",
-                            "type": "best_fields",
-                            "query": query
-                          }
-                        }
-                      ],
-                      filter : filtered_query,
-                      "should": [
-                        {
-                          "multi_match": {
-                            "fields": [
-                              "title^7",
-                              "description^2"
-                            ],
-                            "operator": "OR",
-                            "type": "best_fields",
-                            "query": query
-                          }
-                        },
-                        {
-                          "multi_match": {
-                            "fields": [
-                              "title^7",
-                              "description^2"
-                            ],
-                            "operator": "OR",
-                            "type": "best_fields",
-                            "query": query
-                          }
-                        }
-                      ]
-                    }
-                  },
-        "script_score": {
-          "script": {
-            "params": {
-              "a": 5,
-              "b": 1.2
-            },
-            "source": "if (doc.rating.size() == 0) {return 0} else {doc.rating.value * doc.count_reviews.value}"
+          "bool": {
+            filter : filtered_query,
+            "should": [
+              {
+                "multi_match": {
+                  "fields": [
+                    "title^2",
+                    "description",
+                    "reviews",
+                    "categories",
+                    "brand"
+                  ],
+                  "operator": "OR",
+                  "type": "best_fields",
+                  "query": query
+                }
+              },
+              {
+                "rank_feature": {
+                  "field": "count_reviews",
+                  "saturation": {},
+                  "boost": 50
+                }
+              },
+              {
+                "rank_feature": {
+                  "field": "rating",
+                  "saturation": {},
+                  "boost": 2
+                }
+              },
+              {
+                "rank_feature": {
+                  "field": "avgSalesRank",
+                  "saturation": {},
+                  "boost": 1
+                }
+              }
+              
+            ]
           }
         }
-      }
-    }
   }
 };
 

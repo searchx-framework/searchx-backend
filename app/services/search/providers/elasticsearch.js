@@ -62,7 +62,7 @@ exports.fetchFacets = function (query, vertical, pageNumber, resultsPerPage, rel
         
         return esClient.search({
             index: dataset.index,
-            body: dataset.getFacets(query)
+            body: dataset.getFacets(query, vertical)
             
         }).then(formatAggregation('shopping'));
     }
@@ -70,7 +70,7 @@ exports.fetchFacets = function (query, vertical, pageNumber, resultsPerPage, rel
         const dataset = verticals[vertical];
         return esClient.search({
             index: dataset.index,
-            body: dataset.getFacets(query)
+            body: dataset.getFacets(query, vertical)
             
         }).then(formatResults(vertical));
     } else return Promise.reject({

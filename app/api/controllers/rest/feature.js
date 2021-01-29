@@ -4,7 +4,8 @@ const queryhistory = require('../../../services/features/queryhistory');
 const bookmark = require('../../../services/features/bookmark');
 const annotation = require('../../../services/features/annotation');
 const rating = require('../../../services/features/rating');
-const chat = require('../../../services/features/chat')
+const chat = require('../../../services/features/chat');
+const searchstate = require('../../../services/features/searchstate');
 
 const resolve = function(req, res, promise, errorMessage) {
     promise
@@ -164,5 +165,15 @@ exports.addChatMessage = function(req, res) {
     resolve(req, res,
         chat.addChatMessage(sessionId, data),
         'Could not save rating data.'
+    );
+};
+
+//// SEARCH STATE
+
+exports.getSearchState = function(req, res) {
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        searchstate.getSearchState(sessionId),
+        'Could not get search state.'
     );
 };

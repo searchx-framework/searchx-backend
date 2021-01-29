@@ -136,6 +136,24 @@ const PopularQuerySchema = new Schema({
     }
 });
 
+const SearchStateSchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+
+    state: {
+        type: String,
+        required: true
+    }
+});
+
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
@@ -143,5 +161,6 @@ module.exports = {
     Annotation: mongoose.model('Annotation', AnnotationSchema),
     Rating: mongoose.model('Rating', RatingSchema),
     View: mongoose.model('View', ViewSchema),
-    PopularQuery : mongoose.model('PopularQuery', PopularQuerySchema)
+    PopularQuery : mongoose.model('PopularQuery', PopularQuerySchema),
+    SearchState: mongoose.model('SearchState', SearchStateSchema)
 };

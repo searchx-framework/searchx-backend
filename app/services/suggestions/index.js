@@ -13,6 +13,8 @@ exports.getQuerySuggestions = async function(query, sessionId, userId) {
             return await bing.fetch(query);
         case "indri":
             return await indri.fetch(escape(query.toLowerCase()));
+        case undefined:
+            return [];
         default:
             throw {
                 name: "Bad Request",

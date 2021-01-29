@@ -31,6 +31,7 @@ module.exports = function(router) {
 
     // Feature
     router.get('/session/:sessionId/query', FeatureCtrl.getQueryHistory);
+    router.get('/session/:sessionId/searchstate', FeatureCtrl.getSearchState);
     router.get('/session/:sessionId/bookmark', FeatureCtrl.getBookmarks);
     router.get('/session/:sessionId/exclude', FeatureCtrl.getExcludes);
     router.post('/session/:sessionId/bookmark', FeatureCtrl.addBookmark);

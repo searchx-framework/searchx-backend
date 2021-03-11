@@ -19,7 +19,6 @@ Object.keys(topics).forEach((index) => {
 exports.getUserTask = async function(userId, params) {
 
     let group = await helper.getGroupByUserId(userId, TASK_ID);
-
     let groupIds = group.members.map((x) => x.userId);
     if (group.taskData.loggedIn.includes(userId)) {
         return group;
@@ -55,17 +54,7 @@ exports.addGroup = async function(groupData) {
 
 
 exports.handleSyncLeave = async function(userId) {
-    const group = await helper.getGroupByUserId(userId, TASK_ID);
-    if (group === null || 'topic' in group.taskData) {
-        return;
-    }
-
-    group.members = group.members.filter(x => x.userId !== userId);
-    group.taskData.nMembers = group.members.length;
-
-    group.markModified('members');
-    group.markModified('taskData');
-    await group.save();
+    // Do anything, this task they are allowed to leave
 };
 
 exports.handleSyncTimeout = async function(userId) {

@@ -28,3 +28,7 @@ exports.broadcastChatUpdate = async function(socket, io, data) {
 exports.broadcastPageMetadataUpdate = async function(socket, io, data) {
     socket.broadcast.to(data.groupId).emit('pageMetadataUpdate', data);
 };
+
+exports.broadcastBasketUpdate = async function(socket, io, data) {
+    socket.broadcast.to(data.groupId).emit('basketUpdate', data.searchState);
+};

@@ -154,6 +154,38 @@ const SearchStateSchema = new Schema({
     }
 });
 
+const BasketSchema = new Schema({
+    sessionId: {
+        type: String
+    },
+    userId: {
+        type: String
+    },
+    created: {
+        type: Date,
+        required: true
+    },
+    url: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    meta : {
+        type: Schema.Types.Mixed
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    deleted: {
+        type: Boolean,
+        default: false
+    }
+});
+
 module.exports = {
     QueryHistory: mongoose.model('QueryHistory', QueryHistorySchema),
     Bookmark: mongoose.model('Bookmark', BookmarkSchema),
@@ -162,5 +194,6 @@ module.exports = {
     Rating: mongoose.model('Rating', RatingSchema),
     View: mongoose.model('View', ViewSchema),
     PopularQuery : mongoose.model('PopularQuery', PopularQuerySchema),
-    SearchState: mongoose.model('SearchState', SearchStateSchema)
+    SearchState: mongoose.model('SearchState', SearchStateSchema),
+    Basket: mongoose.model('Basket', BasketSchema)
 };

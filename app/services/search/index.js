@@ -6,6 +6,7 @@ const bookmark = require('../features/bookmark');
 const annotation = require('../features/annotation');
 const rating = require('../features/rating');
 const view = require('../features/view');
+const basket = require('../features/basket');
 const cache = require('./cache');
 const config = require('../../config/config');
 
@@ -84,6 +85,7 @@ async function addMetadata(results, sessionId, userId) {
             annotations: (await annotation.getAnnotations(sessionId, id)),
             rating: (await rating.getRating(sessionId, id, userId)),
             views: await view.getViews(sessionId, result.url),
+            basket: await basket.getBasketItem(sessionId, id)
         };
         return result;
     });

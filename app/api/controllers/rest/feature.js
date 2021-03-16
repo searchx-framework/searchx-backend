@@ -6,6 +6,7 @@ const annotation = require('../../../services/features/annotation');
 const rating = require('../../../services/features/rating');
 const chat = require('../../../services/features/chat');
 const searchstate = require('../../../services/features/searchstate');
+const basket = require('../../../services/features/basket');
 
 const resolve = function(req, res, promise, errorMessage) {
     promise
@@ -175,5 +176,34 @@ exports.getSearchState = function(req, res) {
     resolve(req, res,
         searchstate.getSearchState(sessionId),
         'Could not get search state.'
+    );
+};
+
+//// BASKET ITEMS
+
+
+exports.getBasketItems = function(req, res) {
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        basket.getBasketItems(sessionId),
+        'Could not get basket items.'
+    );
+};
+
+exports.addBasketItem = function(req, res) {
+    const data = req.body;
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        basket.addBasketItem(sessionId, data),
+        'Could not create a new basket item.'
+    );
+};
+
+exports.removeBasketItem = function(req,res) {
+    const url = req.body.url;
+    const sessionId = req.params.sessionId;
+    resolve(req, res,
+        basket.removeBasketItem(sessionId, url),
+        'Could not delete basket item.'
     );
 };

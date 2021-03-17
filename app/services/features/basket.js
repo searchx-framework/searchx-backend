@@ -67,7 +67,6 @@ exports.getUserBasketItems = async function(sessionId, userId) {
 };
 
 exports.getBasketItem = async function(sessionId, url) {
-    console.log(sessionId, url);
     const query = {
         sessionId: sessionId,
         url: url,

@@ -158,10 +158,10 @@ const getFilterQuery = function(vertical, filters){
     }
   }
 
-  if ('rating' in filters) {
-    filtered_query.push({ "range" : { "rating" : 
+  if ('avgRating' in filters) {
+    filtered_query.push({ "range" : { "avgRating" : 
     {
-    "gte" : filters.rating
+    "gte" : filters.avgRating
     }
     }})
   }

@@ -28,10 +28,11 @@ exports.getUserTask = async function(userId, params) {
         group.taskData.loggedIn.push(userId);
         group.taskData.nMembers = group.taskData.loggedIn.length;
         group.markModified('taskData');
+        group.markModified('nMembers');
         if (utils.arraysEqual(groupIds, group.taskData.loggedIn)) {
             group.taskData.topics = topics;
             group.markModified("status");
-            console.log("group formed: {size: " + group.taskData.size + ", members: [" + group.members.map(member => member.userId) + "]}");
+            console.log("group formed: {size: " + group.taskData.nMembers + ", members: [" + group.members.map(member => member.userId) + "]}");
         }
         await group.save();
         return group;

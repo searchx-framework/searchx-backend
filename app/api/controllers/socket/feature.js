@@ -6,6 +6,7 @@ const searchstate = require('../../../services/features/searchstate');
 
 exports.broadcastSearchState = async function(socket, io, data) {
     socket.broadcast.to(data.groupId).emit('searchState', data);
+    console.log('Sending searchState');
     if (data.state.query !== '') {
          queryhistory.pushQueryHistory(data.sessionId, data.userId, data.state.query)
             .catch((err) => console.log(err));

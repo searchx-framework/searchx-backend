@@ -14,16 +14,19 @@ exports.broadcastSearchState = async function(socket, io, data) {
 };
 
 exports.broadcastViewState = async function(socket, io, data) {
+    console.log('Sending viewState');
     socket.broadcast.to(data.groupId).emit('viewState', data);
     view.pushView(data.sessionId, data.userId, data.state.url)
         .catch((err) => console.log(err));
 };
 
 exports.broadcastBookmarkUpdate = async function(socket, io, data) {
+    console.log('Sending bookmarkUpdate');
     socket.broadcast.to(data.groupId).emit('bookmarkUpdate', data.searchState);
 };
 
 exports.broadcastChatUpdate = async function(socket, io, data) {
+    console.log('Sending chatUpdate');
     socket.broadcast.to(data.groupId).emit('chatUpdate', data);
 };
 
@@ -32,5 +35,6 @@ exports.broadcastPageMetadataUpdate = async function(socket, io, data) {
 };
 
 exports.broadcastBasketUpdate = async function(socket, io, data) {
+    console.log('Sending basketUpdate');
     socket.broadcast.to(data.groupId).emit('basketUpdate', data.searchState);
 };

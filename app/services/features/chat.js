@@ -18,27 +18,33 @@ exports.getChatMessageList = async function(sessionId) {
     }
 };
 
-exports.addChatMessage = async function(sessionId, data) {
-    const initializeChat = async function() {
+exports.addChatMessage = async function(sessionId, message) {
+    
+    const initializeChat = async function(message) {
         const chat = new Chat({
             created: new Date(),
             sessionId: sessionId,
             messageList: []
         });
-
+        if (message) {
+            chat.messageList.push(message);
+        }
         await chat.save();
         return chat;
     };
-
     const query = {
         "sessionId": sessionId
     }
 
     let chat = await Chat.findOne(query);
     if (chat === null) {
-        chat = await initializeChat();
+        chat = await initializeChat(message);
+    } else {
+        if (message) {
+            chat.messageList.push(message);
+            chat.markModified('messageList');
+            await chat.save();
+        }
     }
-    chat.messageList.push(data.message);
-    chat.markModified('messageList');
-    chat.save();
+    return chat.messageList;
 };

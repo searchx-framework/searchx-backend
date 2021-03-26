@@ -21,7 +21,15 @@ const bodyParser   = require('body-parser');
 const app          = express();
 const http         = require('http').Server(app);
 const router       = express.Router();
-const io           = require('socket.io').listen(http);
+const io           = require('socket.io')(http, {
+        cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+      }
+}
+    
+    
+    );
 
 // Run initializers
 require('../app/config/initializers/mongoose')(process.env.DB);

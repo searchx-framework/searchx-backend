@@ -8,11 +8,11 @@ module.exports = function(io) {
     gio.on('connection', (socket) => {
         // Register
         socket.on('register', async (data) => {
-            console.log('user connected: ' + data.userId);
             if (data.groupId) {
                 socket.sessionId = data.groupId;
                 socket.join(data.groupId);
             }
+            console.log('user connected: ' + data.userId);
         });
 
         // Join Group

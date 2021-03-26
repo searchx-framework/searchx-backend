@@ -1,0 +1,76 @@
+db.chats.createIndex(
+  { sessionId: 1 } ,
+  { name: "chat query" }
+)
+
+db.queryhistories.createIndex(
+  { sessionId: 1 } ,
+  { name: "query history query" }
+)
+
+db.bookmarks.createIndex(
+  { sessionId: 1 , url: -1} ,
+  { name: "bookmark query" }
+)
+
+db.bookmarks.createIndex(
+  { sessionId: 1 ,userId: -1, deleted: 1} ,
+  { name: "bookmarks user query" }
+)
+
+db.bookmarks.createIndex(
+  { sessionId: 1 , deleted: 1} ,
+  { name: "bookmarks query" }
+)
+
+db.bookmarks.createIndex(
+  { sessionId: 1 , url: -1, deleted: 1} ,
+  { name: "bookmark query delete" }
+)
+
+db.excludes.createIndex(
+  { sessionId: 1 , url: -1} ,
+  { name: "exclude query" }
+)
+
+db.excludes.createIndex(
+  { sessionId: 1 ,userId: -1, deleted: 1} ,
+  { name: "excludes user query" }
+)
+
+db.excludes.createIndex(
+  { sessionId: 1 , deleted: 1} ,
+  { name: "excludes query" }
+)
+
+db.excludes.createIndex(
+  { sessionId: 1 , url: -1, deleted: 1} ,
+  { name: "exclude query delete" }
+)
+
+db.searchstates.createIndex(
+  { sessionId: 1 } ,
+  { name: "search state query" }
+)
+
+db.baskets.createIndex(
+  { sessionId: 1 , url: -1} ,
+  { name: "basket query" }
+)
+
+db.baskets.createIndex(
+  { sessionId: 1 ,userId: -1, deleted: 1} ,
+  { name: "baskets user query" }
+)
+
+db.baskets.createIndex(
+  { sessionId: 1 , deleted: 1} ,
+  { name: "baskets query" }
+)
+
+db.baskets.createIndex(
+  { sessionId: 1 , url: -1, deleted: 1} ,
+  { name: "baskets query delete" }
+)
+
+

@@ -23,8 +23,10 @@ const http         = require('http').Server(app);
 const router       = express.Router();
 const io           = require('socket.io')(http, {
         cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: process.env.ORIGIN_URI,
+        methods: ["GET", "PUT", "POST", "DELETE"],
+	credentials: true,
+	allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma"
       }
 }
     

@@ -2,7 +2,7 @@
 
 const elasticsearchApi = require('elasticsearch');
 const esClient = new elasticsearchApi.Client({
-    host: 'localhost:9200',
+    host: process.env.ELASTICSEARCH,
     log: 'error'
 });
 const clueweb = require('./es-datasets/clueweb');

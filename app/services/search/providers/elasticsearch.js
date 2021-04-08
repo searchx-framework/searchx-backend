@@ -23,7 +23,6 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
     }
     if (vertical in verticals) {
         const dataset = verticals[vertical];
-        console.log(JSON.stringify(dataset.custom_query(query)))
         if (process.env.ES_INDEX) {
             return esClient.search({
                 index: dataset.index,
@@ -63,7 +62,6 @@ function formatResults(vertical) {
         }
         let results = [];
         result.hits.hits.forEach(function (hit) {
-            console.log(JSON.stringify(dataset.formatHit(hit)))
             results.push(dataset.formatHit(hit));
         });
 

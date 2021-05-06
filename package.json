@@ -30,7 +30,7 @@
     "socket.io": "^2.3.0",
     "stopword": "^1.0.0",
     "trie-search": "^1.2.11",
-    "underscore": "^1.9.2"
+    "underscore": "^1.12.1"
   },
   "devDependencies": {
     "elasticdump": "^6.16.2",

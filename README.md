@@ -111,6 +111,8 @@ The main production configuration keys can be set in the `.env` file, example va
 - `REDIS`: the redis server url
 - `DEFAULT_SEARCH_PROVIDER`: the search provider that is used by default if the provider url parameter of the API is not set
 - `BING_ACCESS_KEY` (optional): the API access key for when the Bing search provider is used
+- `ELASTICSEARCH_URI` (optional): the Elasticsearch url
+- `SUGGESTIONS_TYPE` (optional, defaul=none): choose from bing, indri, or none. Indri makes a suffix-prefix lookup.
 
 Further development configuration can be found inside `app/config/config.js`:
 ```

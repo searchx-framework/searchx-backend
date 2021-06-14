@@ -2,8 +2,8 @@
 
 const request = require ('request');
 
-let host = 'https://api.cognitive.microsoft.com';
-let path = '/bing/v7.0/Suggestions';
+let host = 'https://api.bing.microsoft.com/';
+let path = 'v7.0/suggestions';
 
 let mkt = 'en-US';
 
@@ -25,6 +25,7 @@ exports.fetch = function(query){
                 console.log(err);
                 reject(err);
             } else {
+                console.log(body)
                 resolve(formatResults(JSON.parse(body)));
             }
         };

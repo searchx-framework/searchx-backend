@@ -3,7 +3,7 @@
 
 const BingApi = require('node-bing-api')({
     accKey: process.env.BING_ACCESS_KEY,
-    rootUri: "https://api.cognitive.microsoft.com/bing/v7.0/"
+    rootUri: "https://api.bing.microsoft.com/v7.0/"
 });
 
 /**

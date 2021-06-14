@@ -2,15 +2,16 @@
 
 const elasticsearchApi = require('elasticsearch');
 const esClient = new elasticsearchApi.Client({
-    host: 'localhost:9200',
+    host: process.env.ELASTIC_SEARCH,
     log: 'error'
 });
 const clueweb = require('./es-datasets/clueweb');
 const cranfield = require('./es-datasets/cranfield');
+const customIndex = require('./es-datasets/semanticScholar')
 
 // mapping of vertical to module for elasticsearch dataset
 const verticals = {
-    text: cranfield
+    text:  (process.env.ES_INDEX)? customIndex : cranfield
 };
 
 /**
@@ -22,9 +23,18 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
     }
     if (vertical in verticals) {
         const dataset = verticals[vertical];
+        if (process.env.ES_INDEX) {
+            return esClient.search({
+                index: dataset.index,
+                from: (pageNumber - 1) * resultsPerPage,
+                size: resultsPerPage,
+                body: dataset.custom_query(query),
+                pretty: true
+            }).then(formatResults(vertical));
+        }
         return esClient.search({
             index: dataset.index,
-            type: 'document',
+            // type: 'document',
             from: (pageNumber - 1) * resultsPerPage,
             size: resultsPerPage,
             body: {
@@ -37,7 +47,7 @@ exports.fetch = function (query, vertical, pageNumber, resultsPerPage, relevance
         }).then(formatResults(vertical));
     } else return Promise.reject({
         name: 'Bad Request',
-        message: 'Invalid vertical'
+        message: 'Invalid vertical. Valid verticals are %s ', verticals
     });
 };
 
@@ -51,7 +61,6 @@ function formatResults(vertical) {
             throw new Error('No results from search api.');
         }
         let results = [];
-
         result.hits.hits.forEach(function (hit) {
             results.push(dataset.formatHit(hit));
         });

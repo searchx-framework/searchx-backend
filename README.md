@@ -70,7 +70,7 @@ These instructions are for Ubuntu Linux. The steps can be adapted for all major 
     // port, instructions for changing the port are in the configuration section below.
     
     // Check if API is running (curl or through browser)
-    curl http://localhost:4443/v1
+    curl http://localhost:4443
     ```
 
 ## Search Providers

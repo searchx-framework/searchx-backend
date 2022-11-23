@@ -27,7 +27,7 @@
     "randomcolor": "^0.5.4",
     "redis": "^2.8.0",
     "request": "^2.88.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "stopword": "^1.0.0",
     "trie-search": "^1.2.11",
     "underscore": "^1.9.2"
